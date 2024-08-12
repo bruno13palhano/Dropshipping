@@ -12,7 +12,7 @@ internal interface DataSource<T> {
 
     suspend fun delete(id: Long)
 
-    suspend fun get(id: Long): Flow<T>
+    fun get(id: Long): Flow<T>
 
-    suspend fun getAll(): Flow<List<T>>
+    fun getAll(): Flow<List<T>>
 }
