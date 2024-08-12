@@ -26,6 +26,6 @@ internal interface ProductDao : ProductDataSource {
     override fun getAll(): Flow<List<ProductInternal>>
 
     @Query("SELECT * FROM ProductInternal WHERE naturaCode LIKE '%' || :query || '%'" +
-            " OR name LIKE '%' || :query || '%' ORDER BY name, naturaCode DESC")
+            " OR name LIKE '%' || :query || '%' ORDER BY name DESC, naturaCode DESC")
     override fun search(query: String): Flow<List<ProductInternal>>
 }
