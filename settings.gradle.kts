@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Dropshipping"
 include(":app")
-include(":data")
+include(":core:data")
