@@ -40,7 +40,7 @@ internal class ProductDataSourceTest {
 
 
     @Test
-    fun getProductsShouldReturnListOfAllProducts() = runTest {
+    fun getAll_ShouldReturnListOfAllProducts_OrderedByIdDesc() = runTest {
         val productInternal1 = ProductInternal(id = 1L, naturaCode = "1", name = "Product 1")
         val productInternal2 = ProductInternal(id = 2L, naturaCode = "2", name = "Product 2")
         val productInternal3 = ProductInternal(id = 3L, naturaCode = "3", name = "Product 3")
@@ -58,51 +58,21 @@ internal class ProductDataSourceTest {
     }
 
     @Test
-    fun searchProductsByNaturaCodeShouldReturnListOfProductsThatMatchTheQuery() = runTest {
-        val productInternal1 = ProductInternal(id = 1L, naturaCode = "1", name = "Product 1")
-        val productInternal2 = ProductInternal(id = 2L, naturaCode = "2", name = "Product 2")
-        val productInternal3 = ProductInternal(id = 3L, naturaCode = "3", name = "Product 3")
-
-        productDao.insert(productInternal1)
-        productDao.insert(productInternal2)
-        productDao.insert(productInternal3)
-
-        productDao.search(query = productInternal1.naturaCode).test {
-            assertThat(awaitItem()).containsExactly(productInternal1)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun searchProductsByNameShouldReturnListOfProductsThatMatchTheQuery() = runTest {
-        val productInternal1 = ProductInternal(id = 1L, naturaCode = "1", name = "Product 1")
-        val productInternal2 = ProductInternal(id = 2L, naturaCode = "2", name = "Product 2")
-        val productInternal3 = ProductInternal(id = 3L, naturaCode = "3", name = "Product 3")
-
-        productDao.insert(productInternal1)
-        productDao.insert(productInternal2)
-        productDao.insert(productInternal3)
-
-        productDao.search(query = productInternal2.name).test {
-            assertThat(awaitItem()).containsExactly(productInternal2)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun shouldReturn_ListOfProducts_InDescOrderByNameAndNaturaCode_WhenThatMatchTheQuery() = runTest {
-        val commonNameAndCode = "product2"
-        val productInternal1 = ProductInternal(id = 1L, naturaCode = "1", name = "Product 1")
-        val productInternal2 = ProductInternal(id = 2L, naturaCode = "2", name = commonNameAndCode)
+        val query1 = "2"
+        val query2 = "1"
+
+        val productInternal1 = ProductInternal(id = 1L, naturaCode = query2, name = "1")
+        val productInternal2 = ProductInternal(id = 2L, naturaCode = "2", name = query1)
         val productInternal3 = ProductInternal(
             id = 3L,
-            naturaCode = commonNameAndCode,
-            name = "Product 3"
+            naturaCode = query1,
+            name = "3"
         )
         val productInternal4 = ProductInternal(
             id = 4L,
-            naturaCode = "1",
-            name = commonNameAndCode
+            naturaCode = query2,
+            name = query1
         )
 
         productDao.insert(productInternal1)
@@ -112,7 +82,7 @@ internal class ProductDataSourceTest {
 
         val expected = listOf(productInternal3, productInternal2, productInternal4)
 
-        productDao.search(query = commonNameAndCode).test {
+        productDao.search(query = query1).test {
             assertThat(awaitItem()).containsExactlyElementsIn(expected).inOrder()
             cancelAndConsumeRemainingEvents()
         }
