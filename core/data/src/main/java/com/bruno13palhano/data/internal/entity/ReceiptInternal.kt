@@ -9,7 +9,7 @@ import com.bruno13palhano.model.Receipt
 data class ReceiptInternal(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val productId: Long,
+    val product: ProductInternal,
     val requestNumber: Long,
     val requestDate: Long,
     val quantity: Int,
@@ -21,9 +21,9 @@ data class ReceiptInternal(
     val observations: String
 )
 
-internal fun ReceiptInternal.asExternal(product: Product) = Receipt(
+internal fun ReceiptInternal.asExternal() = Receipt(
     id = id,
-    product = product,
+    product = product.asExternal(),
     requestNumber = requestNumber,
     requestDate = requestDate,
     quantity = quantity,
@@ -37,7 +37,7 @@ internal fun ReceiptInternal.asExternal(product: Product) = Receipt(
 
 internal fun Receipt.asInternal() = ReceiptInternal(
     id = id,
-    productId = product.id,
+    product = product.asInternal(),
     requestNumber = requestNumber,
     requestDate = requestDate,
     quantity = quantity,
