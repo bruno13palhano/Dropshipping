@@ -1,5 +1,6 @@
 package com.bruno13palhano.data.internal
 
+import com.bruno13palhano.data.DataSource
 import com.bruno13palhano.data.internal.entity.ReceiptInternal
 import kotlinx.coroutines.flow.Flow
 

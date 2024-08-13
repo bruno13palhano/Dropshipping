@@ -1,11 +1,11 @@
-package com.bruno13palhano.data.internal
+package com.bruno13palhano.data
 
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Common interface for all data sources
  */
-internal interface DataSource<T> {
+interface DataSource<T> {
     suspend fun insert(data: T)
 
     suspend fun update(data: T)
