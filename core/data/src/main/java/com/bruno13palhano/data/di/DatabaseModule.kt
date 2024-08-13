@@ -3,6 +3,7 @@ package com.bruno13palhano.data.di
 import android.content.Context
 import androidx.room.Room
 import com.bruno13palhano.data.internal.database.AppDatabase
+import com.bruno13palhano.data.internal.database.Converters
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,13 +24,18 @@ internal object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideDatabase(@ApplicationContext context: Context, converters: Converters): AppDatabase {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "AppDatabase"
             )
             .fallbackToDestructiveMigrationFrom()
+            .addTypeConverter(converters)
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideTypeConverters() = Converters()
 }
