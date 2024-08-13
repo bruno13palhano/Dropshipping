@@ -5,10 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="getProductsShouldReturnListOfAllProducts()">
+      <SelectionState runConfigName="searchProductsShouldReturnListOfProductsThatMatchTheQuery()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="searchProductsShouldReturnListOfProductsThatMatchTheQuery()">
+      <SelectionState runConfigName="searchProductsShouldReturnEmptyListOfProductsIfNoProductsThatMatchTheQuery()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ProductDataSourceTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByName_WhenThatMatchTheQuery()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByNameAndNaturaCode_WhenThatMatchTheQuery()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

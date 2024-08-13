@@ -12,13 +12,13 @@ data class ProductInternal(
     val name: String
 )
 
-fun ProductInternal.asExternal() = Product(
+internal fun ProductInternal.asExternal() = Product(
     id = id,
     naturaCode = naturaCode,
     name = name
 )
 
-fun Product.asInternal() = ProductInternal(
+internal fun Product.asInternal() = ProductInternal(
     id = id,
     naturaCode = naturaCode,
     name = name
