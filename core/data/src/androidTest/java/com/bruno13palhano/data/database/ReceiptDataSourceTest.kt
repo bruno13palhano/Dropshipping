@@ -3,6 +3,7 @@ package com.bruno13palhano.data.database
 import app.cash.turbine.test
 import com.bruno13palhano.data.internal.dao.ReceiptDao
 import com.bruno13palhano.data.internal.database.AppDatabase
+import com.bruno13palhano.data.internal.entity.ProductInternal
 import com.bruno13palhano.data.internal.entity.ReceiptInternal
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -44,7 +45,7 @@ internal class ReceiptDataSourceTest {
         val receiptList = (1..10).map {
             ReceiptInternal(
                 id = it.toLong(),
-                productId = it.toLong(),
+                product = ProductInternal(id = it.toLong(), naturaCode = "$it", name = ""),
                 requestNumber = 12234L,
                 requestDate = 1234454L,
                 quantity = it,
