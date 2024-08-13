@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="searchProductsShouldReturnListOfProductsThatMatchTheQuery()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="searchProductsShouldReturnEmptyListOfProductsIfNoProductsThatMatchTheQuery()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="ProductDataSourceTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByName_WhenThatMatchTheQuery()">
+      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByNameAndNaturaCode_WhenThatMatchTheQuery()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByNameAndNaturaCode_WhenThatMatchTheQuery()">
+      <SelectionState runConfigName="shouldReturn_ListWithLastReceipt_ByTheLimit()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="Tests in 'com.bruno13palhano.data.database'">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ReceiptDataSourceTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
