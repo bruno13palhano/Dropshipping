@@ -23,3 +23,5 @@ rootProject.name = "Dropshipping"
 include(":app")
 include(":core:data")
 include(":core:model")
+include(":feature:product")
+include(":feature:receipt")
