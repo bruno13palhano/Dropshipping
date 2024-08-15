@@ -11,19 +11,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.bruno13palhano.dropshipping.ui.theme.DropshippingTheme
+import com.bruno13palhano.product.ui.navigation.ProductsRoutes
+import com.bruno13palhano.product.ui.navigation.productsScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             DropshippingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    NavHost(
+                        modifier = Modifier.padding(innerPadding),
+                        navController = rememberNavController(),
+                        startDestination = ProductsRoutes.Products,
+                    ) {
+                        productsScreen {
+                            println("valor do id:$it")
+                        }
+                    }
                 }
             }
         }
