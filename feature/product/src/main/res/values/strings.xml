@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="natura_code">Natura Code</string>
+    <string name="enter_natura_code">Enter Natura Code</string>
+    <string name="product_name">Product name</string>
+    <string name="enter_product_name">Enter product name</string>
+    <string name="add_product">Add product</string>
+    <string name="update_product">Update product</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+</resources>
