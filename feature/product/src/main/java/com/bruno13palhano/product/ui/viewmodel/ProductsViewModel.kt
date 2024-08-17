@@ -31,6 +31,11 @@ class ProductsViewModel @Inject constructor(
 
     private var _uiState = MutableStateFlow<UiState>(UiState.Idle)
     val uiState = _uiState
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileSubscribed(5_000),
+            initialValue = UiState.Idle
+        )
 
     private var productId by mutableLongStateOf(0L)
     var naturaCode by mutableStateOf("")
@@ -38,66 +43,88 @@ class ProductsViewModel @Inject constructor(
     var productName by mutableStateOf("")
         private set
 
-    fun updateNaturaCode(value: String) {
-        naturaCode = value
-    }
+    fun updateNaturaCode(value: String) { naturaCode = value }
 
-    fun updateProductName(value: String) {
-        productName = value
-    }
+    fun updateProductName(value: String) { productName = value }
 
     fun getProducts() {
         viewModelScope.launch {
-            productRepository.getAll().collect {
-                _products.update { it }
+            productRepository.getAll().collect { productList: List<Product> ->
+                _products.update {
+                    productList
+                }
             }
         }
     }
 
     fun setUpdateProductState(id: Long)  {
+        if (_uiState.value == UiState.Adding) return
+
         viewModelScope.launch {
             productRepository.get(id = id).collect {
-                productId = it.id
-                naturaCode = it.naturaCode
-                productName = it.name
+                setSelectedProductProperties(it)
             }
         }
         _uiState.update { UiState.Updating }
     }
 
     fun setAddProductState() {
+        if (_uiState.value == UiState.Updating) return
+
+        resetSelectedProductProperties()
         _uiState.update { UiState.Adding }
     }
 
+    fun setCancelState() = _uiState.update { UiState.Idle }
+
     fun updateProduct() {
-        viewModelScope.launch {
-            productRepository.update(
-                data = Product(
-                    id = productId,
-                    naturaCode = naturaCode,
-                    name = productName
-                )
-            )
+        if (!isProductValid()) {
+            _uiState.update { UiState.Error }
+            return
         }
+
+        viewModelScope.launch { productRepository.update(data = saveProduct(id = productId)) }
         _uiState.update { UiState.Idle }
     }
 
     fun addProduct() {
-        viewModelScope.launch {
-            productRepository.insert(
-                data = Product(
-                    id =  0L,
-                    naturaCode = naturaCode,
-                    name = productName
-                )
-            )
+        if (!isProductValid()) {
+            _uiState.update { UiState.Error }
+            return
         }
+
+        viewModelScope.launch { productRepository.insert(data = saveProduct()) }
         _uiState.update { UiState.Idle }
+    }
+
+    private fun isProductValid(): Boolean {
+        return naturaCode.isNotBlank() && productName.isNotBlank()
+    }
+
+    private fun saveProduct(id: Long = 0L): Product {
+        return Product(
+            id = id,
+            naturaCode = naturaCode,
+            name = productName
+        )
+    }
+
+    private fun resetSelectedProductProperties() {
+        productId = 0L
+        naturaCode = ""
+        productName = ""
+    }
+
+    private fun setSelectedProductProperties(product: Product) {
+        productId = product.id
+        naturaCode = product.naturaCode
+        productName = product.name
     }
 }
 
 sealed interface UiState {
-    data object  Idle : UiState
-    data object  Adding : UiState
-    data object  Updating : UiState
+    data object Idle : UiState
+    data object Adding : UiState
+    data object Updating : UiState
+    data object Error : UiState
 }

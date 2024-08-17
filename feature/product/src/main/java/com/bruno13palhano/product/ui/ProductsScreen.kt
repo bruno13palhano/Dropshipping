@@ -1,5 +1,8 @@
 package com.bruno13palhano.product.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +22,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +57,9 @@ fun ProductsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isUpdatingProduct by remember { mutableStateOf(false) }
     var isAddingProduct by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val errorMessage = stringResource(id = R.string.empty_fields_error)
+    var hasError by remember { mutableStateOf(false) }
 
     when (uiState) {
         UiState.Updating -> isUpdatingProduct = true
@@ -59,10 +67,20 @@ fun ProductsRoute(
         UiState.Idle -> {
             isUpdatingProduct = false
             isAddingProduct = false
+            hasError = false
+        }
+        UiState.Error -> {
+            hasError = true
+            LaunchedEffect(key1 = Unit) {
+                snackbarHostState.showSnackbar(message = errorMessage)
+            }
         }
     }
 
     ProductsContent(
+        modifier = modifier,
+        snackbarHostState = snackbarHostState,
+        hasInvalidField = hasError,
         isUpdatingProduct = isUpdatingProduct,
         isAddingProduct = isAddingProduct,
         products = products,
@@ -74,14 +92,16 @@ fun ProductsRoute(
         onAddNewProductClicked = { viewModel.setAddProductState() },
         onUpdateProductOkClicked = { viewModel.updateProduct() },
         onAddProductOkClicked = viewModel::addProduct,
-        onUpdateProductCancelClicked = { isUpdatingProduct = false },
-        onAddProductCancelClicked = { isAddingProduct = false }
+        onUpdateProductCancelClicked = viewModel::setCancelState,
+        onAddProductCancelClicked = viewModel::setCancelState
     )
 }
 
 @Composable
 fun ProductsContent(
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    hasInvalidField: Boolean,
     isUpdatingProduct: Boolean,
     isAddingProduct: Boolean,
     products: List<Product>,
@@ -97,16 +117,18 @@ fun ProductsContent(
     onAddProductCancelClicked: () -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddNewProductClicked) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.add_product)
                 )
             }
         }
     ) {
-        LazyColumn(modifier = modifier.padding(it)) {
+        LazyColumn(modifier = Modifier.padding(it)) {
             items(items = products, key = { product -> product.id }) { product ->
                 ListItem(
                     modifier = Modifier.clickable {
@@ -122,7 +144,11 @@ fun ProductsContent(
             }
         }
 
-        if (isUpdatingProduct) {
+        AnimatedVisibility(
+            visible = isUpdatingProduct,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             ProductContent(
                 modifier = Modifier
                     .padding(16.dp)
@@ -130,6 +156,7 @@ fun ProductsContent(
                 title = stringResource(id = R.string.update_product),
                 naturaCode = naturaCode,
                 productName = productName,
+                hasInvalidField = hasInvalidField,
                 onNaturaCodeChanged = onNaturaCodeChanged,
                 onProductNameChanged = onProductNameChanged,
                 onOkClicked = onUpdateProductOkClicked,
@@ -137,7 +164,11 @@ fun ProductsContent(
             )
         }
 
-        if (isAddingProduct) {
+        AnimatedVisibility(
+            visible = isAddingProduct,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             ProductContent(
                 modifier = Modifier
                     .padding(16.dp)
@@ -145,6 +176,7 @@ fun ProductsContent(
                 title = stringResource(id = R.string.add_product),
                 naturaCode = naturaCode,
                 productName = productName,
+                hasInvalidField = hasInvalidField,
                 onNaturaCodeChanged = onNaturaCodeChanged,
                 onProductNameChanged = onProductNameChanged,
                 onOkClicked = onAddProductOkClicked,
@@ -160,6 +192,7 @@ fun ProductContent(
     title: String,
     naturaCode: String,
     productName: String,
+    hasInvalidField: Boolean,
     onNaturaCodeChanged: (String) -> Unit,
     onProductNameChanged: (String) -> Unit,
     onOkClicked: () -> Unit,
@@ -181,6 +214,7 @@ fun ProductContent(
                     .fillMaxWidth(),
                 value = naturaCode,
                 onValueChange = onNaturaCodeChanged,
+                isError = hasInvalidField && naturaCode.isBlank(),
                 label = { Text(text = stringResource(id = R.string.natura_code)) },
                 placeholder = { Text(text = stringResource(id = R.string.enter_natura_code)) }
             )
@@ -190,6 +224,7 @@ fun ProductContent(
                     .fillMaxWidth(),
                 value = productName,
                 onValueChange = onProductNameChanged,
+                isError = hasInvalidField && productName.isBlank(),
                 label = { Text(text = stringResource(id = R.string.product_name)) },
                 placeholder = { Text(text = stringResource(id = R.string.enter_product_name)) }
             )
@@ -221,7 +256,8 @@ fun ProductContentPreview() {
     ProductContent(
         title = stringResource(id = R.string.add_product),
         naturaCode = "1234",
-        productName = "test",
+        productName = "",
+        hasInvalidField = true,
         onNaturaCodeChanged = {},
         onProductNameChanged = {},
         onOkClicked = {},
@@ -233,8 +269,10 @@ fun ProductContentPreview() {
 @Composable
 fun ProductsContentPreview() {
     ProductsContent(
+        snackbarHostState = remember { SnackbarHostState() },
         isUpdatingProduct = true,
         isAddingProduct = false,
+        hasInvalidField = false,
         products = emptyList(),
         naturaCode = "123",
         productName = "Homem",

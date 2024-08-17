@@ -8,4 +8,5 @@
     <string name="update_product">Update product</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="empty_fields_error">Fill missing fields</string>
 </resources>
