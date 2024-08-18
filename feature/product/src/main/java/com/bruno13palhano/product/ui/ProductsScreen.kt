@@ -20,7 +20,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -33,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,9 @@ import com.bruno13palhano.model.Product
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
 import com.bruno13palhano.product.ui.viewmodel.UiState
+import com.bruno13palhano.ui.clickableWithoutRipple
+import com.bruno13palhano.ui.components.CustomIntegerField
+import com.bruno13palhano.ui.components.CustomTextField
 
 @Composable
 fun ProductsRoute(
@@ -57,9 +61,12 @@ fun ProductsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isUpdatingProduct by remember { mutableStateOf(false) }
     var isAddingProduct by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage = stringResource(id = R.string.empty_fields_error)
-    var hasError by remember { mutableStateOf(false) }
+    var hasInvalidField by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     when (uiState) {
         UiState.Updating -> isUpdatingProduct = true
@@ -67,10 +74,10 @@ fun ProductsRoute(
         UiState.Idle -> {
             isUpdatingProduct = false
             isAddingProduct = false
-            hasError = false
+            hasInvalidField = false
         }
         UiState.Error -> {
-            hasError = true
+            hasInvalidField = true
             LaunchedEffect(key1 = Unit) {
                 snackbarHostState.showSnackbar(message = errorMessage)
             }
@@ -80,7 +87,7 @@ fun ProductsRoute(
     ProductsContent(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        hasInvalidField = hasError,
+        hasInvalidField = hasInvalidField,
         isUpdatingProduct = isUpdatingProduct,
         isAddingProduct = isAddingProduct,
         products = products,
@@ -93,7 +100,11 @@ fun ProductsRoute(
         onUpdateProductOkClicked = { viewModel.updateProduct() },
         onAddProductOkClicked = viewModel::addProduct,
         onUpdateProductCancelClicked = viewModel::setCancelState,
-        onAddProductCancelClicked = viewModel::setCancelState
+        onAddProductCancelClicked = viewModel::setCancelState,
+        onProductOutsideClick = {
+            keyboardController?.hide()
+            focusManager.clearFocus(force = true)
+        }
     )
 }
 
@@ -114,7 +125,8 @@ fun ProductsContent(
     onUpdateProductOkClicked: () -> Unit,
     onAddProductOkClicked: () -> Unit,
     onUpdateProductCancelClicked: () -> Unit,
-    onAddProductCancelClicked: () -> Unit
+    onAddProductCancelClicked: () -> Unit,
+    onProductOutsideClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -151,6 +163,7 @@ fun ProductsContent(
         ) {
             ProductContent(
                 modifier = Modifier
+                    .clickableWithoutRipple { onProductOutsideClick() }
                     .padding(16.dp)
                     .fillMaxSize(),
                 title = stringResource(id = R.string.update_product),
@@ -171,6 +184,7 @@ fun ProductsContent(
         ) {
             ProductContent(
                 modifier = Modifier
+                    .clickableWithoutRipple { onProductOutsideClick() }
                     .padding(16.dp)
                     .fillMaxSize(),
                 title = stringResource(id = R.string.add_product),
@@ -208,25 +222,26 @@ fun ProductContent(
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
-            OutlinedTextField(
+            CustomIntegerField(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = naturaCode,
                 onValueChange = onNaturaCodeChanged,
+                label = stringResource(id = R.string.natura_code),
+                placeholder = stringResource(id = R.string.enter_natura_code),
                 isError = hasInvalidField && naturaCode.isBlank(),
-                label = { Text(text = stringResource(id = R.string.natura_code)) },
-                placeholder = { Text(text = stringResource(id = R.string.enter_natura_code)) }
             )
-            OutlinedTextField(
+
+            CustomTextField(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = productName,
                 onValueChange = onProductNameChanged,
-                isError = hasInvalidField && productName.isBlank(),
-                label = { Text(text = stringResource(id = R.string.product_name)) },
-                placeholder = { Text(text = stringResource(id = R.string.enter_product_name)) }
+                label = stringResource(id = R.string.product_name),
+                placeholder = stringResource(id = R.string.enter_product_name),
+                isError = hasInvalidField && productName.isBlank()
             )
 
             Row(
@@ -283,6 +298,7 @@ fun ProductsContentPreview() {
         onUpdateProductOkClicked = {},
         onAddProductOkClicked = {},
         onUpdateProductCancelClicked = {},
-        onAddProductCancelClicked = {}
+        onAddProductCancelClicked = {},
+        onProductOutsideClick = {}
     )
 }
