@@ -87,46 +87,50 @@ fun ProductsRoute(
     ProductsContent(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        hasInvalidField = hasInvalidField,
-        isUpdatingProduct = isUpdatingProduct,
-        isAddingProduct = isAddingProduct,
         products = products,
-        naturaCode = viewModel.naturaCode,
-        productName = viewModel.productName,
-        onNaturaCodeChanged = viewModel::updateNaturaCode,
-        onProductNameChanged = viewModel::updateProductName,
         onProductItemClicked = { viewModel.setUpdateProductState(id = it) },
-        onAddNewProductClicked = { viewModel.setAddProductState() },
-        onUpdateProductOkClicked = { viewModel.updateProduct() },
-        onAddProductOkClicked = viewModel::addProduct,
-        onUpdateProductCancelClicked = viewModel::setCancelState,
-        onAddProductCancelClicked = viewModel::setCancelState,
-        onProductOutsideClick = {
-            keyboardController?.hide()
-            focusManager.clearFocus(force = true)
-        }
+        onAddNewProductClicked = { viewModel.setAddProductState() }
     )
+
+    AnimatedVisibility(
+        visible = isUpdatingProduct || isAddingProduct,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        val title =
+            if (isUpdatingProduct) stringResource(id = R.string.update_product)
+            else stringResource(id = R.string.add_product)
+
+        ProductContent(
+            modifier = Modifier
+                .clickableWithoutRipple {
+                    keyboardController?.hide()
+                    focusManager.clearFocus(force = true)
+                }
+                .padding(16.dp)
+                .fillMaxSize(),
+            title = title,
+            naturaCode = viewModel.naturaCode,
+            productName = viewModel.productName,
+            hasInvalidField = hasInvalidField,
+            onNaturaCodeChanged = viewModel::updateNaturaCode,
+            onProductNameChanged = viewModel::updateProductName,
+            onOkClicked = {
+                if (isUpdatingProduct) viewModel.updateProduct()
+                else if (isAddingProduct) viewModel.addProduct()
+            },
+            onCancelClicked = viewModel::setCancelState
+        )
+    }
 }
 
 @Composable
 fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
-    hasInvalidField: Boolean,
-    isUpdatingProduct: Boolean,
-    isAddingProduct: Boolean,
     products: List<Product>,
-    naturaCode: String,
-    productName: String,
-    onNaturaCodeChanged: (String) -> Unit,
-    onProductNameChanged: (String) -> Unit,
     onProductItemClicked: (Long) -> Unit,
-    onAddNewProductClicked: () -> Unit,
-    onUpdateProductOkClicked: () -> Unit,
-    onAddProductOkClicked: () -> Unit,
-    onUpdateProductCancelClicked: () -> Unit,
-    onAddProductCancelClicked: () -> Unit,
-    onProductOutsideClick: () -> Unit
+    onAddNewProductClicked: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -154,48 +158,6 @@ fun ProductsContent(
                     }
                 )
             }
-        }
-
-        AnimatedVisibility(
-            visible = isUpdatingProduct,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ProductContent(
-                modifier = Modifier
-                    .clickableWithoutRipple { onProductOutsideClick() }
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                title = stringResource(id = R.string.update_product),
-                naturaCode = naturaCode,
-                productName = productName,
-                hasInvalidField = hasInvalidField,
-                onNaturaCodeChanged = onNaturaCodeChanged,
-                onProductNameChanged = onProductNameChanged,
-                onOkClicked = onUpdateProductOkClicked,
-                onCancelClicked = onUpdateProductCancelClicked
-            )
-        }
-
-        AnimatedVisibility(
-            visible = isAddingProduct,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ProductContent(
-                modifier = Modifier
-                    .clickableWithoutRipple { onProductOutsideClick() }
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                title = stringResource(id = R.string.add_product),
-                naturaCode = naturaCode,
-                productName = productName,
-                hasInvalidField = hasInvalidField,
-                onNaturaCodeChanged = onNaturaCodeChanged,
-                onProductNameChanged = onProductNameChanged,
-                onOkClicked = onAddProductOkClicked,
-                onCancelClicked = onAddProductCancelClicked
-            )
         }
     }
 }
@@ -285,20 +247,8 @@ fun ProductContentPreview() {
 fun ProductsContentPreview() {
     ProductsContent(
         snackbarHostState = remember { SnackbarHostState() },
-        isUpdatingProduct = true,
-        isAddingProduct = false,
-        hasInvalidField = false,
         products = emptyList(),
-        naturaCode = "123",
-        productName = "Homem",
-        onNaturaCodeChanged = {},
-        onProductNameChanged = {},
         onProductItemClicked = {},
-        onAddNewProductClicked = {},
-        onUpdateProductOkClicked = {},
-        onAddProductOkClicked = {},
-        onUpdateProductCancelClicked = {},
-        onAddProductCancelClicked = {},
-        onProductOutsideClick = {}
+        onAddNewProductClicked = {}
     )
 }
