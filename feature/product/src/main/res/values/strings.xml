@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="products">Products</string>
     <string name="natura_code">Natura Code</string>
     <string name="enter_natura_code">Enter Natura Code</string>
     <string name="product_name">Product name</string>
