@@ -40,11 +40,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bruno13palhano.model.Product
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
 import com.bruno13palhano.product.ui.viewmodel.UiState
 import com.bruno13palhano.ui.clickableWithoutRipple
+import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 
@@ -125,10 +125,10 @@ fun ProductsRoute(
 }
 
 @Composable
-fun ProductsContent(
+internal fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
-    products: List<Product>,
+    products: List<CommonItem>,
     onProductItemClicked: (Long) -> Unit,
     onAddNewProductClicked: () -> Unit
 ) {
@@ -153,7 +153,7 @@ fun ProductsContent(
                     headlineContent = {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = product.name
+                            text = product.title
                         )
                     }
                 )
@@ -163,7 +163,7 @@ fun ProductsContent(
 }
 
 @Composable
-fun ProductContent(
+internal fun ProductContent(
     modifier: Modifier = Modifier,
     title: String,
     naturaCode: String,
@@ -229,7 +229,7 @@ fun ProductContent(
 
 @Preview
 @Composable
-fun ProductContentPreview() {
+private fun ProductContentPreview() {
     ProductContent(
         title = stringResource(id = R.string.add_product),
         naturaCode = "1234",
@@ -244,7 +244,7 @@ fun ProductContentPreview() {
 
 @Preview
 @Composable
-fun ProductsContentPreview() {
+private fun ProductsContentPreview() {
     ProductsContent(
         snackbarHostState = remember { SnackbarHostState() },
         products = emptyList(),

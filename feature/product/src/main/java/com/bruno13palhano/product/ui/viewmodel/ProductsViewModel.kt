@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.model.Product
+import com.bruno13palhano.ui.components.CommonItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class ProductsViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository
 ): ViewModel() {
-    private var _products = MutableStateFlow<List<Product>>(emptyList())
+    private var _products = MutableStateFlow<List<CommonItem>>(emptyList())
     val products = _products
         .stateIn(
             scope = viewModelScope,
@@ -51,7 +52,12 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             productRepository.getAll().collect { productList: List<Product> ->
                 _products.update {
-                    productList
+                    productList.map { product ->
+                        CommonItem(
+                            id = product.id,
+                            title = product.name
+                        )
+                    }
                 }
             }
         }
