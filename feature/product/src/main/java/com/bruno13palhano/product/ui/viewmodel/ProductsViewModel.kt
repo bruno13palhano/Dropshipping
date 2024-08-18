@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductsViewModel @Inject constructor(
+internal class ProductsViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository
 ): ViewModel() {
     private var _products = MutableStateFlow<List<CommonItem>>(emptyList())

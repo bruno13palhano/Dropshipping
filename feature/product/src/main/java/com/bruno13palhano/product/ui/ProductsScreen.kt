@@ -51,7 +51,7 @@ import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 
 @Composable
-fun ProductsRoute(
+internal fun ProductsRoute(
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
@@ -99,9 +99,9 @@ fun ProductsRoute(
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        val title =
-            if (isUpdatingProduct) stringResource(id = R.string.update_product)
-            else stringResource(id = R.string.add_product)
+        var title = ""
+        if (isUpdatingProduct) title = stringResource(id = R.string.update_product)
+        else if(isAddingProduct) title = stringResource(id = R.string.add_product)
 
         ProductContent(
             modifier = Modifier
