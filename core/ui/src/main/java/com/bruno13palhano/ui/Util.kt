@@ -2,6 +2,9 @@ package com.bruno13palhano.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Rect
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.clickable
@@ -19,6 +22,8 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 private fun View.isKeyboardOpen(): Boolean {
     val rect = Rect()
@@ -76,3 +81,10 @@ fun Modifier.clickableWithoutRipple(onClick: () -> Unit): Modifier = composed {
         onClick = onClick
     )
 }
+
+fun currentDate() = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()
+
+val dateFormat: DateFormat =
+    SimpleDateFormat.getDateInstance().apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
