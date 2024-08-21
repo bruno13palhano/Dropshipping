@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receipts">Receipts</string>
+    <string name="receipt">Receipt</string>
+    <string name="add_receipt">Add receipt</string>
+    <string name="update_receipt">Update receipt</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="empty_fields_error">Fill missing fields</string>
+    <string name="search_products">Search products</string>
+    <string name="request_number">Request number</string>
+    <string name="enter_request_number">Enter request number"</string>
+    <string name="request_date">Request date</string>
+    <string name="enter_request_date">Enter request date</string>
+    <string name="customer_name">Customer name</string>
+    <string name="enter_customer_name">Enter customer name</string>
+    <string name="quantity">Quantity</string>
+    <string name="enter_quantity">Enter quantity</string>
+    <string name="natura_price">Natura price</string>
+    <string name="enter_natura_price">Enter natura price</string>
+    <string name="amazon_price">Amazon price</string>
+    <string name="enter_amazon_price">Enter amazon price</string>
+    <string name="payment_option">Payment option</string>
+    <string name="enter_payment_option">Enter payment option</string>
+    <string name="observations">Observations</string>
+    <string name="enter_observations">Enter observations</string>
+    <string name="navigate_back">Navigate back</string>
+    <string name="vert_menu">Vertical menu</string>
+    <string name="done">Done</string>
+</resources>
