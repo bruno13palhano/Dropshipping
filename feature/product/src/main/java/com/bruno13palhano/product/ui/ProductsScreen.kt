@@ -90,8 +90,8 @@ internal fun ProductsRoute(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         products = products,
-        onProductItemClicked = { viewModel.setUpdateProductState(id = it) },
-        onAddNewProductClicked = { viewModel.setAddProductState() }
+        onProductItemClick = { viewModel.setUpdateProductState(id = it) },
+        onAddNewProductClick = { viewModel.setAddProductState() }
     )
 
     AnimatedVisibility(
@@ -115,13 +115,13 @@ internal fun ProductsRoute(
             naturaCode = viewModel.naturaCode,
             productName = viewModel.productName,
             hasInvalidField = hasInvalidField,
-            onNaturaCodeChanged = viewModel::updateNaturaCode,
-            onProductNameChanged = viewModel::updateProductName,
-            onOkClicked = {
+            onNaturaCodeChange = viewModel::updateNaturaCode,
+            onProductNameChange = viewModel::updateProductName,
+            onOkClick = {
                 if (isUpdatingProduct) viewModel.updateProduct()
                 else if (isAddingProduct) viewModel.addProduct()
             },
-            onCancelClicked = viewModel::setCancelState
+            onCancelClick = viewModel::setCancelState
         )
     }
 }
@@ -132,15 +132,15 @@ internal fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     products: List<CommonItem>,
-    onProductItemClicked: (Long) -> Unit,
-    onAddNewProductClicked: () -> Unit
+    onProductItemClick: (Long) -> Unit,
+    onAddNewProductClick: () -> Unit
 ) {
     Scaffold(
         modifier = modifier,
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.products)) }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddNewProductClicked) {
+            FloatingActionButton(onClick = onAddNewProductClick) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_product)
@@ -152,7 +152,7 @@ internal fun ProductsContent(
             items(items = products, key = { product -> product.id }) { product ->
                 ListItem(
                     modifier = Modifier.clickable {
-                        onProductItemClicked(product.id)
+                        onProductItemClick(product.id)
                     },
                     headlineContent = {
                         Text(
@@ -173,10 +173,10 @@ internal fun ProductContent(
     naturaCode: String,
     productName: String,
     hasInvalidField: Boolean,
-    onNaturaCodeChanged: (String) -> Unit,
-    onProductNameChanged: (String) -> Unit,
-    onOkClicked: () -> Unit,
-    onCancelClicked: () -> Unit
+    onNaturaCodeChange: (String) -> Unit,
+    onProductNameChange: (String) -> Unit,
+    onOkClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         ElevatedCard {
@@ -193,7 +193,7 @@ internal fun ProductContent(
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = naturaCode,
-                onValueChange = onNaturaCodeChanged,
+                onValueChange = onNaturaCodeChange,
                 label = stringResource(id = R.string.natura_code),
                 placeholder = stringResource(id = R.string.enter_natura_code),
                 isError = hasInvalidField && naturaCode.isBlank(),
@@ -204,7 +204,7 @@ internal fun ProductContent(
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = productName,
-                onValueChange = onProductNameChanged,
+                onValueChange = onProductNameChange,
                 label = stringResource(id = R.string.product_name),
                 placeholder = stringResource(id = R.string.enter_product_name),
                 isError = hasInvalidField && productName.isBlank()
@@ -216,13 +216,13 @@ internal fun ProductContent(
             ) {
                 Button(
                     modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp),
-                    onClick = onOkClicked
+                    onClick = onOkClick
                 ) {
                     Text(text = stringResource(id = R.string.ok))
                 }
                 Button(
                     modifier = Modifier.padding(start = 4.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
-                    onClick = onCancelClicked
+                    onClick = onCancelClick
                 ) {
                     Text(text = stringResource(id = R.string.cancel))
                 }
@@ -239,10 +239,10 @@ private fun ProductContentPreview() {
         naturaCode = "1234",
         productName = "",
         hasInvalidField = true,
-        onNaturaCodeChanged = {},
-        onProductNameChanged = {},
-        onOkClicked = {},
-        onCancelClicked = {}
+        onNaturaCodeChange = {},
+        onProductNameChange = {},
+        onOkClick = {},
+        onCancelClick = {}
     )
 }
 
@@ -252,7 +252,7 @@ private fun ProductsContentPreview() {
     ProductsContent(
         snackbarHostState = remember { SnackbarHostState() },
         products = emptyList(),
-        onProductItemClicked = {},
-        onAddNewProductClicked = {}
+        onProductItemClick = {},
+        onAddNewProductClick = {}
     )
 }
