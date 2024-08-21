@@ -3,6 +3,7 @@ package com.bruno13palhano.dropshipping.ui.menu
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -21,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bruno13palhano.dropshipping.R
 import com.bruno13palhano.home.navigation.HomeRoutes
 import com.bruno13palhano.product.navigation.ProductsRoutes
+import com.bruno13palhano.receipt.navigation.ReceiptsRoutes
 
 @Composable
 fun BottomMenu(
@@ -29,13 +31,14 @@ fun BottomMenu(
 ) {
     val items = listOf(
         Screen.Home,
+        Screen.Receipts,
         Screen.Products
     )
     
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     
-    NavigationBar {
+    NavigationBar(modifier = modifier) {
         items.forEach { screen ->
             val selected = currentDestination?.isRouteSelected(screen)
             
@@ -73,12 +76,17 @@ sealed class Screen<T>(
     val icon: ImageVector,
     @StringRes val resourceId: Int
 ) {
-    data object Home: Screen<HomeRoutes.Home>(
+    data object Home: Screen<HomeRoutes>(
         route = HomeRoutes.Home,
         icon = Icons.Filled.Home,
         resourceId = R.string.home
     )
-    data object Products: Screen<ProductsRoutes.Products>(
+    data object Receipts: Screen<ReceiptsRoutes>(
+        route = ReceiptsRoutes.Main,
+        icon = Icons.AutoMirrored.Filled.ListAlt,
+        resourceId = R.string.receipts
+    )
+    data object Products: Screen<ProductsRoutes>(
         route = ProductsRoutes.Products,
         icon = Icons.AutoMirrored.Filled.List,
         resourceId = R.string.products

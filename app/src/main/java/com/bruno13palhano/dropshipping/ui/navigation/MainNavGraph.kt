@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import com.bruno13palhano.home.navigation.HomeRoutes
 import com.bruno13palhano.home.navigation.homeScreen
 import com.bruno13palhano.product.navigation.productsScreen
+import com.bruno13palhano.receipt.navigation.receiptsScreen
 
 @Composable
 fun MainNavGraph(
@@ -17,7 +18,8 @@ fun MainNavGraph(
         navController = navController,
         startDestination = HomeRoutes.Home
     ) {
-        homeScreen()
+        homeScreen(modifier = modifier)
+        receiptsScreen(modifier = modifier, navController = navController)
         productsScreen(modifier = modifier)
     }
 }
