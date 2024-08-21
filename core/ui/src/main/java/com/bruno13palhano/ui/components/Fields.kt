@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.bruno13palhano.ui.clearFocusOnKeyboardDismiss
@@ -32,8 +33,18 @@ fun CustomTextField(
         onValueChange = onValueChange,
         isError = isError,
         leadingIcon = icon,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
+        label = {
+            Text(
+                text = label,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        placeholder = {
+            Text(
+                text = placeholder,
+                fontStyle = FontStyle.Italic
+            )
+        },
         singleLine = singleLine,
         readOnly = readOnly,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -65,8 +76,18 @@ fun CustomIntegerField(
         },
         isError = isError,
         leadingIcon = icon,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
+        label = {
+            Text(
+                text = label,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        placeholder = {
+            Text(
+                text = placeholder,
+                fontStyle = FontStyle.Italic
+            )
+        },
         singleLine = singleLine,
         readOnly = readOnly,
         keyboardOptions = KeyboardOptions(
@@ -93,8 +114,7 @@ fun CustomFloatField(
     val pattern = remember { Regex("^\\d*\\$decimalSeparator?\\d*\$") }
 
     OutlinedTextField(
-        modifier =
-        modifier.clearFocusOnKeyboardDismiss(),
+        modifier = modifier.clearFocusOnKeyboardDismiss(),
         value = value,
         onValueChange = { newValue ->
             if (newValue.isEmpty() || newValue.matches(pattern)) {
@@ -102,17 +122,23 @@ fun CustomFloatField(
             }
         },
         leadingIcon = icon,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
-        keyboardOptions =
-        KeyboardOptions(
+        label = {
+            Text(
+                text = label,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        placeholder = {
+            Text(
+                text = placeholder,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Decimal
         ),
-        keyboardActions =
-        KeyboardActions(onDone = {
-            defaultKeyboardAction(ImeAction.Done)
-        }),
+        keyboardActions = KeyboardActions(onDone = { defaultKeyboardAction(ImeAction.Done) }),
         singleLine = singleLine,
         readOnly = readOnly
     )
@@ -139,8 +165,18 @@ fun CustomClickField(
         value = value,
         onValueChange = {},
         leadingIcon = icon,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
+        label = {
+            Text(
+                text = label,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        placeholder = {
+            Text(
+                text = placeholder,
+                fontStyle = FontStyle.Italic
+            )
+        },
         singleLine = singleLine,
         readOnly = readOnly
     )
