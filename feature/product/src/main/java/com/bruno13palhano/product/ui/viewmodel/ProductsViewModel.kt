@@ -103,6 +103,12 @@ internal class ProductsViewModel @Inject constructor(
         _uiState.update { UiState.Idle }
     }
 
+    fun deleteProduct(id: Long) {
+        viewModelScope.launch {
+            productRepository.delete(id = id)
+        }
+    }
+
     private fun isProductValid(): Boolean {
         return naturaCode.isNotBlank() && productName.isNotBlank()
     }

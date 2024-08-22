@@ -3,9 +3,9 @@ package com.bruno13palhano.product.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +19,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -37,6 +36,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,15 +50,14 @@ import com.bruno13palhano.ui.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
+import com.bruno13palhano.ui.components.ElevatedListItem
 
 @Composable
 internal fun ProductsRoute(
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getProducts()
-    }
+    LaunchedEffect(key1 = Unit) { viewModel.getProducts() }
 
     val products by viewModel.products.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,8 +90,9 @@ internal fun ProductsRoute(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         products = products,
-        onProductItemClick = { viewModel.setUpdateProductState(id = it) },
-        onAddNewProductClick = { viewModel.setAddProductState() }
+        onProductItemClick = viewModel::setUpdateProductState,
+        onDeleteItemClick = viewModel::deleteProduct,
+        onAddNewProductClick = viewModel::setAddProductState
     )
 
     AnimatedVisibility(
@@ -132,15 +133,19 @@ internal fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     products: List<CommonItem>,
-    onProductItemClick: (Long) -> Unit,
+    onProductItemClick: (id: Long) -> Unit,
+    onDeleteItemClick: (id: Long) -> Unit,
     onAddNewProductClick: () -> Unit
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.semantics { contentDescription = "Products content" },
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.products)) }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddNewProductClick) {
+            FloatingActionButton(
+                modifier = Modifier.semantics { contentDescription = "Add button" },
+                onClick = onAddNewProductClick
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_product)
@@ -148,19 +153,23 @@ internal fun ProductsContent(
             }
         }
     ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(it)
+                .semantics { contentDescription = "List of products" },
+            contentPadding = PaddingValues(4.dp)
+        ) {
             items(items = products, key = { product -> product.id }) { product ->
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onProductItemClick(product.id)
-                    },
-                    headlineContent = {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = product.title
-                        )
-                    }
-                )
+                ElevatedListItem(
+                    modifier = Modifier.padding(4.dp),
+                    onItemClick = { onProductItemClick(product.id) },
+                    onDeleteItemClick = { onDeleteItemClick(product.id) }
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = product.title
+                    )
+                }
             }
         }
     }
@@ -178,10 +187,14 @@ internal fun ProductContent(
     onOkClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.semantics { contentDescription = "Product Content" }
+    ) {
         ElevatedCard {
             Text(
                 modifier = Modifier
+                    .semantics { contentDescription = "Title" }
                     .padding(16.dp)
                     .fillMaxWidth(),
                 text = title,
@@ -190,6 +203,7 @@ internal fun ProductContent(
             )
             CustomIntegerField(
                 modifier = Modifier
+                    .semantics { contentDescription = "Natura code" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = naturaCode,
@@ -201,6 +215,7 @@ internal fun ProductContent(
 
             CustomTextField(
                 modifier = Modifier
+                    .semantics { contentDescription = "Product name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
                 value = productName,
@@ -215,13 +230,17 @@ internal fun ProductContent(
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp),
+                    modifier = Modifier
+                        .semantics { contentDescription = "Ok button" }
+                        .padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp),
                     onClick = onOkClick
                 ) {
                     Text(text = stringResource(id = R.string.ok))
                 }
                 Button(
-                    modifier = Modifier.padding(start = 4.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
+                    modifier = Modifier
+                        .semantics { contentDescription = "Cancel button" }
+                        .padding(start = 4.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
                     onClick = onCancelClick
                 ) {
                     Text(text = stringResource(id = R.string.cancel))
@@ -251,8 +270,16 @@ private fun ProductContentPreview() {
 private fun ProductsContentPreview() {
     ProductsContent(
         snackbarHostState = remember { SnackbarHostState() },
-        products = emptyList(),
+        products = listOf(
+            CommonItem(id = 1, title = "product 1"),
+            CommonItem(id = 2, title = "product 2"),
+            CommonItem(id = 3, title = "product 3"),
+            CommonItem(id = 4, title = "product 4"),
+            CommonItem(id = 5, title = "product 5"),
+            CommonItem(id = 6, title = "product 6"),
+        ),
         onProductItemClick = {},
+        onDeleteItemClick = {},
         onAddNewProductClick = {}
     )
 }
