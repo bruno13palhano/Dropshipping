@@ -106,6 +106,7 @@ fun CustomFloatField(
     icon: @Composable (()-> Unit)? = null,
     label: String,
     placeholder: String,
+    isError: Boolean = false,
     singleLine: Boolean = true,
     readOnly: Boolean = false
 ) {
@@ -121,6 +122,7 @@ fun CustomFloatField(
                 onValueChange(newValue)
             }
         },
+        isError = isError,
         leadingIcon = icon,
         label = {
             Text(
