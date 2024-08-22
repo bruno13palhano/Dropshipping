@@ -19,10 +19,10 @@ fun NavGraphBuilder.receiptsScreen(
         composable<ReceiptsRoutes.Receipts> {
             ReceiptsRoute(
                 modifier = modifier,
-                onItemClicked = {
+                onItemClick = {
                     navController.navigate(ReceiptsRoutes.UpdateReceipt(id = it))
                 },
-                onAddNewReceiptClicked = {
+                onAddNewReceiptClick = {
                     navController.navigate(ReceiptsRoutes.AddReceipt(productId = it))
                 }
             )

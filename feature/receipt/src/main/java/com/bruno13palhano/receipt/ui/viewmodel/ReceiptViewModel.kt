@@ -1,6 +1,5 @@
 package com.bruno13palhano.receipt.ui.viewmodel
 
-import androidx.collection.mutableLongSetOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,6 +48,13 @@ internal class ReceiptViewModel @Inject constructor(
         private set
     var observations by mutableStateOf("")
         private set
+
+    private val _hasInvalidField = MutableStateFlow(false)
+    val hasInvalidField = _hasInvalidField.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5_000),
+        initialValue = false
+    )
 
     fun updateRequestNumber(requestNumber: String) {
         this.requestNumber = requestNumber
@@ -100,25 +105,32 @@ internal class ReceiptViewModel @Inject constructor(
                 .catch { it.printStackTrace() }
                 .collect { receipt: Receipt ->
                     setReceiptProperties(receipt = receipt)
-                    productName = receipt.product.name
                 }
         }
     }
 
     fun addReceipt() {
-        if (!isReceiptValid()) return
+        if (!isReceiptValid()) {
+            _hasInvalidField.update { true }
+            return
+        }
 
         viewModelScope.launch {
             receiptRepository.insert(data = saveReceipt())
         }
+        _hasInvalidField.update { false }
     }
 
     fun updateReceipt() {
-        if (!isReceiptValid()) return
+        if (!isReceiptValid()) {
+            _hasInvalidField.update { true }
+            return
+        }
 
         viewModelScope.launch {
             receiptRepository.update(data = saveReceipt(id = id))
         }
+        _hasInvalidField.update { false }
     }
 
     fun deleteReceipt() {
@@ -147,7 +159,7 @@ internal class ReceiptViewModel @Inject constructor(
             id = id,
             product = product.value,
             requestNumber = requestNumber.toLong(),
-            requestDate = requestDate.toLong(),
+            requestDate = requestDate,
             customerName = customerName,
             quantity = quantity.toInt(),
             naturaPrice = naturaPrice.toFloat(),
@@ -160,6 +172,8 @@ internal class ReceiptViewModel @Inject constructor(
 
     private fun setReceiptProperties(receipt: Receipt) {
         id = receipt.id
+        product.value = receipt.product
+        productName = receipt.product.name
         requestNumber = receipt.requestNumber.toString()
         requestDate = receipt.requestDate
         customerName = receipt.customerName
