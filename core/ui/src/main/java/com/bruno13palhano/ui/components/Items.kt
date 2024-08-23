@@ -16,7 +16,7 @@ fun ElevatedListItem(
     modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
     onDeleteItemClick: () -> Unit,
-    headLineContent: @Composable () -> Unit
+    headlineContent: @Composable () -> Unit
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -34,7 +34,7 @@ fun ElevatedListItem(
                     )
                 }
             },
-            headlineContent = headLineContent
+            headlineContent = headlineContent
         )
     }
 }
