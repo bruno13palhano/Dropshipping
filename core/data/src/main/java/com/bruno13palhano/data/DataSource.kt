@@ -10,9 +10,5 @@ interface DataSource<T> {
 
     suspend fun update(data: T)
 
-//    suspend fun delete(id: Long)
-
-//    fun get(id: Long): Flow<T>
-
     fun getAll(): Flow<List<T>>
 }
