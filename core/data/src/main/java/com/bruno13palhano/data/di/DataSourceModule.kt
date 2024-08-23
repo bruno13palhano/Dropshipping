@@ -1,9 +1,13 @@
 package com.bruno13palhano.data.di
 
+import com.bruno13palhano.data.internal.CacheDataSource
 import com.bruno13palhano.data.internal.ProductDataSource
 import com.bruno13palhano.data.internal.ReceiptDataSource
+import com.bruno13palhano.data.internal.dao.CacheDao
 import com.bruno13palhano.data.internal.dao.ProductDao
 import com.bruno13palhano.data.internal.dao.ReceiptDao
+import com.bruno13palhano.data.repository.CacheRepository
+import com.bruno13palhano.data.repository.DefaultCacheRepository
 import com.bruno13palhano.data.repository.DefaultProductRepository
 import com.bruno13palhano.data.repository.DefaultReceiptRepository
 import com.bruno13palhano.data.repository.ProductRepository
@@ -22,10 +26,16 @@ internal annotation class ProductInternalDataSource
 internal annotation class ReceiptInternalDataSource
 
 @Qualifier
+internal annotation class CacheInternalDataSource
+
+@Qualifier
 annotation class ProductRep
 
 @Qualifier
 annotation class ReceiptRep
+
+@Qualifier
+annotation class CacheRep
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -44,6 +54,14 @@ internal abstract class DataSourceModule {
         receiptDataSource: ReceiptDao
     ): ReceiptDataSource
 
+    @CacheInternalDataSource
+    @Singleton
+    @Binds
+    abstract fun bindCacheDataSource(
+        cacheDataSource: CacheDao
+    ): CacheDataSource
+
+
     @ProductRep
     @Singleton
     @Binds
@@ -57,4 +75,11 @@ internal abstract class DataSourceModule {
     abstract fun bindReceiptRepository(
         receiptRepository: DefaultReceiptRepository
     ): ReceiptRepository
+
+    @CacheRep
+    @Singleton
+    @Binds
+    abstract fun bindCacheRepository(
+        cacheRepository: DefaultCacheRepository
+    ): CacheRepository
 }

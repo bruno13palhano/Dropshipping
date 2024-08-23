@@ -24,6 +24,10 @@ internal object DatabaseModule {
 
     @Provides
     @Singleton
+    fun provideCacheDao(database: AppDatabase) = database.cacheDao
+
+    @Provides
+    @Singleton
     fun provideDatabase(@ApplicationContext context: Context, converters: Converters): AppDatabase {
         return Room.databaseBuilder(
             context,
