@@ -17,12 +17,9 @@ internal interface CacheDao : CacheDataSource {
     @Update
     override suspend fun update(data: CacheInternal)
 
-    @Query("DELETE FROM CacheInternal WHERE id = :id")
-    override suspend fun delete(id: Long)
+    @Query("DELETE FROM CacheInternal WHERE `query` = :query")
+    override suspend fun delete(query: String)
 
-    @Query("SELECT * FROM CacheInternal WHERE id = :id")
-    override fun get(id: Long): Flow<CacheInternal>
-
-    @Query("SELECT * FROM CacheInternal ORDER BY id DESC")
+    @Query("SELECT * FROM CacheInternal")
     override fun getAll(): Flow<List<CacheInternal>>
 }

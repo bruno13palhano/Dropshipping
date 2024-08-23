@@ -6,17 +6,10 @@ import com.bruno13palhano.model.Cache
 
 @Entity
 internal class CacheInternal(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    @PrimaryKey
     val query: String
 )
 
-internal fun CacheInternal.asExternal() = Cache(
-    id = id,
-    query = query
-)
+internal fun CacheInternal.asExternal() = Cache(query = query)
 
-internal fun Cache.asInternal() = CacheInternal(
-    id = id,
-    query = query
-)
+internal fun Cache.asInternal() = CacheInternal(query = query)

@@ -20,12 +20,8 @@ internal class DefaultCacheRepository @Inject constructor(
         cacheDataSource.update(data = data.asInternal())
     }
 
-    override suspend fun delete(id: Long) {
-        cacheDataSource.delete(id = id)
-    }
-
-    override fun get(id: Long): Flow<Cache> {
-        return cacheDataSource.get(id = id).map { it.asExternal() }
+    override suspend fun delete(query: String) {
+        cacheDataSource.delete(query = query)
     }
 
     override fun getAll(): Flow<List<Cache>> {
