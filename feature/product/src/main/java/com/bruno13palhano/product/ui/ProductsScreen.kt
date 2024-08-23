@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -162,8 +163,10 @@ internal fun ProductsContent(
             items(items = products, key = { product -> product.id }) { product ->
                 ElevatedListItem(
                     modifier = Modifier.padding(4.dp),
+                    icon = Icons.Filled.Delete,
+                    iconDescription = stringResource(id = R.string.delete),
                     onItemClick = { onProductItemClick(product.id) },
-                    onDeleteItemClick = { onDeleteItemClick(product.id) }
+                    onIconClick = { onDeleteItemClick(product.id) }
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
