@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -61,6 +64,7 @@ internal fun ReceiptsRoute(
 
     val receipts by viewModel.receipts.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
+    val cache by viewModel.cache.collectAsStateWithLifecycle()
 
     var showProductsSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -78,6 +82,7 @@ internal fun ReceiptsRoute(
         showProductsSearch = showProductsSearch,
         products = products,
         receipts = receipts,
+        cache = cache,
         onReceiptItemClick = onItemClick,
         onDeleteReceiptClick = viewModel::deleteReceipt,
         onAddNewReceiptClick = {
@@ -95,6 +100,7 @@ internal fun ReceiptsRoute(
             showProductsSearch = true
             onAddNewReceiptClick(it)
         },
+        onDeleteSearchClick = viewModel::deleteCache,
         onClose = { showProductsSearch = false }
     )
 }
@@ -107,11 +113,13 @@ internal fun ReceiptsContent(
     showProductsSearch: Boolean,
     receipts: List<CommonItem>,
     products: List<CommonItem>,
+    cache: List<String>,
     onReceiptItemClick: (id: Long) -> Unit,
     onDeleteReceiptClick: (id: Long) -> Unit,
     onAddNewReceiptClick: () -> Unit,
     onSearchClick: (query: String) -> Unit,
     onProductItemClick: (id: Long) -> Unit,
+    onDeleteSearchClick: (query: String) -> Unit,
     onClose: () -> Unit
 ) {
     Scaffold(
@@ -141,8 +149,10 @@ internal fun ReceiptsContent(
                 items(items = receipts, key = { receipt -> receipt.id }) { receipt ->
                     ElevatedListItem(
                         modifier = Modifier.padding(4.dp),
+                        icon = Icons.Filled.Delete,
+                        iconDescription = stringResource(id = R.string.delete),
                         onItemClick = { onReceiptItemClick(receipt.id) },
-                        onDeleteItemClick = { onDeleteReceiptClick(receipt.id) }
+                        onIconClick = { onDeleteReceiptClick(receipt.id) }
                     ) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
@@ -163,8 +173,10 @@ internal fun ReceiptsContent(
         SearchProducts(
             modifier = Modifier,
             products = products,
-            onSearchClicked = onSearchClick,
-            onItemClicked = onProductItemClick,
+            cache = cache,
+            onSearchClick = onSearchClick,
+            onItemClick = onProductItemClick,
+            onDeleteSearchClick = onDeleteSearchClick,
             onClose = onClose
         )
     }
@@ -175,8 +187,10 @@ internal fun ReceiptsContent(
 internal fun SearchProducts(
     modifier: Modifier = Modifier,
     products: List<CommonItem>,
-    onSearchClicked: (query: String) -> Unit,
-    onItemClicked: (id: Long) -> Unit,
+    cache: List<String>,
+    onSearchClick: (query: String) -> Unit,
+    onItemClick: (id: Long) -> Unit,
+    onDeleteSearchClick: (query: String) -> Unit,
     onClose: () -> Unit
 ) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -191,7 +205,7 @@ internal fun SearchProducts(
             onQueryChange = { query = it },
             onSearch = {
                 active = false
-                onSearchClicked(it)
+                onSearchClick(it)
             },
             placeholder = { Text(text = stringResource(id = R.string.search_products)) },
             active = active,
@@ -212,14 +226,32 @@ internal fun SearchProducts(
                     modifier = Modifier.semantics { contentDescription = "Search button" },
                     onClick = {
                         active = false
-                        onSearchClicked(query)
+                        onSearchClick(query)
                     }
                 ) {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                 }
             }
         ) {
-            // TODO: implement search cache
+            LazyColumn(reverseLayout = true) {
+                items(items = cache, key = { item -> item }) {
+                    ElevatedListItem(
+                        icon = Icons.Filled.Close,
+                        iconDescription = stringResource(id = R.string.delete),
+                        shape = RectangleShape,
+                        onItemClick = {
+                            active = false
+                            onSearchClick(it)
+                        },
+                        onIconClick = { onDeleteSearchClick(it) }
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = it
+                        )
+                    }
+                }
+            }
         }
 
         LazyColumn(
@@ -229,7 +261,7 @@ internal fun SearchProducts(
             items(items = products, key = { product -> product.id }) {
                 ElevatedCard(
                     modifier = Modifier.padding(4.dp),
-                    onClick = { onItemClicked(it.id) }
+                    onClick = { onItemClick(it.id) }
                 ) {
                     ListItem(
                         headlineContent = {
@@ -264,11 +296,13 @@ private fun ReceiptsContentPreview() {
             CommonItem(id = 2, title = "product 2"),
             CommonItem(id = 3, title = "product 3")
         ),
+        cache = listOf(),
         onReceiptItemClick = {},
         onDeleteReceiptClick = {},
         onAddNewReceiptClick = {},
         onSearchClick = {},
         onProductItemClick = {},
+        onDeleteSearchClick = {},
         onClose = {}
     )
 }
@@ -285,8 +319,10 @@ private fun SearchProductsPreview() {
             CommonItem(id = 5, title = "product 5"),
             CommonItem(id = 6, title = "product 6"),
         ),
-        onSearchClicked = {},
-        onItemClicked = {},
+        cache = listOf(),
+        onSearchClick = {},
+        onItemClick = {},
+        onDeleteSearchClick = {},
         onClose = {}
     )
 }
