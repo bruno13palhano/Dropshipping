@@ -4,7 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,12 +47,13 @@ import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptsViewModel
 import com.bruno13palhano.ui.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
+import com.bruno13palhano.ui.components.ElevatedListItem
 
 @Composable
 internal fun ReceiptsRoute(
     modifier: Modifier = Modifier,
-    onItemClicked: (id: Long) -> Unit,
-    onAddNewReceiptClicked: (productId: Long) -> Unit,
+    onItemClick: (id: Long) -> Unit,
+    onAddNewReceiptClick : (productId: Long) -> Unit,
     viewModel: ReceiptsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(key1 = Unit) { viewModel.getReceipts() }
@@ -59,7 +62,7 @@ internal fun ReceiptsRoute(
     val receipts by viewModel.receipts.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
 
-    var showProductsSearch by remember { mutableStateOf(false) }
+    var showProductsSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -72,43 +75,28 @@ internal fun ReceiptsRoute(
                 showProductsSearch = false
             },
         snackbarHostState = snackbarHostState,
+        showProductsSearch = showProductsSearch,
+        products = products,
         receipts = receipts,
-        onReceiptItemClicked = onItemClicked,
-        onAddNewReceiptClicked = {
+        onReceiptItemClick = onItemClick,
+        onDeleteReceiptClick = viewModel::deleteReceipt,
+        onAddNewReceiptClick = {
             showProductsSearch = true
             viewModel.getProducts()
-        }
+        },
+        onSearchClick =  {
+            keyboardController?.hide()
+            focusManager.clearFocus(force = true)
+            viewModel.searchProducts(it)
+        },
+        onProductItemClick = {
+            keyboardController?.hide()
+            focusManager.clearFocus(force = true)
+            showProductsSearch = true
+            onAddNewReceiptClick(it)
+        },
+        onClose = { showProductsSearch = false }
     )
-
-    AnimatedVisibility(
-        visible = showProductsSearch,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        BackHandler { showProductsSearch = false }
-
-        SearchProducts(
-            modifier = Modifier.padding(8.dp),
-            products = products,
-            onSearchClicked = {
-                keyboardController?.hide()
-                focusManager.clearFocus(force = true)
-                viewModel.searchProducts(query = it)
-            },
-            onItemClicked = {
-                keyboardController?.hide()
-                focusManager.clearFocus(force = true)
-                showProductsSearch = false
-
-                onAddNewReceiptClicked(it)
-            },
-            onClose = {
-                keyboardController?.hide()
-                focusManager.clearFocus(force = true)
-                showProductsSearch = false
-            }
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,16 +104,22 @@ internal fun ReceiptsRoute(
 internal fun ReceiptsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
+    showProductsSearch: Boolean,
     receipts: List<CommonItem>,
-    onReceiptItemClicked: (Long) -> Unit,
-    onAddNewReceiptClicked: () -> Unit
+    products: List<CommonItem>,
+    onReceiptItemClick: (id: Long) -> Unit,
+    onDeleteReceiptClick: (id: Long) -> Unit,
+    onAddNewReceiptClick: () -> Unit,
+    onSearchClick: (query: String) -> Unit,
+    onProductItemClick: (id: Long) -> Unit,
+    onClose: () -> Unit
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.semantics { contentDescription = "Receipts content" },
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.receipts)) }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddNewReceiptClicked) {
+            FloatingActionButton(onClick = onAddNewReceiptClick) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_receipt)
@@ -133,21 +127,46 @@ internal fun ReceiptsContent(
             }
         }
     ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            items(items = receipts, key = { receipt -> receipt.id }) { receipt ->
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onReceiptItemClicked(receipt.id)
-                    },
-                    headlineContent = {
+        AnimatedVisibility(
+            visible = !showProductsSearch,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .semantics { contentDescription = "List of receipts" }
+                    .padding(it),
+                contentPadding = PaddingValues(4.dp)
+            ) {
+                items(items = receipts, key = { receipt -> receipt.id }) { receipt ->
+                    ElevatedListItem(
+                        modifier = Modifier.padding(4.dp),
+                        onItemClick = { onReceiptItemClick(receipt.id) },
+                        onDeleteItemClick = { onDeleteReceiptClick(receipt.id) }
+                    ) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = receipt.title
                         )
                     }
-                )
+                }
             }
         }
+    }
+    AnimatedVisibility(
+        visible = showProductsSearch,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        BackHandler { onClose() }
+
+        SearchProducts(
+            modifier = Modifier,
+            products = products,
+            onSearchClicked = onSearchClick,
+            onItemClicked = onProductItemClick,
+            onClose = onClose
+        )
     }
 }
 
@@ -163,11 +182,11 @@ internal fun SearchProducts(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
 
-    ElevatedCard(modifier = modifier) {
+    Column {
         SearchBar(
             modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             query = query,
             onQueryChange = { query = it },
             onSearch = {
@@ -178,7 +197,10 @@ internal fun SearchProducts(
             active = active,
             onActiveChange = { active = it },
             leadingIcon = {
-                IconButton(onClick = { if (active) active = false else onClose() }) {
+                IconButton(
+                    modifier = Modifier.semantics { contentDescription = "Close button" },
+                    onClick = { if (active) active = false else onClose() }
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null
@@ -187,6 +209,7 @@ internal fun SearchProducts(
             },
             trailingIcon = {
                 IconButton(
+                    modifier = Modifier.semantics { contentDescription = "Search button" },
                     onClick = {
                         active = false
                         onSearchClicked(query)
@@ -199,15 +222,16 @@ internal fun SearchProducts(
             // TODO: implement search cache
         }
 
-        LazyColumn(contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)) {
+        LazyColumn(
+            modifier = modifier.semantics { contentDescription = "List of products" },
+            contentPadding = PaddingValues(4.dp)
+        ) {
             items(items = products, key = { product -> product.id }) {
-
                 ElevatedCard(
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier.padding(4.dp),
                     onClick = { onItemClicked(it.id) }
                 ) {
                     ListItem(
-                        modifier = Modifier.padding(vertical = 4.dp),
                         headlineContent = {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
@@ -226,6 +250,7 @@ internal fun SearchProducts(
 private fun ReceiptsContentPreview() {
     ReceiptsContent(
         snackbarHostState = remember { SnackbarHostState() },
+        showProductsSearch = false,
         receipts = listOf(
             CommonItem(id = 1, title = "receipt 1"),
             CommonItem(id = 2, title = "receipt 2"),
@@ -234,8 +259,17 @@ private fun ReceiptsContentPreview() {
             CommonItem(id = 5, title = "receipt 5"),
             CommonItem(id = 6, title = "receipt 6"),
         ),
-        onReceiptItemClicked = {},
-        onAddNewReceiptClicked = {}
+        products = listOf(
+            CommonItem(id = 1, title = "product 1"),
+            CommonItem(id = 2, title = "product 2"),
+            CommonItem(id = 3, title = "product 3")
+        ),
+        onReceiptItemClick = {},
+        onDeleteReceiptClick = {},
+        onAddNewReceiptClick = {},
+        onSearchClick = {},
+        onProductItemClick = {},
+        onClose = {}
     )
 }
 
