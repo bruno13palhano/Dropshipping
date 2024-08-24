@@ -6,8 +6,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -123,7 +127,10 @@ internal fun ReceiptsContent(
     onClose: () -> Unit
 ) {
     Scaffold(
-        modifier = modifier.semantics { contentDescription = "Receipts content" },
+        modifier = modifier
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.safeDrawing)
+            .semantics { contentDescription = "Receipts content" },
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.receipts)) }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
@@ -143,8 +150,8 @@ internal fun ReceiptsContent(
             LazyColumn(
                 modifier = Modifier
                     .semantics { contentDescription = "List of receipts" }
-                    .padding(it),
-                contentPadding = PaddingValues(4.dp)
+                    .consumeWindowInsets(it),
+                contentPadding = it
             ) {
                 items(items = receipts, key = { receipt -> receipt.id }) { receipt ->
                     ElevatedListItem(
@@ -277,7 +284,7 @@ internal fun SearchProducts(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 private fun ReceiptsContentPreview() {
     ReceiptsContent(

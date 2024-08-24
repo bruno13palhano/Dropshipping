@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -139,7 +143,10 @@ internal fun ProductsContent(
     onAddNewProductClick: () -> Unit
 ) {
     Scaffold(
-        modifier = modifier.semantics { contentDescription = "Products content" },
+        modifier = modifier
+            .semantics { contentDescription = "Products content" }
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.safeDrawing),
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.products)) }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
@@ -156,9 +163,9 @@ internal fun ProductsContent(
     ) {
         LazyColumn(
             modifier = Modifier
-                .padding(it)
-                .semantics { contentDescription = "List of products" },
-            contentPadding = PaddingValues(4.dp)
+                .semantics { contentDescription = "List of products" }
+                .consumeWindowInsets(it),
+            contentPadding = it
         ) {
             items(items = products, key = { product -> product.id }) { product ->
                 ElevatedListItem(

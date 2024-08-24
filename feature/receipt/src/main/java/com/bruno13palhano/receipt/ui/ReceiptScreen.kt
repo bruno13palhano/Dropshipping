@@ -7,9 +7,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -213,7 +217,9 @@ internal fun ReceiptContent(
                 keyboardController?.hide()
                 focusManager.clearFocus(force = true)
             }
-            .clearFocusOnKeyboardDismiss(),
+            .clearFocusOnKeyboardDismiss()
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.safeDrawing),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
