@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -25,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -201,59 +201,61 @@ internal fun ProductContent(
         contentAlignment = Alignment.Center,
         modifier = modifier.semantics { contentDescription = "Product Content" }
     ) {
-        ElevatedCard {
-            Text(
-                modifier = Modifier
-                    .semantics { contentDescription = "Title" }
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
-            )
-            CustomIntegerField(
-                modifier = Modifier
-                    .semantics { contentDescription = "Natura code" }
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .fillMaxWidth(),
-                value = naturaCode,
-                onValueChange = onNaturaCodeChange,
-                label = stringResource(id = R.string.natura_code),
-                placeholder = stringResource(id = R.string.enter_natura_code),
-                isError = hasInvalidField && naturaCode.isBlank(),
-            )
-
-            CustomTextField(
-                modifier = Modifier
-                    .semantics { contentDescription = "Product name" }
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .fillMaxWidth(),
-                value = productName,
-                onValueChange = onProductNameChange,
-                label = stringResource(id = R.string.product_name),
-                placeholder = stringResource(id = R.string.enter_product_name),
-                isError = hasInvalidField && productName.isBlank()
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(
+        OutlinedCard {
+            ElevatedCard {
+                Text(
                     modifier = Modifier
-                        .semantics { contentDescription = "Ok button" }
-                        .padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp),
-                    onClick = onOkClick
-                ) {
-                    Text(text = stringResource(id = R.string.ok))
-                }
-                Button(
+                        .semantics { contentDescription = "Title" }
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+                CustomIntegerField(
                     modifier = Modifier
-                        .semantics { contentDescription = "Cancel button" }
-                        .padding(start = 4.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
-                    onClick = onCancelClick
+                        .semantics { contentDescription = "Natura code" }
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .fillMaxWidth(),
+                    value = naturaCode,
+                    onValueChange = onNaturaCodeChange,
+                    label = stringResource(id = R.string.natura_code),
+                    placeholder = stringResource(id = R.string.enter_natura_code),
+                    isError = hasInvalidField && naturaCode.isBlank(),
+                )
+
+                CustomTextField(
+                    modifier = Modifier
+                        .semantics { contentDescription = "Product name" }
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .fillMaxWidth(),
+                    value = productName,
+                    onValueChange = onProductNameChange,
+                    label = stringResource(id = R.string.product_name),
+                    placeholder = stringResource(id = R.string.enter_product_name),
+                    isError = hasInvalidField && productName.isBlank()
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = stringResource(id = R.string.cancel))
+                    Button(
+                        modifier = Modifier
+                            .semantics { contentDescription = "Ok button" }
+                            .padding(start = 8.dp, top = 8.dp, end = 4.dp, bottom = 8.dp),
+                        onClick = onOkClick
+                    ) {
+                        Text(text = stringResource(id = R.string.ok))
+                    }
+                    Button(
+                        modifier = Modifier
+                            .semantics { contentDescription = "Cancel button" }
+                            .padding(start = 4.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
+                        onClick = onCancelClick
+                    ) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
                 }
             }
         }
