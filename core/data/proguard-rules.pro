@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keeppackagenames
+
+-keep class com.bruno13palhano.data.di.** { *; }
+-keep class com.bruno13palhano.data.repository.** { *; }

@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keeppackagenames
+
+-keep class com.bruno13palhano.product.navigation.** { *; }
+-keep class com.bruno13palhano.product.ui.viewmodel.** { *; }
