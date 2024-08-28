@@ -1,4 +1,4 @@
-package com.bruno13palhano.home.ui
+package com.bruno13palhano.home.homeui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -41,19 +41,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.home.R
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
-import com.bruno13palhano.home.ui.viewmodel.MostSaleItem
-import com.bruno13palhano.home.ui.viewmodel.ReceiptItem
+import com.bruno13palhano.home.homeui.viewmodel.MostSaleItem
+import com.bruno13palhano.home.homeui.viewmodel.ReceiptItem
 import com.bruno13palhano.ui.components.ExpandedListItem
 import com.bruno13palhano.ui.dateFormat
 
 @Composable
 internal fun HomeRoute(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    val profit by viewModel.profit.collectAsStateWithLifecycle()
-    val lastReceipts by viewModel.lasReceipts.collectAsStateWithLifecycle()
-    val mostSale by viewModel.mostSale.collectAsStateWithLifecycle()
+    val profit by homeViewModel.profit.collectAsStateWithLifecycle()
+    val lastReceipts by homeViewModel.lasReceipts.collectAsStateWithLifecycle()
+    val mostSale by homeViewModel.mostSale.collectAsStateWithLifecycle()
 
     HomeContent(
         modifier = modifier,
@@ -67,7 +67,7 @@ internal fun HomeRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun HomeContent(
+private fun HomeContent(
     modifier: Modifier = Modifier,
     profit: Float,
     amazonProfit: Float,

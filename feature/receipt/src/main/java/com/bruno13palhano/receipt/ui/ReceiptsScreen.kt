@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui
+package com.bruno13palhano.receipt.receiptsui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
-import com.bruno13palhano.receipt.ui.viewmodel.ReceiptsViewModel
+import com.bruno13palhano.receipt.receiptsui.viewmodel.ReceiptsViewModel
 import com.bruno13palhano.ui.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem

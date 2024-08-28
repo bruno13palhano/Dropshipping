@@ -1,5 +1,6 @@
-package com.bruno13palhano.home.ui.viewmodel
+package com.bruno13palhano.home.homeui.viewmodel
 
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ReceiptRep
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+@Keep
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,

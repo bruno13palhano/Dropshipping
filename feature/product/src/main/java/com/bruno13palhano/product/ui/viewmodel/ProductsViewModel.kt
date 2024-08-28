@@ -1,5 +1,6 @@
-package com.bruno13palhano.product.ui.viewmodel
+package com.bruno13palhano.product.productsui.viewmodel
 
+import androidx.annotation.Keep
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Keep
 @HiltViewModel
 internal class ProductsViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository
