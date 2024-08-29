@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.bruno13palhano.data.internal.CacheDataSource
+import com.bruno13palhano.data.internal.datasource.CacheDataSource
 import com.bruno13palhano.data.internal.entity.CacheInternal
 import kotlinx.coroutines.flow.Flow
 

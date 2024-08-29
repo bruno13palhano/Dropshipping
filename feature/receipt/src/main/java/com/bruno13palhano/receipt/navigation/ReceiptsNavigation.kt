@@ -6,9 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.receipt.ui.AddReceiptRoute
-import com.bruno13palhano.receipt.ui.ReceiptsRoute
-import com.bruno13palhano.receipt.ui.UpdateReceiptRoute
+import com.bruno13palhano.receipt.ui.screen.AddReceiptRoute
+import com.bruno13palhano.receipt.ui.screen.ReceiptsRoute
+import com.bruno13palhano.receipt.ui.screen.UpdateReceiptRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.receiptsScreen(

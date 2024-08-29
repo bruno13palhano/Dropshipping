@@ -8,12 +8,6 @@
       <SelectionState runConfigName="ProductDataSourceTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="shouldReturn_ListOfProducts_InDescOrderByNameAndNaturaCode_WhenThatMatchTheQuery()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="shouldReturn_ListWithLastReceipt_ByTheLimit()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="Tests in 'com.bruno13palhano.data.database'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

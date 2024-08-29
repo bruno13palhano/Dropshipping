@@ -12,7 +12,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.bruno13palhano.ui.clearFocusOnKeyboardDismiss
 import java.util.Locale
 
 @Composable

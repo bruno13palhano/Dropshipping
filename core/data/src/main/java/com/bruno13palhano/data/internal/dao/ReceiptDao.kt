@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.bruno13palhano.data.internal.ReceiptDataSource
+import com.bruno13palhano.data.internal.datasource.ReceiptDataSource
 import com.bruno13palhano.data.internal.entity.ReceiptInternal
 import kotlinx.coroutines.flow.Flow
 

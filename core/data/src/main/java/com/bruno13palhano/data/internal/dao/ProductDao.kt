@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.bruno13palhano.data.internal.ProductDataSource
+import com.bruno13palhano.data.internal.datasource.ProductDataSource
 import com.bruno13palhano.data.internal.entity.ProductInternal
 import kotlinx.coroutines.flow.Flow
 

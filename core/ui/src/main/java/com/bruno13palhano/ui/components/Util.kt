@@ -1,4 +1,4 @@
-package com.bruno13palhano.ui
+package com.bruno13palhano.ui.components
 
 import android.annotation.SuppressLint
 import android.graphics.Rect

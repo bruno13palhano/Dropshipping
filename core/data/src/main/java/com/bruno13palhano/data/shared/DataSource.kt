@@ -1,4 +1,4 @@
-package com.bruno13palhano.data
+package com.bruno13palhano.data.shared
 
 import kotlinx.coroutines.flow.Flow
 

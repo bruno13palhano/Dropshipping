@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.bruno13palhano.model.Product
 
 @Entity
-data class ProductInternal(
+internal data class ProductInternal(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val naturaCode: String,

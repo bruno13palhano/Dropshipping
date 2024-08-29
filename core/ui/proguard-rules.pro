@@ -22,5 +22,4 @@
 
 -keeppackagenames
 
--keep class com.bruno13palhano.ui.components.** { <methods>; }
--keep class com.bruno13palhano.ui.UtilKt { *; }
+-keep class com.bruno13palhano.ui.components.** { *; }

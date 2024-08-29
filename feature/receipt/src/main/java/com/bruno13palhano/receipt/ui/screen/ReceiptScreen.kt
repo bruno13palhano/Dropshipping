@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui
+package com.bruno13palhano.receipt.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -53,15 +53,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
-import com.bruno13palhano.ui.clearFocusOnKeyboardDismiss
-import com.bruno13palhano.ui.clickableWithoutRipple
+import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
+import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CustomClickField
 import com.bruno13palhano.ui.components.CustomFloatField
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.MoreVertMenu
-import com.bruno13palhano.ui.currentDate
-import com.bruno13palhano.ui.dateFormat
+import com.bruno13palhano.ui.components.currentDate
+import com.bruno13palhano.ui.components.dateFormat
 import kotlinx.coroutines.launch
 
 @Composable

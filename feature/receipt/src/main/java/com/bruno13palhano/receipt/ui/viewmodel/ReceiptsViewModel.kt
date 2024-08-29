@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.receiptsui.viewmodel
+package com.bruno13palhano.receipt.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

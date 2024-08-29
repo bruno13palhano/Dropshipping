@@ -2,11 +2,10 @@ package com.bruno13palhano.data.internal.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
 
 @Entity
-data class ReceiptInternal(
+internal data class ReceiptInternal(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val product: ProductInternal,

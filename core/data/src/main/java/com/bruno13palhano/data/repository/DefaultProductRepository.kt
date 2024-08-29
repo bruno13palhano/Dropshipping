@@ -1,7 +1,7 @@
 package com.bruno13palhano.data.repository
 
 import com.bruno13palhano.data.di.ProductInternalDataSource
-import com.bruno13palhano.data.internal.ProductDataSource
+import com.bruno13palhano.data.internal.datasource.ProductDataSource
 import com.bruno13palhano.data.internal.entity.asExternal
 import com.bruno13palhano.data.internal.entity.asInternal
 import com.bruno13palhano.model.Product

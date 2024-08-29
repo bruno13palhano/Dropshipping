@@ -1,4 +1,4 @@
-package com.bruno13palhano.product
+package com.bruno13palhano.feature.product
 
 import org.junit.Test
 

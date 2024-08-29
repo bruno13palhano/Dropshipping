@@ -1,8 +1,8 @@
 package com.bruno13palhano.data.di
 
-import com.bruno13palhano.data.internal.CacheDataSource
-import com.bruno13palhano.data.internal.ProductDataSource
-import com.bruno13palhano.data.internal.ReceiptDataSource
+import com.bruno13palhano.data.internal.datasource.CacheDataSource
+import com.bruno13palhano.data.internal.datasource.ProductDataSource
+import com.bruno13palhano.data.internal.datasource.ReceiptDataSource
 import com.bruno13palhano.data.internal.dao.CacheDao
 import com.bruno13palhano.data.internal.dao.ProductDao
 import com.bruno13palhano.data.internal.dao.ReceiptDao

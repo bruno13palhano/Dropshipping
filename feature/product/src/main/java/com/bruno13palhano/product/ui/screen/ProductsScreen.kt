@@ -1,4 +1,4 @@
-package com.bruno13palhano.product.productsui
+package com.bruno13palhano.product.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -50,8 +50,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
-import com.bruno13palhano.product.productsui.viewmodel.UiState
-import com.bruno13palhano.ui.clickableWithoutRipple
+import com.bruno13palhano.product.ui.viewmodel.UiState
+import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
@@ -60,12 +60,12 @@ import com.bruno13palhano.ui.components.ElevatedListItem
 @Composable
 internal fun ProductsRoute(
     modifier: Modifier = Modifier,
-    productsViewModel: ProductsViewModel = hiltViewModel()
+    viewModel: ProductsViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) { productsViewModel.getProducts() }
+    LaunchedEffect(key1 = Unit) { viewModel.getProducts() }
 
-    val products by productsViewModel.products.collectAsStateWithLifecycle()
-    val uiState by productsViewModel.uiState.collectAsStateWithLifecycle()
+    val products by viewModel.products.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isUpdatingProduct by remember { mutableStateOf(false) }
     var isAddingProduct by remember { mutableStateOf(false) }
     val errorMessage = stringResource(id = R.string.empty_fields_error)
@@ -95,9 +95,9 @@ internal fun ProductsRoute(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         products = products,
-        onProductItemClick = productsViewModel::setUpdateProductState,
-        onDeleteItemClick = productsViewModel::deleteProduct,
-        onAddNewProductClick = productsViewModel::setAddProductState
+        onProductItemClick = viewModel::setUpdateProductState,
+        onDeleteItemClick = viewModel::deleteProduct,
+        onAddNewProductClick = viewModel::setAddProductState
     )
 
     AnimatedVisibility(
@@ -118,23 +118,23 @@ internal fun ProductsRoute(
                 .padding(16.dp)
                 .fillMaxSize(),
             title = title,
-            naturaCode = productsViewModel.naturaCode,
-            productName = productsViewModel.productName,
+            naturaCode = viewModel.naturaCode,
+            productName = viewModel.productName,
             hasInvalidField = hasInvalidField,
-            onNaturaCodeChange = productsViewModel::updateNaturaCode,
-            onProductNameChange = productsViewModel::updateProductName,
+            onNaturaCodeChange = viewModel::updateNaturaCode,
+            onProductNameChange = viewModel::updateProductName,
             onOkClick = {
-                if (isUpdatingProduct) productsViewModel.updateProduct()
-                else if (isAddingProduct) productsViewModel.addProduct()
+                if (isUpdatingProduct) viewModel.updateProduct()
+                else if (isAddingProduct) viewModel.addProduct()
             },
-            onCancelClick = productsViewModel::setCancelState
+            onCancelClick = viewModel::setCancelState
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProductsContent(
+internal fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     products: List<CommonItem>,
@@ -186,7 +186,7 @@ private fun ProductsContent(
 }
 
 @Composable
-private fun ProductContent(
+internal fun ProductContent(
     modifier: Modifier = Modifier,
     title: String,
     naturaCode: String,
