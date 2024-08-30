@@ -7,13 +7,13 @@
     <string name="last_receipts">Last receipts</string>
     <string name="visible">Visible</string>
     <string name="not_visible">Not visible</string>
-    <string name="most_sale">Most sale</string>
-    <string name="customer">Customer name, %s</string>
-    <string name="product">Product name, %s</string>
-    <string name="amazon_price">The price in Amazon, R$%.2f</string>
-    <string name="date">The date of sale, %s</string>
-    <string name="title">%s, %s</string>
-    <string name="most_sale_title">%s, number of units sold %d</string>
-    <string name="profit_amount">Profit \nR$%.2f</string>
+    <string name="most_sale_info">Most sale</string>
+    <string name="customer_info">Customer name, %s</string>
+    <string name="product_info">Product name, %s</string>
+    <string name="amazon_price_info">The price in Amazon, R$%.2f</string>
+    <string name="date_info">The date of sale, %s</string>
+    <string name="title_info">%s, %s</string>
+    <string name="most_sale_title_info">%s, number of units sold %d</string>
+    <string name="profit_amount_info">Profit \nR$%.2f</string>
     <string name="dots">Profit\nR$\u25CF\u25CF\u25CF\u25CF</string>
 </resources>

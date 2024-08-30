@@ -129,19 +129,19 @@ internal fun HomeContent(
                         ExpandedListItem(
                             modifier = Modifier.padding(vertical = 1.dp),
                             title = stringResource(
-                                id = R.string.title,
+                                id = R.string.title_info,
                                 dateFormat.format(receipt.requestDate),
                                 receipt.customerName
                             ),
                             shape = RectangleShape
                         ) {
                             Text(
-                                text = stringResource(id = R.string.product, receipt.productName),
+                                text = stringResource(id = R.string.product_info, receipt.productName),
                                 fontStyle = FontStyle.Italic,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = stringResource(id = R.string.amazon_price, receipt.amazonPrice),
+                                text = stringResource(id = R.string.amazon_price_info, receipt.amazonPrice),
                                 fontStyle = FontStyle.Italic,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -154,7 +154,7 @@ internal fun HomeContent(
                 modifier = Modifier
                     .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
                     .fillMaxWidth(),
-                text = stringResource(id = R.string.most_sale),
+                text = stringResource(id = R.string.most_sale_info),
                 style = MaterialTheme.typography.bodyLarge,
             )
 
@@ -172,7 +172,7 @@ internal fun HomeContent(
                                 headlineContent = {
                                     Text(
                                         text = stringResource(
-                                            id = R.string.most_sale_title,
+                                            id = R.string.most_sale_title_info,
                                             it.productName,
                                             it.unitsSold
                                         )
@@ -202,7 +202,7 @@ private fun ProfitInfo(profitAmount: Float) {
                 .weight(1f),
             text =
             if (showProfit) {
-                stringResource(id = R.string.profit_amount, profitAmount)
+                stringResource(id = R.string.profit_amount_info, profitAmount)
             } else {
                 stringResource(id = R.string.dots)
             },
