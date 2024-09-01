@@ -26,10 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -38,30 +37,41 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.bruno13palhano.home.R
+import com.bruno13palhano.home.ui.shared.MostSaleItem
+import com.bruno13palhano.home.ui.shared.ReceiptItem
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
-import com.bruno13palhano.home.ui.viewmodel.MostSaleItem
-import com.bruno13palhano.home.ui.viewmodel.ReceiptItem
 import com.bruno13palhano.ui.components.ExpandedListItem
 import com.bruno13palhano.ui.components.dateFormat
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun HomeRoute(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val profit by viewModel.profit.collectAsStateWithLifecycle()
-    val lastReceipts by viewModel.lasReceipts.collectAsStateWithLifecycle()
-    val mostSale by viewModel.mostSale.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 =  Unit) { viewModel.getProfit() }
+    LaunchedEffect(key1 =  Unit) { viewModel.getLastReceipts() }
+    LaunchedEffect(key1 =  Unit) { viewModel.getMostSale() }
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     HomeContent(
         modifier = modifier,
-        profit = profit.profit,
-        amazonProfit = profit.amazonProfit,
-        naturaProfit = profit.naturaProfit,
-        lastReceipts = lastReceipts,
-        mostSale = mostSale
+        profit = state.profit.profit,
+        profitVisible = state.profitVisible,
+        receiptsVisible = state.receiptsVisible,
+        expandItemsIds = state.expandedItems,
+        amazonProfit = state.profit.amazonProfit,
+        naturaProfit = state.profit.naturaProfit,
+        lastReceipts = state.lastReceipts,
+        mostSale = state.mostSale,
+        onToggleProfitVisibility = viewModel::toggleProfitVisibility,
+        onExpandReceiptItem = viewModel::expandItem
     )
 }
 
@@ -70,10 +80,15 @@ internal fun HomeRoute(
 internal fun HomeContent(
     modifier: Modifier = Modifier,
     profit: Float,
+    profitVisible: Boolean,
+    receiptsVisible: Boolean,
+    expandItemsIds: List<Pair<Long, Boolean>>,
     amazonProfit: Float,
     naturaProfit: Float,
     lastReceipts: List<ReceiptItem>,
-    mostSale: List<MostSaleItem>
+    mostSale: List<MostSaleItem>,
+    onToggleProfitVisibility: (visibility: Boolean) -> Unit,
+    onExpandReceiptItem: (id: Long, expand: Boolean) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -87,7 +102,11 @@ internal fun HomeContent(
                 .consumeWindowInsets(it)
                 .verticalScroll(rememberScrollState())
         ) {
-            ProfitInfo(profitAmount = profit)
+            ProfitInfo(
+                profitAmount = profit,
+                profitVisibility = profitVisible,
+                onToggleProfitVisibility = onToggleProfitVisibility
+            )
 
             OutlinedCard(
                 modifier = Modifier
@@ -112,73 +131,87 @@ internal fun HomeContent(
                 }
             }
 
-            Text(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
-                    .fillMaxWidth(),
-                text = stringResource(id = R.string.last_receipts),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            if (receiptsVisible) {
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.last_receipts),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
 
-            OutlinedCard(modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-            ) {
-                Column {
-                    lastReceipts.forEach { receipt ->
-                        ExpandedListItem(
-                            modifier = Modifier.padding(vertical = 1.dp),
-                            title = stringResource(
-                                id = R.string.title_info,
-                                dateFormat.format(receipt.requestDate),
-                                receipt.customerName
-                            ),
-                            shape = RectangleShape
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.product_info, receipt.productName),
-                                fontStyle = FontStyle.Italic,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = stringResource(id = R.string.amazon_price_info, receipt.amazonPrice),
-                                fontStyle = FontStyle.Italic,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                OutlinedCard(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Column {
+                        lastReceipts.forEach { receipt ->
+                            ExpandedListItem(
+                                modifier = Modifier.padding(vertical = 1.dp),
+                                title = stringResource(
+                                    id = R.string.title_info,
+                                    dateFormat.format(receipt.requestDate),
+                                    receipt.customerName
+                                ),
+                                expanded = expandItemsIds.find { item ->
+                                    item.first == receipt.id
+                                }?.second ?: false,
+                                shape = RectangleShape,
+                                onClick = { expanded -> onExpandReceiptItem(receipt.id, expanded) }
+                            ) {
+                                Text(
+                                    text = stringResource(
+                                        id = R.string.product_info,
+                                        receipt.productName
+                                    ),
+                                    fontStyle = FontStyle.Italic,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = stringResource(
+                                        id = R.string.amazon_price_info,
+                                        receipt.amazonPrice
+                                    ),
+                                    fontStyle = FontStyle.Italic,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            Text(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
-                    .fillMaxWidth(),
-                text = stringResource(id = R.string.most_sale_info),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.most_sale_info),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
 
-            OutlinedCard(modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-            ) {
-                Column {
-                    mostSale.forEach {
-                        Card(
-                            modifier = Modifier.padding(vertical = 1.dp),
-                            shape = RectangleShape
-                        ) {
-                            ListItem(
-                                headlineContent = {
-                                    Text(
-                                        text = stringResource(
-                                            id = R.string.most_sale_title_info,
-                                            it.productName,
-                                            it.unitsSold
+                OutlinedCard(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Column {
+                        mostSale.forEach {
+                            Card(
+                                modifier = Modifier.padding(vertical = 1.dp),
+                                shape = RectangleShape
+                            ) {
+                                ListItem(
+                                    headlineContent = {
+                                        Text(
+                                            text = stringResource(
+                                                id = R.string.most_sale_title_info,
+                                                it.productName,
+                                                it.unitsSold
+                                            )
                                         )
-                                    )
-                                }
-                            )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -188,9 +221,11 @@ internal fun HomeContent(
 }
 
 @Composable
-private fun ProfitInfo(profitAmount: Float) {
-    var showProfit by remember { mutableStateOf(false) }
-
+private fun ProfitInfo(
+    profitAmount: Float,
+    profitVisibility: Boolean,
+    onToggleProfitVisibility: (showProfit: Boolean) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -201,7 +236,7 @@ private fun ProfitInfo(profitAmount: Float) {
                 .fillMaxWidth()
                 .weight(1f),
             text =
-            if (showProfit) {
+            if (profitVisibility) {
                 stringResource(id = R.string.profit_amount_info, profitAmount)
             } else {
                 stringResource(id = R.string.dots)
@@ -210,9 +245,9 @@ private fun ProfitInfo(profitAmount: Float) {
         )
         IconButton(
             modifier = Modifier.padding(end = 8.dp),
-            onClick = { showProfit = !showProfit }
+            onClick = { onToggleProfitVisibility(!profitVisibility) }
         ) {
-            if (showProfit) {
+            if (profitVisibility) {
                 Icon(
                     imageVector = Icons.Filled.Visibility,
                     contentDescription = stringResource(id = R.string.visible)
@@ -232,6 +267,9 @@ private fun ProfitInfo(profitAmount: Float) {
 private fun HomePreview() {
     HomeContent(
         profit = 245.67f,
+        profitVisible = true,
+        receiptsVisible = true,
+        expandItemsIds = emptyList(),
         amazonProfit = 45.67f,
         naturaProfit = 145.67f,
         lastReceipts = listOf(
@@ -273,6 +311,20 @@ private fun HomePreview() {
                 productName = "product 3",
                 unitsSold = 3
             )
-        )
+        ),
+        onToggleProfitVisibility = {},
+        onExpandReceiptItem = { _, _ -> }
+    )
+}
+
+@Composable
+fun <T> rememberFlowWithLifecycle(
+    flow: Flow<T>,
+    lifecycle: Lifecycle = LocalLifecycleOwner.current.lifecycle,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+): Flow<T> = remember(flow, lifecycle) {
+    flow.flowWithLifecycle(
+        lifecycle = lifecycle,
+        minActiveState = minActiveState
     )
 }
