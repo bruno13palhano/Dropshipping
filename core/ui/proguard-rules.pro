@@ -23,3 +23,4 @@
 -keeppackagenames
 
 -keep class com.bruno13palhano.ui.components.** { *; }
+-keep class com.bruno13palhano.ui.shared.** { *; }
