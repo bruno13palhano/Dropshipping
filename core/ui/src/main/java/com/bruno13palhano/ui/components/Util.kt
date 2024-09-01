@@ -21,7 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -79,6 +83,18 @@ fun Modifier.clickableWithoutRipple(onClick: () -> Unit): Modifier = composed {
         indication = null,
         interactionSource = remember { MutableInteractionSource() },
         onClick = onClick
+    )
+}
+
+@Composable
+fun <T> rememberFlowWithLifecycle(
+    flow: Flow<T>,
+    lifecycle: Lifecycle = LocalLifecycleOwner.current.lifecycle,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+): Flow<T> = remember(flow, lifecycle) {
+    flow.flowWithLifecycle(
+        lifecycle = lifecycle,
+        minActiveState = minActiveState
     )
 }
 
