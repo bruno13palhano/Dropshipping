@@ -28,7 +28,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -37,17 +36,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.bruno13palhano.home.R
 import com.bruno13palhano.home.ui.shared.MostSaleItem
 import com.bruno13palhano.home.ui.shared.ReceiptItem
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
 import com.bruno13palhano.ui.components.ExpandedListItem
 import com.bruno13palhano.ui.components.dateFormat
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun HomeRoute(
@@ -314,17 +309,5 @@ private fun HomePreview() {
         ),
         onToggleProfitVisibility = {},
         onExpandReceiptItem = { _, _ -> }
-    )
-}
-
-@Composable
-fun <T> rememberFlowWithLifecycle(
-    flow: Flow<T>,
-    lifecycle: Lifecycle = LocalLifecycleOwner.current.lifecycle,
-    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
-): Flow<T> = remember(flow, lifecycle) {
-    flow.flowWithLifecycle(
-        lifecycle = lifecycle,
-        minActiveState = minActiveState
     )
 }
