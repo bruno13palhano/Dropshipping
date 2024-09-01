@@ -7,5 +7,5 @@ interface Reducer<State: Reducer.ViewState, Event: Reducer.ViewEvent, Effect: Re
 
     interface ViewEffect
 
-    fun reduce(state: State, event: Event): Pair<State, Effect?>
+    fun reduce(previousState: State, event: Event): Pair<State, Effect?>
 }
