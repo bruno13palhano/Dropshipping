@@ -12,6 +12,9 @@ import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.data.repository.ReceiptRepository
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
+import com.bruno13palhano.ui.shared.stringToFloat
+import com.bruno13palhano.ui.shared.stringToInt
+import com.bruno13palhano.ui.shared.stringToLong
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -158,12 +161,12 @@ internal class ReceiptViewModel @Inject constructor(
         return Receipt(
             id = id,
             product = product.value,
-            requestNumber = requestNumber.toLong(),
+            requestNumber = stringToLong(requestNumber),
             requestDate = requestDate,
             customerName = customerName,
-            quantity = quantity.toInt(),
-            naturaPrice = naturaPrice.toFloat(),
-            amazonPrice = amazonPrice.toFloat(),
+            quantity = stringToInt(quantity),
+            naturaPrice = stringToFloat(naturaPrice),
+            amazonPrice = stringToFloat(amazonPrice),
             paymentOption = paymentOption,
             canceled = canceled,
             observations = observations
