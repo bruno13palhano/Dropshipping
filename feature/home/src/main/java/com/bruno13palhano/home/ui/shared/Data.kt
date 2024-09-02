@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.bruno13palhano.ui.shared.Reducer
 
 @Immutable
-data class HomeState(
+internal data class HomeState(
     val profitVisible: Boolean,
     val profit: Profit,
     val receiptsVisible: Boolean,
@@ -13,7 +13,7 @@ data class HomeState(
     val expandedItems: List<Pair<Long, Boolean>>
 ) : Reducer.ViewState {
     companion object {
-        val Empty =  HomeState(
+        val INITIAL_STATE =  HomeState(
             profitVisible = false,
             receiptsVisible = false,
             profit = Profit(0f,0f,0f),
@@ -25,7 +25,7 @@ data class HomeState(
 }
 
 @Immutable
-sealed interface HomeEvent : Reducer.ViewEvent {
+internal sealed interface HomeEvent : Reducer.ViewEvent {
     data class UpdateProfitVisibility(val visible: Boolean) : HomeEvent
     data class UpdateProfit(val profit: Profit) : HomeEvent
     data class UpdateReceiptsVisibility(val visible: Boolean) : HomeEvent
@@ -35,11 +35,9 @@ sealed interface HomeEvent : Reducer.ViewEvent {
 }
 
 @Immutable
-sealed interface HomeEffect : Reducer.ViewEffect {
+internal sealed interface HomeEffect : Reducer.ViewEffect
 
-}
-
-data class ReceiptItem(
+internal data class ReceiptItem(
     val id: Long,
     val customerName: String,
     val productName: String,
@@ -47,13 +45,13 @@ data class ReceiptItem(
     val requestDate: Long,
 )
 
-data class MostSaleItem(
+internal data class MostSaleItem(
     val id: Long,
     val productName: String,
     val unitsSold: Int
 )
 
-data class Profit(
+internal data class Profit(
     val profit: Float,
     val amazonProfit: Float,
     val naturaProfit: Float,
