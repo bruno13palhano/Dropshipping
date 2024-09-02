@@ -20,7 +20,7 @@ import javax.inject.Inject
 internal class HomeViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
 ) : BaseViewModel<HomeState, HomeEvent, HomeEffect>(
-    initialState = HomeState.Empty,
+    initialState = HomeState.INITIAL_STATE,
     reducer = HomeReducer()
 ) {
     fun getProfit() {
