@@ -15,6 +15,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     isProductAdding = false,
                     isProductCanceling = false,
                     isProductDeleting = false,
+                    hasInvalidField = false,
                     isError = false,
                     currentProduct = event.product,
                 ) to null
@@ -26,6 +27,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     isProductAdding = event.isAdding,
                     isProductCanceling = false,
                     isProductDeleting = false,
+                    hasInvalidField = false,
                     isError = false
                 ) to null
             }
@@ -37,7 +39,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     isProductCanceling = event.isCanceling,
                     isProductDeleting = false,
                     isError = false
-                ) to ProductsEffect.ShowCanceledMessage
+                ) to null
             }
             is ProductsEvent.ProductDeleting -> {
                 previousState.copy(
@@ -51,12 +53,13 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
             }
             is ProductsEvent.IdleState -> {
                 previousState.copy(
-                    isIdle = event.isIdle,
+                    isProductsUpdating = false,
                     isProductUpdating = false,
                     isProductAdding = false,
                     isProductCanceling = false,
                     isProductDeleting = false,
                     hasInvalidField = false,
+                    isIdle = event.isIdle,
                     isError = false
                 ) to null
             }

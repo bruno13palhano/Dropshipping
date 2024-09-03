@@ -50,6 +50,5 @@ internal sealed interface ProductsEvent : Reducer.ViewEvent {
 @Immutable
 internal sealed interface ProductsEffect : Reducer.ViewEffect {
     data object ShowErrorMessage : ProductsEffect
-    data object ShowCanceledMessage : ProductsEffect
     data object ShowDeletedMessage : ProductsEffect
 }
