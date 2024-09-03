@@ -33,9 +33,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -49,13 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
+import com.bruno13palhano.product.ui.shared.ProductsEffect
 import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
-import com.bruno13palhano.product.ui.viewmodel.UiState
 import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.ElevatedListItem
+import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 
 @Composable
 internal fun ProductsRoute(
@@ -64,29 +63,25 @@ internal fun ProductsRoute(
 ) {
     LaunchedEffect(key1 = Unit) { viewModel.getProducts() }
 
-    val products by viewModel.products.collectAsStateWithLifecycle()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var isUpdatingProduct by remember { mutableStateOf(false) }
-    var isAddingProduct by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
+
     val errorMessage = stringResource(id = R.string.empty_fields_error)
-    var hasInvalidField by remember { mutableStateOf(false) }
+    val deleteMessage = stringResource(id = R.string.product_deleted)
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    when (uiState) {
-        UiState.Updating -> isUpdatingProduct = true
-        UiState.Adding -> isAddingProduct = true
-        UiState.Idle -> {
-            isUpdatingProduct = false
-            isAddingProduct = false
-            hasInvalidField = false
-        }
-        UiState.Error -> {
-            hasInvalidField = true
-            LaunchedEffect(key1 = Unit) {
-                snackbarHostState.showSnackbar(message = errorMessage)
+    LaunchedEffect(effect) {
+        effect.collect { action ->
+            when(action) {
+                is ProductsEffect.ShowErrorMessage -> {
+                    snackbarHostState.showSnackbar(message = errorMessage)
+                }
+                is ProductsEffect.ShowDeletedMessage -> {
+                    snackbarHostState.showSnackbar(message = deleteMessage)
+                }
             }
         }
     }
@@ -94,20 +89,20 @@ internal fun ProductsRoute(
     ProductsContent(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        products = products,
-        onProductItemClick = viewModel::setUpdateProductState,
+        products = state.products,
+        onEditProductItemClick = viewModel::updatingProductState,
         onDeleteItemClick = viewModel::deleteProduct,
-        onAddNewProductClick = viewModel::setAddProductState
+        onAddNewProductClick = viewModel::addButtonClick
     )
 
     AnimatedVisibility(
-        visible = isUpdatingProduct || isAddingProduct,
+        visible = state.isProductUpdating || state.isProductAdding,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
         var title = ""
-        if (isUpdatingProduct) title = stringResource(id = R.string.update_product)
-        else if(isAddingProduct) title = stringResource(id = R.string.add_product)
+        if (state.isProductUpdating) title = stringResource(id = R.string.update_product)
+        else if(state.isProductAdding) title = stringResource(id = R.string.add_product)
 
         ProductContent(
             modifier = Modifier
@@ -120,14 +115,11 @@ internal fun ProductsRoute(
             title = title,
             naturaCode = viewModel.naturaCode,
             productName = viewModel.productName,
-            hasInvalidField = hasInvalidField,
+            hasInvalidField = state.hasInvalidField,
             onNaturaCodeChange = viewModel::updateNaturaCode,
             onProductNameChange = viewModel::updateProductName,
-            onOkClick = {
-                if (isUpdatingProduct) viewModel.updateProduct()
-                else if (isAddingProduct) viewModel.addProduct()
-            },
-            onCancelClick = viewModel::setCancelState
+            onOkClick = viewModel::okButtonClick,
+            onCancelClick = viewModel::cancelButtonClick
         )
     }
 }
@@ -138,7 +130,7 @@ internal fun ProductsContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     products: List<CommonItem>,
-    onProductItemClick: (id: Long) -> Unit,
+    onEditProductItemClick: (id: Long) -> Unit,
     onDeleteItemClick: (id: Long) -> Unit,
     onAddNewProductClick: () -> Unit
 ) {
@@ -172,7 +164,7 @@ internal fun ProductsContent(
                     modifier = Modifier.padding(4.dp),
                     icon = Icons.Filled.Delete,
                     iconDescription = stringResource(id = R.string.delete),
-                    onItemClick = { onProductItemClick(product.id) },
+                    onItemClick = { onEditProductItemClick(product.id) },
                     onIconClick = { onDeleteItemClick(product.id) }
                 ) {
                     Text(
@@ -290,7 +282,7 @@ private fun ProductsContentPreview() {
             CommonItem(id = 5, title = "product 5"),
             CommonItem(id = 6, title = "product 6"),
         ),
-        onProductItemClick = {},
+        onEditProductItemClick = {},
         onDeleteItemClick = {},
         onAddNewProductClick = {}
     )

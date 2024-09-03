@@ -4,40 +4,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.model.Product
+import com.bruno13palhano.product.ui.shared.ProductsEffect
+import com.bruno13palhano.product.ui.shared.ProductsEvent
+import com.bruno13palhano.product.ui.shared.ProductsReducer
+import com.bruno13palhano.product.ui.shared.ProductsState
 import com.bruno13palhano.ui.components.CommonItem
+import com.bruno13palhano.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ProductsViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository
-): ViewModel() {
-    private var _products = MutableStateFlow<List<CommonItem>>(emptyList())
-    val products = _products
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    private var _uiState = MutableStateFlow<UiState>(UiState.Idle)
-    val uiState = _uiState
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(5_000),
-            initialValue = UiState.Idle
-        )
-
+): BaseViewModel<ProductsState, ProductsEvent, ProductsEffect>(
+    initialState = ProductsState.INITIAL_STATE,
+    reducer = ProductsReducer()
+) {
     private var productId by mutableLongStateOf(0L)
     var naturaCode by mutableStateOf("")
         private set
@@ -51,62 +38,74 @@ internal class ProductsViewModel @Inject constructor(
     fun getProducts() {
         viewModelScope.launch {
             productRepository.getAll().collect { productList: List<Product> ->
-                _products.update {
-                    productList.map { product ->
-                        CommonItem(
-                            id = product.id,
-                            title = product.name
-                        )
-                    }
-                }
+                sendEvent(
+                    event = ProductsEvent.UpdateProducts(
+                        isUpdating = true,
+                        products = productList.map { product ->
+                            CommonItem(
+                                id = product.id,
+                                title = product.name
+                            )
+                        }
+                    )
+                )
             }
         }
     }
 
-    fun setUpdateProductState(id: Long)  {
-        if (_uiState.value == UiState.Adding) return
-
+    fun updatingProductState(id: Long) {
         viewModelScope.launch {
             productRepository.get(id = id).collect {
                 setSelectedProductProperties(it)
             }
         }
-        _uiState.update { UiState.Updating }
+
+        sendEvent(
+            event = ProductsEvent.ProductUpdating(
+                isUpdating = true,
+                product = Product(id = id, naturaCode = naturaCode, name = productName)
+            )
+        )
     }
 
-    fun setAddProductState() {
-        if (_uiState.value == UiState.Updating) return
-
+    fun addButtonClick() {
         resetSelectedProductProperties()
-        _uiState.update { UiState.Adding }
+        sendEvent(event = ProductsEvent.ProductAdding(true))
     }
 
-    fun setCancelState() = _uiState.update { UiState.Idle }
-
-    fun updateProduct() {
-        if (!isProductValid()) {
-            _uiState.update { UiState.Error }
-            return
-        }
-
-        viewModelScope.launch { productRepository.update(data = saveProduct(id = productId)) }
-        _uiState.update { UiState.Idle }
+    fun cancelButtonClick() {
+        sendEvent(event = ProductsEvent.IdleState(true))
     }
 
-    fun addProduct() {
-        if (!isProductValid()) {
-            _uiState.update { UiState.Error }
-            return
-        }
+    fun okButtonClick() {
+        if (state.value.isProductUpdating) {
+            if (!isProductValid()) {
+                sendEvent(event = ProductsEvent.ProductUpdatingInvalidField(true))
+                return
+            }
 
-        viewModelScope.launch { productRepository.insert(data = saveProduct()) }
-        _uiState.update { UiState.Idle }
+            viewModelScope.launch { productRepository.update(data = saveProduct(id = productId)) }
+            sendEvent(event = ProductsEvent.IdleState(true))
+        } else if (state.value.isProductAdding) {
+            if (!isProductValid()) {
+                sendEvent(event = ProductsEvent.ProductAddingInvalidField(true))
+                return
+            }
+
+            viewModelScope.launch { productRepository.insert(data = saveProduct()) }
+            sendEvent(event = ProductsEvent.IdleState(true))
+        }
     }
 
     fun deleteProduct(id: Long) {
+        sendEvent(event = ProductsEvent.ProductDeleting(true))
+
         viewModelScope.launch {
-            productRepository.delete(id = id)
+            try {
+                productRepository.delete(id = id)
+            } catch (_: Exception) {}
         }
+        sendEvent(event = ProductsEvent.IdleState(true))
     }
 
     private fun isProductValid(): Boolean {
@@ -132,11 +131,4 @@ internal class ProductsViewModel @Inject constructor(
         naturaCode = product.naturaCode
         productName = product.name
     }
-}
-
-sealed interface UiState {
-    data object Idle : UiState
-    data object Adding : UiState
-    data object Updating : UiState
-    data object Error : UiState
 }
