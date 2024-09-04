@@ -8,98 +8,66 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
         event: ProductsEvent
     ): Pair<ProductsState, ProductsEffect?> {
         return when (event) {
-            is ProductsEvent.ProductUpdating -> {
+            is ProductsEvent.UpdateProducts -> {
                 previousState.copy(
+                    productsLoading = event.isLoading,
+                    editProduct = false,
+                    addProduct = false,
+                    deleteProduct = false,
                     isIdle = false,
-                    isProductUpdating = event.isUpdating,
-                    isProductAdding = false,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
-                    hasInvalidField = false,
                     isError = false,
-                    currentProduct = event.product,
+                    products = event.products
                 ) to null
             }
-            is ProductsEvent.ProductAdding -> {
+            is ProductsEvent.EditProduct -> {
                 previousState.copy(
+                    productsLoading = false,
+                    editProduct = event.editProduct,
+                    addProduct = false,
+                    deleteProduct = false,
                     isIdle = false,
-                    isProductUpdating = false,
-                    isProductAdding = event.isAdding,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
-                    hasInvalidField = false,
                     isError = false
-                ) to null
+                ) to ProductsEffect.NavigateToEditProduct(event.id)
             }
-            is ProductsEvent.ProductCanceling -> {
+            is ProductsEvent.AddProduct -> {
                 previousState.copy(
+                    productsLoading = false,
+                    editProduct = false,
+                    addProduct = event.addProduct,
+                    deleteProduct = false,
                     isIdle = false,
-                    isProductUpdating = false,
-                    isProductAdding = false,
-                    isProductCanceling = event.isCanceling,
-                    isProductDeleting = false,
                     isError = false
-                ) to null
+                ) to ProductsEffect.NavigateToAddProduct
             }
             is ProductsEvent.ProductDeleting -> {
                 previousState.copy(
+                    productsLoading = false,
+                    editProduct = false,
+                    addProduct = false,
+                    deleteProduct = event.isDeleting,
                     isIdle = false,
-                    isProductUpdating = false,
-                    isProductAdding = false,
-                    isProductCanceling = false,
-                    isProductDeleting = event.isDeleting,
                     isError = false
                 ) to ProductsEffect.ShowDeletedMessage
             }
             is ProductsEvent.IdleState -> {
                 previousState.copy(
-                    isProductsUpdating = false,
-                    isProductUpdating = false,
-                    isProductAdding = false,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
-                    hasInvalidField = false,
+                    productsLoading = false,
+                    editProduct = false,
+                    addProduct = false,
+                    deleteProduct = false,
                     isIdle = event.isIdle,
                     isError = false
                 ) to null
             }
-            is ProductsEvent.ProductUpdatingInvalidField -> {
-                previousState.copy(
-                    isIdle = false,
-                    isProductUpdating = true,
-                    isProductAdding = false,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
-                    hasInvalidField = event.hasInvalidField,
-                    isError = false
-                ) to ProductsEffect.ShowErrorMessage
-            }
-            is ProductsEvent.ProductAddingInvalidField -> {
-                previousState.copy(
-                    isIdle = false,
-                    isProductUpdating = false,
-                    isProductAdding = true,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
-                    hasInvalidField = event.hasInvalidField,
-                    isError = false
-                ) to ProductsEffect.ShowErrorMessage
-            }
             is ProductsEvent.ErrorState -> {
                 previousState.copy(
+                    productsLoading = false,
+                    editProduct = false,
+                    addProduct = false,
+                    deleteProduct = false,
                     isIdle = false,
-                    isProductUpdating = false,
-                    isProductAdding = false,
-                    isProductCanceling = false,
-                    isProductDeleting = false,
                     isError = event.isError
                 ) to ProductsEffect.ShowErrorMessage
-            }
-            is ProductsEvent.UpdateProducts -> {
-                previousState.copy(
-                    isProductsUpdating = event.isUpdating,
-                    products = event.products
-                ) to null
             }
         }
     }
