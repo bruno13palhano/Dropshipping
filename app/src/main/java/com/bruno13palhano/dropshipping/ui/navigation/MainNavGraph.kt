@@ -20,6 +20,6 @@ fun MainNavGraph(
     ) {
         homeScreen(modifier = modifier)
         receiptsScreen(modifier = modifier, navController = navController)
-        productsScreen(modifier = modifier)
+        productsScreen(modifier = modifier,  navController = navController)
     }
 }
