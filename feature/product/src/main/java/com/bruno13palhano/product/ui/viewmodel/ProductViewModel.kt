@@ -48,36 +48,50 @@ internal class ProductViewModel @Inject constructor(
                     naturaCode = it.naturaCode
                     productName = it.name
                     sendEvent(event = ProductEvent.UpdateCurrentProduct(product = it))
+                    sendEvent(event = ProductEvent.UpdateIdleState)
                 }
-        }
-
-        sendEvent(event = ProductEvent.UpdateIdleState)
-    }
-
-    fun onDoneClick() {
-        viewModelScope.launch {
-            if (isProductValid()) {
-                if (productId == 0L) {
-                    sendEvent(event = ProductEvent.UpdateAddingNewProduct)
-                    productRepository.insert(saveProduct())
-                    sendEvent(event = ProductEvent.OnAddingNewProductDoneClick)
-                } else {
-                    sendEvent(event = ProductEvent.UpdateEditingProduct)
-                    productRepository.update(saveProduct(id = productId))
-                    sendEvent(event = ProductEvent.OnEditingProductDoneClick)
-                }
-            } else {
-                sendEvent(event = ProductEvent.UpdateInvalidField)
-            }
         }
     }
 
-    fun onDeleteClick() {
+    fun onEditingProductDoneClick() {
+        if (isProductValid()) {
+            sendEvent(event = ProductEvent.UpdateEditingProduct)
+        } else {
+            sendEvent(event = ProductEvent.UpdateInvalidField(hasInvalidField = true))
+        }
+    }
+
+    fun onAddingNewProductDoneClick() {
+        if (isProductValid()) {
+            sendEvent(event = ProductEvent.UpdateAddingNewProduct)
+        } else {
+            sendEvent(event = ProductEvent.UpdateInvalidField(hasInvalidField = true))
+        }
+    }
+
+    fun onDeletingProductClick() {
         sendEvent(event = ProductEvent.UpdateDeletingProduct)
+    }
 
-        viewModelScope.launch { productRepository.delete(id = productId) }
+    fun editProduct() {
+        viewModelScope.launch {
+            productRepository.update(saveProduct(id = productId))
+            sendEvent(event = ProductEvent.OnEditProductSuccessfully)
+        }
+    }
 
-        sendEvent(event = ProductEvent.OnDeleteClick)
+    fun addNewProduct() {
+        viewModelScope.launch {
+            productRepository.insert(saveProduct())
+            sendEvent(event = ProductEvent.OnAddNewProductSuccessfully)
+        }
+    }
+
+    fun deleteProduct() {
+        viewModelScope.launch {
+            productRepository.delete(id = productId)
+            sendEvent(event = ProductEvent.OnDeleteProductSuccessfully)
+        }
     }
 
     fun onBackClick() {
