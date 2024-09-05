@@ -78,16 +78,19 @@ internal sealed interface ProductEvent : Reducer.ViewEvent {
     data object UpdateEditingProduct : ProductEvent
     data object UpdateDeletingProduct : ProductEvent
     data object UpdateAddingNewProduct : ProductEvent
-    data object OnEditingProductDoneClick : ProductEvent
-    data object OnAddingNewProductDoneClick : ProductEvent
-    data object OnDeleteClick : ProductEvent
+    data object OnEditProductSuccessfully : ProductEvent
+    data object OnAddNewProductSuccessfully : ProductEvent
+    data object OnDeleteProductSuccessfully : ProductEvent
     data object UpdateIdleState : ProductEvent
-    data object UpdateInvalidField : ProductEvent
+    data class UpdateInvalidField(val hasInvalidField: Boolean) : ProductEvent
     data object OnBackClick : ProductEvent
 }
 
 @Immutable
 internal sealed interface ProductEffect : Reducer.ViewEffect {
+    data object EditProduct : ProductEffect
+    data object AddNewProduct : ProductEffect
+    data object DeleteProduct : ProductEffect
     data object InvalidFieldErrorMessage : ProductEffect
     data object NavigateBack : ProductEffect
 }
