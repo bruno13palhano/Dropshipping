@@ -16,11 +16,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -46,13 +49,16 @@ internal fun ProductRoute(
     onBackClick: () -> Unit,
     viewModel: ProductViewModel = hiltViewModel()
 ) {
-    if (id != 0L) { LaunchedEffect(key1 = Unit) { viewModel.getProduct(id = id) } }
+    LaunchedEffect(key1 = Unit) { viewModel.getProduct(id = id) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(viewModel.effect)
 
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val errorMessage = stringResource(id = R.string.empty_fields_error)
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val title =
         if (id != 0L) stringResource(id = R.string.update_product)
@@ -61,8 +67,17 @@ internal fun ProductRoute(
     LaunchedEffect(effect) {
         effect.collect { action ->
             when(action) {
+                is ProductEffect.EditProduct -> {
+                    viewModel.editProduct()
+                }
+                is ProductEffect.AddNewProduct -> {
+                    viewModel.addNewProduct()
+                }
+                is ProductEffect.DeleteProduct -> {
+                    viewModel.deleteProduct()
+                }
                 is ProductEffect.InvalidFieldErrorMessage -> {
-
+                    snackbarHostState.showSnackbar(message = errorMessage)
                 }
                 is ProductEffect.NavigateBack -> {
                     onBackClick()
@@ -76,14 +91,18 @@ internal fun ProductRoute(
             keyboardController?.hide()
             focusManager.clearFocus(force = true)
         },
+        snackbarHostState = snackbarHostState,
         title = title,
         naturaCode = viewModel.naturaCode,
         productName = viewModel.productName,
         hasInvalidField = state.hasInvalidField,
         onNaturaCodeChange = viewModel::updateNaturaCode,
         onProductNameChange = viewModel::updateProductName,
-        onDoneClick = viewModel::onDoneClick,
-        onDeleteClick = viewModel::onDeleteClick,
+        onDoneClick = {
+            if (id != 0L) viewModel.onEditingProductDoneClick()
+            else viewModel.onAddingNewProductDoneClick()
+        },
+        onDeleteClick = viewModel::onDeletingProductClick,
         onBackClick = viewModel::onBackClick
     )
 }
@@ -92,6 +111,7 @@ internal fun ProductRoute(
 @Composable
 private fun ProductContent(
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
     title: String,
     naturaCode: String,
     productName: String,
@@ -128,6 +148,7 @@ private fun ProductContent(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = onDoneClick) {
                 Icon(
@@ -173,6 +194,7 @@ private fun ProductContent(
 @Composable
 private fun ProductContentPreview() {
     ProductContent(
+        snackbarHostState = remember { SnackbarHostState() },
         title = stringResource(id = R.string.add_product),
         naturaCode = "1234",
         productName = "",
