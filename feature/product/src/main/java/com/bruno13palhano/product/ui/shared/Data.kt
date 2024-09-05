@@ -1,6 +1,7 @@
 package com.bruno13palhano.product.ui.shared
 
 import androidx.compose.runtime.Immutable
+import com.bruno13palhano.model.Product
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.shared.Reducer
 
@@ -47,27 +48,46 @@ internal sealed interface ProductsEffect : Reducer.ViewEffect {
 
 @Immutable
 internal data class ProductState(
+    val loadingCurrentProduct: Boolean,
+    val editingProduct: Boolean,
+    val addingNewProduct: Boolean,
+    val isProductDeleting: Boolean,
     val isIdle: Boolean,
-    val isProductUpdating: Boolean,
-    val isProductAdding: Boolean,
-    val hasInvalidField: Boolean
+    val hasInvalidField: Boolean,
+    val navigateBack: Boolean,
+    val currentProduct: Product?
 ) : Reducer.ViewState {
     companion object {
         val INITIAL_STATE = ProductState(
+            loadingCurrentProduct = false,
+            editingProduct = false,
+            addingNewProduct = false,
+            isProductDeleting = false,
             isIdle = true,
-            isProductUpdating = false,
-            isProductAdding = false,
             hasInvalidField = false,
+            navigateBack = false,
+            currentProduct = null
         )
     }
 }
 
 @Immutable
 internal sealed interface ProductEvent : Reducer.ViewEvent {
-
+    data object UpdateLoadingCurrentProduct : ProductEvent
+    data class UpdateCurrentProduct(val product: Product) : ProductEvent
+    data object UpdateEditingProduct : ProductEvent
+    data object UpdateDeletingProduct : ProductEvent
+    data object UpdateAddingNewProduct : ProductEvent
+    data object OnEditingProductDoneClick : ProductEvent
+    data object OnAddingNewProductDoneClick : ProductEvent
+    data object OnDeleteClick : ProductEvent
+    data object UpdateIdleState : ProductEvent
+    data object UpdateInvalidField : ProductEvent
+    data object OnBackClick : ProductEvent
 }
 
 @Immutable
 internal sealed interface ProductEffect : Reducer.ViewEffect {
-
+    data object InvalidFieldErrorMessage : ProductEffect
+    data object NavigateBack : ProductEffect
 }
