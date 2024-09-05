@@ -7,9 +7,10 @@
     <string name="enter_product_name">Enter product name</string>
     <string name="add_product">Add product</string>
     <string name="update_product">Update product</string>
-    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="done">Done</string>
     <string name="empty_fields_error">Fill missing fields</string>
     <string name="product_deleted">Product deleted</string>"
+    <string name="navigate_back">Navigate back</string>
 </resources>
