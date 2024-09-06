@@ -82,12 +82,12 @@ sealed class Screen<T>(
         resourceId = R.string.home
     )
     data object Receipts: Screen<ReceiptsRoutes>(
-        route = ReceiptsRoutes.Main,
+        route = ReceiptsRoutes.MainReceipt,
         icon = Icons.AutoMirrored.Filled.ListAlt,
         resourceId = R.string.receipts
     )
     data object Products: Screen<ProductsRoutes>(
-        route = ProductsRoutes.Products,
+        route = ProductsRoutes.MainProduct,
         icon = Icons.AutoMirrored.Filled.List,
         resourceId = R.string.products
     )

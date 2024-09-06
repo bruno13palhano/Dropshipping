@@ -15,7 +15,7 @@ fun NavGraphBuilder.receiptsScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    navigation<ReceiptsRoutes.Main>(startDestination = ReceiptsRoutes.Receipts) {
+    navigation<ReceiptsRoutes.MainReceipt>(startDestination = ReceiptsRoutes.Receipts) {
         composable<ReceiptsRoutes.Receipts> {
             ReceiptsRoute(
                 modifier = modifier,
@@ -50,7 +50,7 @@ fun NavGraphBuilder.receiptsScreen(
 
 sealed interface ReceiptsRoutes {
     @Serializable
-    data object Main: ReceiptsRoutes
+    data object MainReceipt: ReceiptsRoutes
 
     @Serializable
     data object Receipts : ReceiptsRoutes
