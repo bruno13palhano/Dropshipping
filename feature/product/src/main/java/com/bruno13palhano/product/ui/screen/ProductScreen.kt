@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -41,6 +42,7 @@ import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ProductRoute(
@@ -59,6 +61,7 @@ internal fun ProductRoute(
 
     val errorMessage = stringResource(id = R.string.empty_fields_error)
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val title =
         if (id != 0L) stringResource(id = R.string.update_product)
@@ -77,7 +80,12 @@ internal fun ProductRoute(
                     viewModel.deleteProduct()
                 }
                 is ProductEffect.InvalidFieldErrorMessage -> {
-                    snackbarHostState.showSnackbar(message = errorMessage)
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = errorMessage,
+                            withDismissAction = true
+                        )
+                    }
                 }
                 is ProductEffect.NavigateBack -> {
                     onBackClick()
@@ -139,6 +147,7 @@ private fun ProductContent(
                     }
                 },
                 actions = {
+                    //Shows only for edit product screen
                     IconButton(onClick = onDeleteClick) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
