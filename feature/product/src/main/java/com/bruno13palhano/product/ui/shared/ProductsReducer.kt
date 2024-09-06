@@ -39,7 +39,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     isError = false
                 ) to ProductsEffect.NavigateToAddProduct
             }
-            is ProductsEvent.ProductDeleting -> {
+            is ProductsEvent.UpdateDeletingProduct -> {
                 previousState.copy(
                     productsLoading = false,
                     editProduct = false,
@@ -47,6 +47,11 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     deleteProduct = event.isDeleting,
                     isIdle = false,
                     isError = false
+                ) to ProductsEffect.DeleteProduct(id = event.id)
+            }
+            is ProductsEvent.OnDeleteProductSuccessfully -> {
+                previousState.copy(
+                    isIdle = true
                 ) to ProductsEffect.ShowDeletedMessage
             }
             is ProductsEvent.IdleState -> {
@@ -58,16 +63,6 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     isIdle = event.isIdle,
                     isError = false
                 ) to null
-            }
-            is ProductsEvent.ErrorState -> {
-                previousState.copy(
-                    productsLoading = false,
-                    editProduct = false,
-                    addProduct = false,
-                    deleteProduct = false,
-                    isIdle = false,
-                    isError = event.isError
-                ) to ProductsEffect.ShowErrorMessage
             }
         }
     }

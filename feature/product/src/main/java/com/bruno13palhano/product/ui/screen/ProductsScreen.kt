@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -37,6 +38,7 @@ import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ProductsRoute(
@@ -50,10 +52,10 @@ internal fun ProductsRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
 
-    val errorMessage = stringResource(id = R.string.empty_fields_error)
     val deleteMessage = stringResource(id = R.string.product_deleted)
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(effect) {
         effect.collect { action ->
@@ -64,11 +66,16 @@ internal fun ProductsRoute(
                 is ProductsEffect.NavigateToAddProduct -> {
                     navigateToAddProduct()
                 }
-                is ProductsEffect.ShowErrorMessage -> {
-                    snackbarHostState.showSnackbar(message = errorMessage)
+                is ProductsEffect.DeleteProduct -> {
+                    viewModel.deleteProduct(id = action.id)
                 }
                 is ProductsEffect.ShowDeletedMessage -> {
-                    snackbarHostState.showSnackbar(message = deleteMessage)
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = deleteMessage,
+                            withDismissAction = true
+                        )
+                    }
                 }
             }
         }
@@ -79,7 +86,7 @@ internal fun ProductsRoute(
         snackbarHostState = snackbarHostState,
         products = state.products,
         onEditProductItemClick = viewModel::updatingProductState,
-        onDeleteItemClick = viewModel::deleteProduct,
+        onDeleteItemClick = viewModel::onDeletingProductClick,
         onAddNewProductClick = viewModel::addButtonClick
     )
 }

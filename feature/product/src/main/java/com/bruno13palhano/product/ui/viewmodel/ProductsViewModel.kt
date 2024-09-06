@@ -52,14 +52,14 @@ internal class ProductsViewModel @Inject constructor(
         sendEvent(event = ProductsEvent.AddProduct(true))
     }
 
-    fun deleteProduct(id: Long) {
-        sendEvent(event = ProductsEvent.ProductDeleting(true))
+    fun onDeletingProductClick(id: Long) {
+        sendEvent(event = ProductsEvent.UpdateDeletingProduct(isDeleting = true, id = id))
+    }
 
+    fun deleteProduct(id: Long) {
         viewModelScope.launch {
-            try {
-                productRepository.delete(id = id)
-            } catch (_: Exception) {}
+            productRepository.delete(id = id)
+            sendEvent(event = ProductsEvent.OnDeleteProductSuccessfully)
         }
-        sendEvent(event = ProductsEvent.IdleState(true))
     }
 }

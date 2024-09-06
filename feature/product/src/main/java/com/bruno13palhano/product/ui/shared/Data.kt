@@ -33,16 +33,16 @@ internal sealed interface ProductsEvent : Reducer.ViewEvent {
     data class UpdateProducts(val isLoading: Boolean, val products: List<CommonItem>) : ProductsEvent
     data class EditProduct(val editProduct: Boolean, val id: Long) : ProductsEvent
     data class AddProduct(val addProduct: Boolean) : ProductsEvent
-    data class ProductDeleting(val isDeleting: Boolean) : ProductsEvent
+    data class UpdateDeletingProduct(val isDeleting: Boolean, val id: Long) : ProductsEvent
+    data object OnDeleteProductSuccessfully : ProductsEvent
     data class IdleState(val isIdle: Boolean) : ProductsEvent
-    data class ErrorState(val isError: Boolean) : ProductsEvent
 }
 
 @Immutable
 internal sealed interface ProductsEffect : Reducer.ViewEffect {
     data class NavigateToEditProduct(val id: Long) : ProductsEffect
     data object NavigateToAddProduct : ProductsEffect
-    data object ShowErrorMessage : ProductsEffect
+    data class DeleteProduct(val id: Long) : ProductsEffect
     data object ShowDeletedMessage : ProductsEffect
 }
 
