@@ -42,7 +42,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                 ) to ProductsEffect.DeleteProduct(id = event.id)
             }
             is ProductsEvent.OnDeleteProductSuccessfully -> {
-                previousState to ProductsEffect.ShowDeletedMessage
+                previousState.copy(deleteProduct = false) to ProductsEffect.ShowDeletedMessage
             }
         }
     }
