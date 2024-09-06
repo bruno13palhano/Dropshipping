@@ -11,8 +11,6 @@ internal data class ProductsState(
     val editProduct: Boolean,
     val addProduct: Boolean,
     val deleteProduct: Boolean,
-    val isIdle: Boolean,
-    val isError: Boolean,
     val products: List<CommonItem>
 ) : Reducer.ViewState {
     companion object {
@@ -21,8 +19,6 @@ internal data class ProductsState(
             editProduct = false,
             addProduct = false,
             deleteProduct = false,
-            isIdle = false,
-            isError = false,
             products = emptyList()
         )
     }
@@ -35,7 +31,6 @@ internal sealed interface ProductsEvent : Reducer.ViewEvent {
     data class AddProduct(val addProduct: Boolean) : ProductsEvent
     data class UpdateDeletingProduct(val isDeleting: Boolean, val id: Long) : ProductsEvent
     data object OnDeleteProductSuccessfully : ProductsEvent
-    data class IdleState(val isIdle: Boolean) : ProductsEvent
 }
 
 @Immutable

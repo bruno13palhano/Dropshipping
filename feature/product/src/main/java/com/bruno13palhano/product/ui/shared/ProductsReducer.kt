@@ -14,8 +14,6 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     editProduct = false,
                     addProduct = false,
                     deleteProduct = false,
-                    isIdle = false,
-                    isError = false,
                     products = event.products
                 ) to null
             }
@@ -24,9 +22,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     productsLoading = false,
                     editProduct = event.editProduct,
                     addProduct = false,
-                    deleteProduct = false,
-                    isIdle = false,
-                    isError = false
+                    deleteProduct = false
                 ) to ProductsEffect.NavigateToEditProduct(event.id)
             }
             is ProductsEvent.AddProduct -> {
@@ -34,9 +30,7 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     productsLoading = false,
                     editProduct = false,
                     addProduct = event.addProduct,
-                    deleteProduct = false,
-                    isIdle = false,
-                    isError = false
+                    deleteProduct = false
                 ) to ProductsEffect.NavigateToAddProduct
             }
             is ProductsEvent.UpdateDeletingProduct -> {
@@ -44,25 +38,11 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
                     productsLoading = false,
                     editProduct = false,
                     addProduct = false,
-                    deleteProduct = event.isDeleting,
-                    isIdle = false,
-                    isError = false
+                    deleteProduct = event.isDeleting
                 ) to ProductsEffect.DeleteProduct(id = event.id)
             }
             is ProductsEvent.OnDeleteProductSuccessfully -> {
-                previousState.copy(
-                    isIdle = true
-                ) to ProductsEffect.ShowDeletedMessage
-            }
-            is ProductsEvent.IdleState -> {
-                previousState.copy(
-                    productsLoading = false,
-                    editProduct = false,
-                    addProduct = false,
-                    deleteProduct = false,
-                    isIdle = event.isIdle,
-                    isError = false
-                ) to null
+                previousState to ProductsEffect.ShowDeletedMessage
             }
         }
     }
