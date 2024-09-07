@@ -59,4 +59,5 @@ internal sealed interface ReceiptsEffect : Reducer.ViewEffect {
     data class DeleteReceipt(val id: Long) : ReceiptsEffect
     data class DeleteCache(val query: String) : ReceiptsEffect
     data object ShowDeletedMessage : ReceiptsEffect
+    data object RefreshProducts : ReceiptsEffect
 }

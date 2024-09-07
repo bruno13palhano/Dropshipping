@@ -102,7 +102,7 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
             is ReceiptsEvent.OnCloseSearchClick -> {
                 previousState.copy(
                     searching = false
-                ) to ReceiptsEffect.SearchingProducts(query = "")
+                ) to ReceiptsEffect.RefreshProducts
             }
         }
     }
