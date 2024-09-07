@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -51,10 +52,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
+import com.bruno13palhano.receipt.ui.shared.ReceiptsEffect
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptsViewModel
 import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
+import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ReceiptsRoute(
@@ -65,47 +69,70 @@ internal fun ReceiptsRoute(
 ) {
     LaunchedEffect(key1 = Unit) { viewModel.getReceipts() }
     LaunchedEffect(key1 = Unit) { viewModel.getProducts() }
+    LaunchedEffect(key1 = Unit) { viewModel.getCache() }
 
-    val receipts by viewModel.receipts.collectAsStateWithLifecycle()
-    val products by viewModel.products.collectAsStateWithLifecycle()
-    val cache by viewModel.cache.collectAsStateWithLifecycle()
-
-    var showProductsSearch by rememberSaveable { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val deleteMessage = stringResource(id = R.string.delete_receipt_message)
+
+    LaunchedEffect(effect) {
+        effect.collect { action ->
+            when (action) {
+                is ReceiptsEffect.NavigateToEditReceipt -> {
+                    onItemClick(action.id)
+                }
+                is ReceiptsEffect.NavigateToAddReceipt -> {
+                    onAddNewReceiptClick(action.productId)
+                }
+                is ReceiptsEffect.SearchingProducts -> {
+                    keyboardController?.hide()
+                    focusManager.clearFocus(force = true)
+
+                    viewModel.searchProducts(query = action.query)
+                }
+                is ReceiptsEffect.DeleteReceipt -> {
+                    viewModel.deleteReceipt(id = action.id)
+                }
+                is ReceiptsEffect.DeleteCache -> {
+                    viewModel.deleteCache(query = action.query)
+                }
+                is ReceiptsEffect.ShowDeletedMessage -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = deleteMessage,
+                            withDismissAction = true
+                        )
+                    }
+                }
+                is ReceiptsEffect.RefreshProducts -> {
+                    viewModel.getProducts()
+                }
+            }
+        }
+    }
 
     ReceiptsContent(
         modifier = modifier
             .clickableWithoutRipple {
-                keyboardController?.hide()
-                focusManager.clearFocus(force = true)
-                showProductsSearch = false
+                viewModel.onCloseSearchClick()
             },
         snackbarHostState = snackbarHostState,
-        showProductsSearch = showProductsSearch,
-        products = products,
-        receipts = receipts,
-        cache = cache,
-        onReceiptItemClick = onItemClick,
-        onDeleteReceiptClick = viewModel::deleteReceipt,
-        onAddNewReceiptClick = {
-            showProductsSearch = true
-            viewModel.getProducts()
-        },
-        onSearchClick =  {
-            keyboardController?.hide()
-            focusManager.clearFocus(force = true)
-            viewModel.searchProducts(it)
-        },
-        onProductItemClick = {
-            keyboardController?.hide()
-            focusManager.clearFocus(force = true)
-            showProductsSearch = true
-            onAddNewReceiptClick(it)
-        },
-        onDeleteSearchClick = viewModel::deleteCache,
-        onClose = { showProductsSearch = false }
+        showProductsSearch = state.searching,
+        products = state.products,
+        receipts = state.receipts,
+        cache = state.cache,
+        onReceiptItemClick = viewModel::onEditReceiptClick,
+        onDeleteReceiptClick = viewModel::onDeleteReceiptClick,
+        onAddNewReceiptClick = viewModel::onAddReceiptClick,
+        onSearchClick =  viewModel::onSearchDoneClick,
+        onProductItemClick = viewModel::onProductItemClick,
+        onDeleteSearchClick = viewModel::onDeleteCacheClick,
+        onClose = viewModel::onCloseSearchClick
     )
 }
 
