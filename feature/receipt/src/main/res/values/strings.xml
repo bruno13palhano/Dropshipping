@@ -28,4 +28,5 @@
     <string name="navigate_back">Navigate back</string>
     <string name="vert_menu">Vertical menu</string>
     <string name="done">Done</string>
+    <string name="delete_receipt_message">Receipt deleted</string>
 </resources>
