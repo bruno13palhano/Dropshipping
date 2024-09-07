@@ -85,9 +85,9 @@ internal fun ProductsRoute(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         products = state.products,
-        onEditProductItemClick = viewModel::updatingProductState,
-        onDeleteItemClick = viewModel::onDeletingProductClick,
-        onAddNewProductClick = viewModel::addButtonClick
+        onEditProductItemClick = viewModel::onEditProductClick,
+        onDeleteItemClick = viewModel::onDeleteProductClick,
+        onAddNewProductClick = viewModel::onAddProductClick
     )
 }
 

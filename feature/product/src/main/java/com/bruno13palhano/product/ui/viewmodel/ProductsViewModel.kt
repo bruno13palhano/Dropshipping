@@ -39,7 +39,7 @@ internal class ProductsViewModel @Inject constructor(
         }
     }
 
-    fun updatingProductState(id: Long) {
+    fun onEditProductClick(id: Long) {
         sendEvent(
             event = ProductsEvent.EditProduct(
                 editProduct = true,
@@ -48,11 +48,11 @@ internal class ProductsViewModel @Inject constructor(
         )
     }
 
-    fun addButtonClick() {
+    fun onAddProductClick() {
         sendEvent(event = ProductsEvent.AddProduct(true))
     }
 
-    fun onDeletingProductClick(id: Long) {
+    fun onDeleteProductClick(id: Long) {
         sendEvent(event = ProductsEvent.UpdateDeletingProduct(isDeleting = true, id = id))
     }
 
