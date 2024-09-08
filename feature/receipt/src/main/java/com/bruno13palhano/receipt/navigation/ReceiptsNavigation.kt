@@ -8,6 +8,7 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.bruno13palhano.receipt.ui.screen.AddReceiptRoute
 import com.bruno13palhano.receipt.ui.screen.ReceiptsRoute
+import com.bruno13palhano.receipt.ui.screen.SearchRoute
 import com.bruno13palhano.receipt.ui.screen.UpdateReceiptRoute
 import kotlinx.serialization.Serializable
 
@@ -23,8 +24,17 @@ fun NavGraphBuilder.receiptsScreen(
                     navController.navigate(ReceiptsRoutes.UpdateReceipt(id = it))
                 },
                 onAddNewReceiptClick = {
-                    navController.navigate(ReceiptsRoutes.AddReceipt(productId = it))
+                    navController.navigate(ReceiptsRoutes.SearchProduct)
                 }
+            )
+        }
+        composable<ReceiptsRoutes.SearchProduct> {
+            SearchRoute(
+                modifier = modifier,
+                navigateToAddReceipt = {
+                    navController.navigate(ReceiptsRoutes.AddReceipt(productId = it))
+                },
+                navigateBack = { navController.navigateUp() }
             )
         }
         composable<ReceiptsRoutes.AddReceipt> {
@@ -54,6 +64,9 @@ sealed interface ReceiptsRoutes {
 
     @Serializable
     data object Receipts : ReceiptsRoutes
+
+    @Serializable
+    data object SearchProduct : ReceiptsRoutes
 
     @Serializable
     data class AddReceipt(val productId: Long) : ReceiptsRoutes
