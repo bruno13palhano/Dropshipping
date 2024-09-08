@@ -95,8 +95,7 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
                     cacheLoading = false,
                     editReceipt = false,
                     addReceipt = true,
-                    deleteReceipt = false,
-                    searching = false
+                    deleteReceipt = false
                 ) to ReceiptsEffect.NavigateToAddReceipt(productId = event.id)
             }
             is ReceiptsEvent.OnCloseSearchClick -> {
