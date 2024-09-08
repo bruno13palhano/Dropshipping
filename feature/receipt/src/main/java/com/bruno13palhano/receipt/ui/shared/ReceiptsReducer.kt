@@ -10,98 +10,46 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
         return when (event) {
             is ReceiptsEvent.UpdateProducts -> {
                 previousState.copy(
-                    productsLoading = event.isLoading,
                     editReceipt = false,
-                    addReceipt = false,
+                    searchProduct = false,
                     deleteReceipt = false,
-                    products = event.products
                 ) to null
             }
             is ReceiptsEvent.UpdateReceipts -> {
                 previousState.copy(
                     receiptsLoading = event.isLoading,
                     editReceipt = false,
-                    addReceipt = false,
+                    searchProduct = false,
                     deleteReceipt = false,
                     receipts = event.receipts
                 ) to null
             }
-            is ReceiptsEvent.UpdateCache -> {
-                previousState.copy(
-                    cacheLoading = event.isLoading,
-                    editReceipt = false,
-                    addReceipt = false,
-                    deleteReceipt = false,
-                    cache = event.cache
-                ) to null
-            }
             is ReceiptsEvent.EditReceipt -> {
                 previousState.copy(
-                    productsLoading = false,
                     receiptsLoading = false,
-                    cacheLoading = false,
                     editReceipt = event.editReceipt,
-                    addReceipt = false,
+                    searchProduct = false,
                     deleteReceipt = false,
-                    searching = false
                 ) to ReceiptsEffect.NavigateToEditReceipt(id = event.id)
+            }
+            is ReceiptsEvent.SearchProduct -> {
+                previousState.copy(
+                    receiptsLoading = false,
+                    editReceipt = false,
+                    searchProduct = event.searching,
+                    deleteReceipt = false
+                ) to ReceiptsEffect.NavigateToSearchProduct
             }
             is ReceiptsEvent.UpdateDeletingReceipt -> {
                 previousState.copy(
-                    productsLoading = false,
                     receiptsLoading = false,
-                    cacheLoading = false,
                     editReceipt = false,
-                    addReceipt = false,
+                    searchProduct = false,
                     deleteReceipt = event.isDeleting
                 ) to ReceiptsEffect.DeleteReceipt(id = event.id)
             }
-            is ReceiptsEvent.UpdateDeletingCache -> {
-                previousState.copy(
-                    productsLoading = false,
-                    receiptsLoading = false,
-                    cacheLoading = false,
-                    editReceipt = false,
-                    addReceipt = false,
-                    deleteReceipt = event.isDeleting
-                ) to ReceiptsEffect.DeleteCache(query = event.query)
-            }
-            is ReceiptsEvent.UpdateSearching -> {
-                previousState.copy(
-                    productsLoading = false,
-                    receiptsLoading = false,
-                    cacheLoading = false,
-                    editReceipt = false,
-                    addReceipt = false,
-                    deleteReceipt = false,
-                    searching = event.isSearching
-                ) to null
-            }
             is ReceiptsEvent.OnDeleteReceiptSuccessfully -> {
                 previousState.copy(deleteReceipt = false) to ReceiptsEffect.ShowDeletedMessage
-            }
-            is ReceiptsEvent.OnDeleteCacheSuccessfully -> {
-                previousState.copy(deleteReceipt = false) to null
-            }
-            is ReceiptsEvent.OnSearchDoneClick -> {
-                previousState.copy(
-                    productsLoading = true
-                ) to ReceiptsEffect.SearchingProducts(query = event.query)
-            }
-            is ReceiptsEvent.OnProductItemClick -> {
-                previousState.copy(
-                    productsLoading = false,
-                    receiptsLoading = false,
-                    cacheLoading = false,
-                    editReceipt = false,
-                    addReceipt = true,
-                    deleteReceipt = false
-                ) to ReceiptsEffect.NavigateToAddReceipt(productId = event.id)
-            }
-            is ReceiptsEvent.OnCloseSearchClick -> {
-                previousState.copy(
-                    searching = false
-                ) to ReceiptsEffect.RefreshProducts
             }
         }
     }
