@@ -2,7 +2,6 @@ package com.bruno13palhano.receipt.ui.screen
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -46,6 +45,9 @@ internal fun SearchRoute(
     navigateBack: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) { viewModel.getCache() }
+    LaunchedEffect(Unit) { viewModel.getProducts() }
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
 
@@ -119,14 +121,14 @@ private fun SearchContent(
         }
     ) {
         LazyColumn(
-            modifier = modifier
+            modifier = Modifier
                 .semantics { contentDescription = "List of products" }
                 .consumeWindowInsets(it),
             contentPadding = it
         ) {
             items(items = products, key = { product -> product.id }) {
                 ElevatedListItem(
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier.padding(4.dp),
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
                     iconDescription = "",
                     onItemClick = { onProductItemClick(it.id) },
@@ -161,17 +163,13 @@ private fun SearchProducts(
             .fillMaxWidth(),
         query = query,
         onQueryChange = onQueryChange,
-        onSearch = {
-            onActiveChange(false)
-            onSearchClick(it)
-        },
+        onSearch = { onSearchClick(it) },
         active = active,
         onActiveChange = onActiveChange,
         leadingIcon = {
             IconButton(
                 modifier = Modifier.semantics { contentDescription = "Close button" },
-                onClick = { if (active) onActiveChange(false) else onClose()
-                }
+                onClick = onClose
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -182,10 +180,7 @@ private fun SearchProducts(
         trailingIcon = {
             IconButton(
                 modifier = Modifier.semantics { contentDescription = "Search button" },
-                onClick = {
-                    onActiveChange(false)
-                    onSearchClick(query)
-                }
+                onClick = { onSearchClick(query) }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Search,
@@ -203,10 +198,7 @@ private fun SearchProducts(
                     icon = Icons.Filled.Close,
                     iconDescription = stringResource(id = R.string.delete),
                     shape = RectangleShape,
-                    onItemClick = {
-                        onActiveChange(false)
-                        onSearchClick(it)
-                    },
+                    onItemClick = { onSearchClick(it) },
                     onIconClick = { onDeleteSearchClick(it) }
                 ) {
                     Text(
