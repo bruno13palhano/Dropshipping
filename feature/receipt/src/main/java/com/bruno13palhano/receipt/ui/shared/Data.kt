@@ -73,11 +73,9 @@ internal sealed interface SearchEvent : Reducer.ViewEvent {
     data class UpdateActive(val active: Boolean) : SearchEvent
     data class UpdateProducts(val products: List<CommonItem>) : SearchEvent
     data class UpdateCache(val cache: List<String>) : SearchEvent
-    data object OnDeleteCacheSuccessfully : SearchEvent
     data class OnSearchDoneClick(val query: String) : SearchEvent
     data object OnCloseSearchClick : SearchEvent
     data class OnProductItemClick(val id: Long) : SearchEvent
-    data object OnNavigateBackClick : SearchEvent
 }
 
 @Immutable
