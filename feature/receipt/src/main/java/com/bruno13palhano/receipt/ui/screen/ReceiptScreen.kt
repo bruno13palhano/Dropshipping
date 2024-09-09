@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -218,7 +220,6 @@ internal fun ReceiptContent(
                 focusManager.clearFocus(force = true)
             }
             .clearFocusOnKeyboardDismiss()
-            .consumeWindowInsets(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.safeDrawing),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
@@ -278,7 +279,12 @@ internal fun ReceiptContent(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
+        ) {
             CustomTextField(
                 modifier = Modifier
                     .semantics { contentDescription = "Product name" }
@@ -370,8 +376,7 @@ internal fun ReceiptContent(
                 modifier = Modifier
                     .semantics { contentDescription = "Observations" }
                     .padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 8.dp)
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .fillMaxWidth(),
                 value = observations,
                 onValueChange = onObservationsChange,
                 label = stringResource(id = R.string.observations),
