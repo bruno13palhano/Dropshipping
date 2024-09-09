@@ -100,6 +100,7 @@ internal fun ProductRoute(
             focusManager.clearFocus(force = true)
         },
         snackbarHostState = snackbarHostState,
+        showEditButton = id != 0L,
         title = title,
         naturaCode = viewModel.naturaCode,
         productName = viewModel.productName,
@@ -120,6 +121,7 @@ internal fun ProductRoute(
 private fun ProductContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
+    showEditButton: Boolean,
     title: String,
     naturaCode: String,
     productName: String,
@@ -147,12 +149,13 @@ private fun ProductContent(
                     }
                 },
                 actions = {
-                    //Shows only for edit product screen
-                    IconButton(onClick = onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(id = R.string.delete)
-                        )
+                    if (showEditButton) {
+                        IconButton(onClick = onDeleteClick) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(id = R.string.delete)
+                            )
+                        }
                     }
                 }
             )
@@ -204,6 +207,7 @@ private fun ProductContent(
 private fun ProductContentPreview() {
     ProductContent(
         snackbarHostState = remember { SnackbarHostState() },
+        showEditButton = false,
         title = stringResource(id = R.string.add_product),
         naturaCode = "1234",
         productName = "",
