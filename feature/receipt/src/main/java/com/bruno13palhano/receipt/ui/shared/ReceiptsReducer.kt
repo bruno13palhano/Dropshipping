@@ -8,13 +8,6 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
         event: ReceiptsEvent
     ): Pair<ReceiptsState, ReceiptsEffect?> {
         return when (event) {
-            is ReceiptsEvent.UpdateProducts -> {
-                previousState.copy(
-                    editReceipt = false,
-                    searchProduct = false,
-                    deleteReceipt = false,
-                ) to null
-            }
             is ReceiptsEvent.UpdateReceipts -> {
                 previousState.copy(
                     receiptsLoading = event.isLoading,

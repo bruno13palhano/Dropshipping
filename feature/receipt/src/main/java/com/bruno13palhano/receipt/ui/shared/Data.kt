@@ -25,7 +25,6 @@ internal data class ReceiptsState(
 
 @Immutable
 internal sealed interface ReceiptsEvent : Reducer.ViewEvent {
-    data class UpdateProducts(val isLoading: Boolean, val products: List<CommonItem>) : ReceiptsEvent
     data class UpdateReceipts(val isLoading: Boolean, val receipts: List<CommonItem>) : ReceiptsEvent
     data class EditReceipt(val editReceipt: Boolean, val id: Long) : ReceiptsEvent
     data class SearchProduct(val searching: Boolean) : ReceiptsEvent
