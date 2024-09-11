@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
+import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
 import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
 import com.bruno13palhano.ui.components.clickableWithoutRipple
@@ -64,65 +65,42 @@ import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.MoreVertMenu
 import com.bruno13palhano.ui.components.currentDate
 import com.bruno13palhano.ui.components.dateFormat
-import kotlinx.coroutines.launch
+import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 
 @Composable
-internal fun AddReceiptRoute(
+internal fun ReceiptRoute(
     modifier: Modifier = Modifier,
+    id: Long,
     productId: Long,
     onBackClick: () -> Unit,
     viewModel: ReceiptViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) { viewModel.getProduct(productId = productId) }
-    LaunchedEffect(key1 = Unit) { viewModel.updateRequestDate(currentDate()) }
+    val title = getScreenTitle(receiptId = id)
 
-    val hasInvalidField by viewModel.hasInvalidField.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(key1 = Unit) {
+        getInitialData(
+            receiptId = id,
+            productId = productId,
+            viewModel = viewModel
+        )
+    }
 
-    ReceiptContent(
-        modifier = modifier,
-        screenTitle = stringResource(id = R.string.add_receipt),
-        menuItems = emptyList(),
-        hasInvalidField = hasInvalidField,
-        productName = viewModel.productName,
-        requestNumber = viewModel.requestNumber,
-        requestDate = viewModel.requestDate,
-        customerName = viewModel.customerName,
-        quantity = viewModel.quantity,
-        naturaPrice = viewModel.naturaPrice,
-        amazonPrice = viewModel.amazonPrice,
-        paymentOption = viewModel.paymentOption,
-        observations = viewModel.observations,
-        onRequestNumberChange = viewModel::updateRequestNumber,
-        onRequestDateChange = viewModel::updateRequestDate,
-        onCustomerNameChange = viewModel::updateCustomerName,
-        onQuantityChange = viewModel::updateQuantity,
-        onNaturaPriceChange = viewModel::updateNaturaPrice,
-        onAmazonPriceChange = viewModel::updateAmazonPrice,
-        onPaymentOptionChange = viewModel::updatePaymentOption,
-        onObservationsChange = viewModel::updateObservations,
-        onMoreVertMenuItemClick = {},
-        onBackClick = onBackClick,
-        onDoneClick = {
-            viewModel.addReceipt()
-            coroutineScope.launch {
-                if (!hasInvalidField) onBackClick()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
+
+    LaunchedEffect(key1 = effect) {
+        effect.collect { effect ->
+            when (effect) {
+                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt()
+
+                is ReceiptEffect.InsertReceipt -> viewModel.insertReceipt()
+
+                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt()
+
+                is ReceiptEffect.NavigateBack -> onBackClick()
             }
         }
-    )
-}
-
-@Composable
-internal fun UpdateReceiptRoute(
-    modifier: Modifier = Modifier,
-    id: Long,
-    onBackClick: () -> Unit,
-    viewModel: ReceiptViewModel = hiltViewModel()
-) {
-    LaunchedEffect(key1 = Unit) { viewModel.getReceipt(id = id) }
-
-    val hasInvalidField by viewModel.hasInvalidField.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
+    }
 
     val items = listOf(
         stringResource(id = R.string.delete),
@@ -131,9 +109,10 @@ internal fun UpdateReceiptRoute(
 
     ReceiptContent(
         modifier = modifier,
-        screenTitle = stringResource(id = R.string.update_receipt),
+        showMenu = id != 0L,
+        screenTitle = title,
         menuItems = items,
-        hasInvalidField = hasInvalidField,
+        hasInvalidField = state.hasInvalidField,
         productName = viewModel.productName,
         requestNumber = viewModel.requestNumber,
         requestDate = viewModel.requestDate,
@@ -153,24 +132,15 @@ internal fun UpdateReceiptRoute(
         onObservationsChange = viewModel::updateObservations,
         onMoreVertMenuItemClick = { index ->
             when (index) {
-                ReceiptMenuOptions.DELETE -> {
-                    viewModel.deleteReceipt()
-                    onBackClick()
-                }
-                ReceiptMenuOptions.CANCEL -> {
-                    viewModel.cancelReceipt()
-                    onBackClick()
-                }
+                ReceiptMenuOptions.DELETE -> { viewModel.onDeleteClick() }
+
+                ReceiptMenuOptions.CANCEL -> { viewModel.cancelReceipt() }
+
                 else -> {}
             }
         },
-        onBackClick = onBackClick,
-        onDoneClick = {
-            viewModel.updateReceipt()
-            coroutineScope.launch {
-                if (!hasInvalidField) onBackClick()
-            }
-        }
+        onBackClick = viewModel::onNavigateBack,
+        onDoneClick = viewModel::saveReceipt
     )
 }
 
@@ -178,6 +148,7 @@ internal fun UpdateReceiptRoute(
 @Composable
 internal fun ReceiptContent(
     modifier: Modifier = Modifier,
+    showMenu: Boolean,
     screenTitle: String,
     menuItems: List<String>,
     hasInvalidField: Boolean,
@@ -237,7 +208,7 @@ internal fun ReceiptContent(
                     }
                 },
                 actions = {
-                    if (menuItems.isNotEmpty()) {
+                    if (showMenu) {
                         IconButton(
                             modifier = Modifier.semantics { contentDescription = "More vert menu" },
                             onClick = { expanded = true }
@@ -434,6 +405,25 @@ internal fun ReceiptContent(
     }
 }
 
+@Composable
+private fun getScreenTitle(receiptId: Long): String {
+    return if (receiptId != 0L) stringResource(id = R.string.update_receipt)
+        else stringResource(id = R.string.add_receipt)
+}
+
+private fun getInitialData(
+    receiptId: Long,
+    productId: Long,
+    viewModel: ReceiptViewModel
+) {
+    if (receiptId == 0L) {
+        viewModel.getProduct(productId = productId)
+        viewModel.updateRequestDate(currentDate())
+    } else {
+        viewModel.getReceipt(id = receiptId)
+    }
+}
+
 private object ReceiptMenuOptions {
     const val DELETE = 0
     const val CANCEL = 1
@@ -443,6 +433,7 @@ private object ReceiptMenuOptions {
 @Composable
 private fun ReceiptPreview() {
     ReceiptContent(
+        showMenu = true,
         screenTitle = "Update Receipt",
         menuItems = listOf("Delete", "Cancel"),
         hasInvalidField = true,

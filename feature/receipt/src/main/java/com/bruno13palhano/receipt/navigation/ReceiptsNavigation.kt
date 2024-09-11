@@ -6,10 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.receipt.ui.screen.AddReceiptRoute
 import com.bruno13palhano.receipt.ui.screen.ReceiptsRoute
 import com.bruno13palhano.receipt.ui.screen.SearchRoute
-import com.bruno13palhano.receipt.ui.screen.UpdateReceiptRoute
+import com.bruno13palhano.receipt.ui.screen.ReceiptRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.receiptsScreen(
@@ -40,8 +39,9 @@ fun NavGraphBuilder.receiptsScreen(
         composable<ReceiptsRoutes.AddReceipt> {
             val productId = it.toRoute<ReceiptsRoutes.AddReceipt>().productId
 
-            AddReceiptRoute(
+            ReceiptRoute(
                 modifier = modifier,
+                id = 0L,
                 productId = productId,
                 onBackClick = { navController.navigateUp() }
             )
@@ -49,9 +49,10 @@ fun NavGraphBuilder.receiptsScreen(
         composable<ReceiptsRoutes.UpdateReceipt> {
             val id = it.toRoute<ReceiptsRoutes.UpdateReceipt>().id
 
-            UpdateReceiptRoute(
+            ReceiptRoute(
                 modifier = modifier,
                 id = id,
+                productId = 0L,
                 onBackClick = { navController.navigateUp() }
             )
         }
