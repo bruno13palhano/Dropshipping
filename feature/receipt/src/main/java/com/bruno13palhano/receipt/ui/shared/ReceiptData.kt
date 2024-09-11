@@ -51,16 +51,21 @@ internal sealed interface ReceiptEvent : Reducer.ViewEvent {
     data object IsEditing : ReceiptEvent
     data object IsAdding : ReceiptEvent
     data class UpdateHasInvalidField(val hasInvalidField: Boolean) : ReceiptEvent
-    data class UpdateCanceled(val canceled: Boolean) : ReceiptEvent
-    data class UpdateProduct(val product: Product) : ReceiptEvent
-    data class UpdateReceipt(val receipt: Receipt) : ReceiptEvent
-    data class UpdateDeleteReceipt(val deleteReceipt: Boolean, val id: Long) : ReceiptEvent
+    data object CancelReceipt : ReceiptEvent
+    data class UpdateCurrentProduct(val product: Product) : ReceiptEvent
+    data class UpdateCurrentReceipt(val receipt: Receipt) : ReceiptEvent
+    data class UpdateDeleteReceipt(val id: Long) : ReceiptEvent
+    data object OnUpdateReceiptSuccessfully : ReceiptEvent
+    data object OnAddReceiptSuccessfully : ReceiptEvent
+    data object OnCancelReceiptSuccessfully : ReceiptEvent
     data object OnDeleteReceiptSuccessfully : ReceiptEvent
     data object OnNavigateBack : ReceiptEvent
 }
 
 @Immutable
 internal sealed interface ReceiptEffect : Reducer.ViewEffect {
+    data object UpdateReceipt : ReceiptEffect
+    data object InsertReceipt : ReceiptEffect
     data class DeleteReceipt(val id: Long) : ReceiptEffect
     data object NavigateBack : ReceiptEffect
 }
