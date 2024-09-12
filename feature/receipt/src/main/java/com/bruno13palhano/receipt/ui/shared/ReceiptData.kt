@@ -26,19 +26,7 @@ internal data class ReceiptState(
             hasInvalidField = false,
             deleteReceipt = false,
             canceled = false,
-            receipt = Receipt(
-                id = 0L,
-                product = Product(id = 0L, name = "", naturaCode = ""),
-                requestNumber = 0L,
-                requestDate = 0L,
-                customerName = "",
-                quantity = 0,
-                naturaPrice = 0F,
-                amazonPrice = 0F,
-                paymentOption = "",
-                canceled = false,
-                observations = ""
-            ),
+            receipt = Receipt.EMPTY,
             navigateBack = false
         )
     }

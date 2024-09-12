@@ -50,7 +50,7 @@ internal data class ProductState(
     val isIdle: Boolean,
     val hasInvalidField: Boolean,
     val navigateBack: Boolean,
-    val currentProduct: Product?
+    val currentProduct: Product
 ) : Reducer.ViewState {
     companion object {
         val INITIAL_STATE = ProductState(
@@ -61,7 +61,7 @@ internal data class ProductState(
             isIdle = true,
             hasInvalidField = false,
             navigateBack = false,
-            currentProduct = null
+            currentProduct = Product.EMPTY
         )
     }
 }

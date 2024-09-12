@@ -12,4 +12,20 @@ data class Receipt(
     val paymentOption: String,
     val canceled: Boolean,
     val observations: String
-)
+) {
+    companion object {
+        val EMPTY = Receipt(
+            id = 0L,
+            product = Product.EMPTY,
+            requestNumber = 0L,
+            requestDate = 0L,
+            customerName = "",
+            quantity = 0,
+            naturaPrice = 0F,
+            amazonPrice = 0F,
+            paymentOption = "",
+            canceled = false,
+            observations = ""
+        )
+    }
+}
