@@ -21,18 +21,6 @@ internal class ReceiptsViewModel @Inject constructor(
     initialState = ReceiptsState.INITIAL_STATE,
     reducer = ReceiptsReducer()
 ) {
-    fun onEditReceiptClick(id: Long) {
-        sendEvent(event = ReceiptsEvent.EditReceipt(editReceipt = true, id = id))
-    }
-
-    fun onAddReceiptClick() {
-        sendEvent(event = ReceiptsEvent.SearchProduct(searching = true))
-    }
-
-    fun onDeleteReceiptClick(id: Long) {
-        sendEvent(event = ReceiptsEvent.UpdateDeletingReceipt(isDeleting = true, id = id))
-    }
-
     fun deleteReceipt(id: Long) {
         viewModelScope.launch {
             receiptRepository.delete(id = id)

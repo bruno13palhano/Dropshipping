@@ -34,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.shared.ReceiptsEffect
+import com.bruno13palhano.receipt.ui.shared.ReceiptsEvent
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptsViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
@@ -84,9 +85,19 @@ internal fun ReceiptsRoute(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         receipts = state.receipts,
-        onReceiptItemClick = viewModel::onEditReceiptClick,
-        onDeleteReceiptClick = viewModel::onDeleteReceiptClick,
-        onAddNewReceiptClick = viewModel::onAddReceiptClick
+        onReceiptItemClick = { id ->
+            viewModel.sendEvent(
+                event = ReceiptsEvent.EditReceipt(editReceipt = true, id = id)
+            )
+        },
+        onDeleteReceiptClick = { id ->
+            viewModel.sendEvent(
+                event = ReceiptsEvent.UpdateDeletingReceipt(isDeleting = true, id = id)
+            )
+        },
+        onAddNewReceiptClick = {
+            viewModel.sendEvent(event = ReceiptsEvent.SearchProduct(searching = true))
+        }
     )
 }
 
