@@ -94,15 +94,15 @@ internal fun ReceiptRoute(
     val errorMessage = stringResource(id = R.string.empty_fields_error)
 
     LaunchedEffect(key1 = effect) {
-        effect.collect { effect ->
-            when (effect) {
-                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt(id = effect.id)
+        effect.collect { action ->
+            when (action) {
+                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt(id = action.id)
 
                 is ReceiptEffect.InsertReceipt -> viewModel.insertReceipt()
 
-                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt(id = effect.id)
+                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt(id = action.id)
 
-                is ReceiptEffect.CancelReceipt -> viewModel.cancelReceipt(id = effect.id)
+                is ReceiptEffect.CancelReceipt -> viewModel.cancelReceipt(id = action.id)
 
                 is ReceiptEffect.NavigateBack -> onBackClick()
 
