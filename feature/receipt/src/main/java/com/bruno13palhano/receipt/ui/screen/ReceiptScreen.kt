@@ -56,6 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
 import com.bruno13palhano.receipt.ui.shared.ReceiptEvent
+import com.bruno13palhano.receipt.ui.viewmodel.ReceiptInput
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
 import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
 import com.bruno13palhano.ui.components.clickableWithoutRipple
@@ -130,23 +131,7 @@ internal fun ReceiptRoute(
         screenTitle = title,
         menuItems = items,
         hasInvalidField = state.hasInvalidField,
-        productName = viewModel.productName,
-        requestNumber = viewModel.requestNumber,
-        requestDate = viewModel.requestDate,
-        customerName = viewModel.customerName,
-        quantity = viewModel.quantity,
-        naturaPrice = viewModel.naturaPrice,
-        amazonPrice = viewModel.amazonPrice,
-        paymentOption = viewModel.paymentOption,
-        observations = viewModel.observations,
-        onRequestNumberChange = viewModel::updateRequestNumber,
-        onRequestDateChange = viewModel::updateRequestDate,
-        onCustomerNameChange = viewModel::updateCustomerName,
-        onQuantityChange = viewModel::updateQuantity,
-        onNaturaPriceChange = viewModel::updateNaturaPrice,
-        onAmazonPriceChange = viewModel::updateAmazonPrice,
-        onPaymentOptionChange = viewModel::updatePaymentOption,
-        onObservationsChange = viewModel::updateObservations,
+        inputs = viewModel.receiptInput,
         onMoreVertMenuItemClick = { index ->
             when (index) {
                 ReceiptMenuOptions.DELETE -> {
@@ -174,23 +159,7 @@ internal fun ReceiptContent(
     screenTitle: String,
     menuItems: List<String>,
     hasInvalidField: Boolean,
-    productName: String,
-    requestNumber: String,
-    requestDate: Long,
-    customerName: String,
-    quantity: String,
-    naturaPrice: String,
-    amazonPrice: String,
-    paymentOption: String,
-    observations: String,
-    onRequestNumberChange: (requestNumber: String) -> Unit,
-    onRequestDateChange: (requestDate: Long) -> Unit,
-    onCustomerNameChange: (customerName: String) -> Unit,
-    onQuantityChange: (quantity: String) -> Unit,
-    onNaturaPriceChange: (naturaPrice: String) -> Unit,
-    onAmazonPriceChange: (amazonPrice: String) -> Unit,
-    onPaymentOptionChange: (paymentOption: String) -> Unit,
-    onObservationsChange: (observations: String) -> Unit,
+    inputs: ReceiptInput,
     onMoreVertMenuItemClick: (index: Int) -> Unit,
     onDoneClick: () -> Unit,
     onBackClick: () -> Unit
@@ -282,7 +251,7 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Product name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = productName,
+                value = inputs.productName,
                 onValueChange = {},
                 label = "",
                 placeholder = "",
@@ -293,18 +262,18 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Request number" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = requestNumber,
-                onValueChange = onRequestNumberChange,
+                value = inputs.requestNumber,
+                onValueChange = inputs::updateRequestNumber,
                 label = stringResource(id = R.string.request_number),
                 placeholder = stringResource(id = R.string.enter_request_number),
-                isError = hasInvalidField && requestNumber.isBlank()
+                isError = hasInvalidField && inputs.requestNumber.isBlank()
             )
             CustomClickField(
                 modifier = Modifier
                     .semantics { contentDescription = "Request date" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = dateFormat.format(requestDate),
+                value = dateFormat.format(inputs.requestDate),
                 onClick = { showDateDialog = true },
                 label = stringResource(id = R.string.request_date),
                 placeholder = stringResource(id = R.string.enter_request_date),
@@ -314,63 +283,63 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Customer name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = customerName,
-                onValueChange = onCustomerNameChange,
+                value = inputs.customerName,
+                onValueChange = inputs::updateCustomerName,
                 label = stringResource(id = R.string.customer_name),
                 placeholder = stringResource(id = R.string.enter_customer_name),
-                isError = hasInvalidField && customerName.isBlank()
+                isError = hasInvalidField && inputs.customerName.isBlank()
             )
             CustomIntegerField(
                 modifier = Modifier
                     .semantics { contentDescription = "Quantity" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = quantity,
-                onValueChange = onQuantityChange,
+                value = inputs.quantity,
+                onValueChange = inputs::updateQuantity,
                 label = stringResource(id = R.string.quantity),
                 placeholder = stringResource(id = R.string.enter_quantity),
-                isError = hasInvalidField && quantity.isBlank()
+                isError = hasInvalidField && inputs.quantity.isBlank()
             )
             CustomFloatField(
                 modifier = Modifier
                     .semantics { contentDescription = "Natura price" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = naturaPrice,
-                onValueChange = onNaturaPriceChange,
+                value = inputs.naturaPrice,
+                onValueChange = inputs::updateNaturaPrice,
                 label = stringResource(id = R.string.natura_price),
                 placeholder = stringResource(id = R.string.enter_natura_price),
-                isError = hasInvalidField && naturaPrice.isBlank()
+                isError = hasInvalidField && inputs.naturaPrice.isBlank()
             )
             CustomFloatField(
                 modifier = Modifier
                     .semantics { contentDescription = "Amazon price" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = amazonPrice,
-                onValueChange = onAmazonPriceChange,
+                value = inputs.amazonPrice,
+                onValueChange = inputs::updateAmazonPrice,
                 label = stringResource(id = R.string.amazon_price),
                 placeholder = stringResource(id = R.string.enter_amazon_price),
-                isError = hasInvalidField && amazonPrice.isBlank()
+                isError = hasInvalidField && inputs.amazonPrice.isBlank()
             )
             CustomTextField(
                 modifier = Modifier
                     .semantics { contentDescription = "Payment option" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = paymentOption,
-                onValueChange = onPaymentOptionChange,
+                value = inputs.paymentOption,
+                onValueChange = inputs::updatePaymentOption,
                 label = stringResource(id = R.string.payment_option),
                 placeholder = stringResource(id = R.string.enter_payment_option),
-                isError = hasInvalidField && paymentOption.isBlank()
+                isError = hasInvalidField && inputs.paymentOption.isBlank()
             )
             CustomTextField(
                 modifier = Modifier
                     .semantics { contentDescription = "Observations" }
                     .padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 8.dp)
                     .fillMaxWidth(),
-                value = observations,
-                onValueChange = onObservationsChange,
+                value = inputs.observations,
+                onValueChange = inputs::updateObservations,
                 label = stringResource(id = R.string.observations),
                 placeholder = stringResource(id = R.string.enter_observations),
                 singleLine = false
@@ -392,7 +361,7 @@ internal fun ReceiptContent(
                     Button(
                         onClick = {
                             datePickerState.selectedDateMillis?.let { newRequestDate ->
-                                onRequestDateChange(newRequestDate)
+                                inputs.updateRequestDate(requestDate = newRequestDate)
                             }
                             focusManager.clearFocus(force = true)
                             showDateDialog = false
@@ -413,7 +382,7 @@ internal fun ReceiptContent(
                 }
             ) {
                 datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = requestDate,
+                    initialSelectedDateMillis = inputs.requestDate,
                     initialDisplayMode = if (isPortrait) DisplayMode.Picker else DisplayMode.Picker
                 )
 
@@ -439,7 +408,7 @@ private fun getInitialData(
 ) {
     if (receiptId == 0L) {
         viewModel.getProduct(productId = productId)
-        viewModel.updateRequestDate(currentDate())
+        viewModel.receiptInput.updateRequestDate(currentDate())
     } else {
         viewModel.getReceipt(id = receiptId)
     }
@@ -459,23 +428,7 @@ private fun ReceiptPreview() {
         screenTitle = "Update Receipt",
         menuItems = listOf("Delete", "Cancel"),
         hasInvalidField = true,
-        productName = "Product 1",
-        requestNumber = "1234",
-        requestDate = 74624272627L,
-        customerName = "Customer 1",
-        quantity = "1",
-        naturaPrice = "10.0",
-        amazonPrice = "20.0",
-        paymentOption = "",
-        observations = "Sale canceled by the customer",
-        onRequestNumberChange = {},
-        onRequestDateChange = {},
-        onCustomerNameChange = {},
-        onQuantityChange = {},
-        onNaturaPriceChange = {},
-        onAmazonPriceChange = {},
-        onPaymentOptionChange = {},
-        onObservationsChange = {},
+        inputs = ReceiptInput(),
         onMoreVertMenuItemClick = {},
         onBackClick = {},
         onDoneClick = {}

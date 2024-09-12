@@ -1,9 +1,5 @@
 package com.bruno13palhano.receipt.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.di.ReceiptRep
@@ -28,63 +24,13 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ReceiptViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
-    @ProductRep private val productRepository: ProductRepository
+    @ProductRep private val productRepository: ProductRepository,
+    val receiptInput: ReceiptInput = ReceiptInput()
 ) : BaseViewModel<ReceiptState, ReceiptEvent, ReceiptEffect>(
     initialState = ReceiptState.INITIAL_STATE,
     reducer = ReceiptReducer()
 ) {
     private var product = MutableStateFlow(Product(id = 0L, name = "", naturaCode = ""))
-
-    var productName by mutableStateOf("")
-        private set
-    var requestNumber by mutableStateOf("")
-        private set
-    var requestDate by mutableLongStateOf(0L)
-        private set
-    var customerName by mutableStateOf("")
-        private set
-    var quantity by mutableStateOf("")
-        private set
-    var naturaPrice by mutableStateOf("")
-        private set
-    var amazonPrice by mutableStateOf("")
-        private set
-    var paymentOption by mutableStateOf("")
-        private set
-    var observations by mutableStateOf("")
-        private set
-
-    fun updateRequestNumber(requestNumber: String) {
-        this.requestNumber = requestNumber
-    }
-
-    fun updateRequestDate(requestDate: Long) {
-        this@ReceiptViewModel.requestDate = requestDate
-    }
-
-    fun updateCustomerName(customerName: String) {
-        this.customerName = customerName
-    }
-
-    fun updateQuantity(quantity: String) {
-        this.quantity = quantity
-    }
-
-    fun updateNaturaPrice(naturaPrice: String) {
-        this.naturaPrice = naturaPrice
-    }
-
-    fun updateAmazonPrice(amazonPrice: String) {
-        this.amazonPrice = amazonPrice
-    }
-
-    fun updatePaymentOption(paymentOption: String) {
-        this.paymentOption = paymentOption
-    }
-
-    fun updateObservations(observations: String) {
-        this.observations = observations
-    }
 
     fun getProduct(productId: Long) {
         sendEvent(event = ReceiptEvent.NewReceipt)
@@ -94,7 +40,7 @@ internal class ReceiptViewModel @Inject constructor(
                 .catch { it.printStackTrace() }
                 .collect {
                     sendEvent(event = ReceiptEvent.UpdateCurrentProduct(product = it))
-                    productName = it.name
+                    receiptInput.updateProductName(productName = it.name)
                     product.value = it
                 }
         }
@@ -152,12 +98,12 @@ internal class ReceiptViewModel @Inject constructor(
     }
 
     private fun isReceiptValid(): Boolean {
-        val isValid = requestNumber.isNotBlank() &&
-                customerName.isNotBlank() &&
-                quantity.isNotBlank() &&
-                naturaPrice.isNotBlank() &&
-                amazonPrice.isNotBlank() &&
-                paymentOption.isNotBlank()
+        val isValid = receiptInput.requestNumber.isNotBlank() &&
+                receiptInput.customerName.isNotBlank() &&
+                receiptInput.quantity.isNotBlank() &&
+                receiptInput.naturaPrice.isNotBlank() &&
+                receiptInput.amazonPrice.isNotBlank() &&
+                receiptInput.paymentOption.isNotBlank()
 
         sendEvent(event = ReceiptEvent.UpdateHasInvalidField(hasInvalidField = !isValid))
 
@@ -168,28 +114,28 @@ internal class ReceiptViewModel @Inject constructor(
         return Receipt(
             id = id,
             product = product.value,
-            requestNumber = stringToLong(requestNumber),
-            requestDate = requestDate,
-            customerName = customerName,
-            quantity = stringToInt(quantity),
-            naturaPrice = stringToFloat(naturaPrice),
-            amazonPrice = stringToFloat(amazonPrice),
-            paymentOption = paymentOption,
+            requestNumber = stringToLong(receiptInput.requestNumber),
+            requestDate = receiptInput.requestDate,
+            customerName = receiptInput.customerName,
+            quantity = stringToInt(receiptInput.quantity),
+            naturaPrice = stringToFloat(receiptInput.naturaPrice),
+            amazonPrice = stringToFloat(receiptInput.amazonPrice),
+            paymentOption = receiptInput.paymentOption,
             canceled = canceled,
-            observations = observations
+            observations = receiptInput.observations
         )
     }
 
     private fun setReceiptProperties(receipt: Receipt) {
         product.value = receipt.product
-        productName = receipt.product.name
-        requestNumber = receipt.requestNumber.toString()
-        requestDate = receipt.requestDate
-        customerName = receipt.customerName
-        quantity = receipt.quantity.toString()
-        naturaPrice = receipt.naturaPrice.toString()
-        amazonPrice = receipt.amazonPrice.toString()
-        paymentOption = receipt.paymentOption
-        observations = receipt.observations
+        receiptInput.updateProductName(productName = receipt.product.name)
+        receiptInput.updateRequestNumber(requestNumber = receipt.requestNumber.toString())
+        receiptInput.updateRequestDate(requestDate = receipt.requestDate)
+        receiptInput.updateCustomerName(customerName = receipt.customerName)
+        receiptInput.updateQuantity(quantity = receipt.quantity.toString())
+        receiptInput.updateNaturaPrice(naturaPrice = receipt.naturaPrice.toString())
+        receiptInput.updateAmazonPrice(amazonPrice = receipt.amazonPrice.toString())
+        receiptInput.updatePaymentOption(paymentOption = receipt.paymentOption)
+        receiptInput.updateObservations(observations = receipt.observations)
     }
 }
