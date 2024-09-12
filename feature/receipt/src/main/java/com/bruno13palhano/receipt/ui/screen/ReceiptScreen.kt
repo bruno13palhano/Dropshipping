@@ -55,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
+import com.bruno13palhano.receipt.ui.shared.ReceiptEvent
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
 import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
 import com.bruno13palhano.ui.components.clickableWithoutRipple
@@ -66,6 +67,7 @@ import com.bruno13palhano.ui.components.MoreVertMenu
 import com.bruno13palhano.ui.components.currentDate
 import com.bruno13palhano.ui.components.dateFormat
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ReceiptRoute(
@@ -87,17 +89,31 @@ internal fun ReceiptRoute(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val errorMessage = stringResource(id = R.string.empty_fields_error)
 
     LaunchedEffect(key1 = effect) {
         effect.collect { effect ->
             when (effect) {
-                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt()
+                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt(id = effect.id)
 
                 is ReceiptEffect.InsertReceipt -> viewModel.insertReceipt()
 
-                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt()
+                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt(id = effect.id)
+
+                is ReceiptEffect.CancelReceipt -> viewModel.cancelReceipt(id = effect.id)
 
                 is ReceiptEffect.NavigateBack -> onBackClick()
+
+                is ReceiptEffect.InvalidFieldErrorMessage -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = errorMessage,
+                            withDismissAction = true
+                        )
+                    }
+                }
             }
         }
     }
@@ -110,6 +126,7 @@ internal fun ReceiptRoute(
     ReceiptContent(
         modifier = modifier,
         showMenu = id != 0L,
+        snackbarHostState = snackbarHostState,
         screenTitle = title,
         menuItems = items,
         hasInvalidField = state.hasInvalidField,
@@ -132,15 +149,19 @@ internal fun ReceiptRoute(
         onObservationsChange = viewModel::updateObservations,
         onMoreVertMenuItemClick = { index ->
             when (index) {
-                ReceiptMenuOptions.DELETE -> { viewModel.onDeleteClick() }
+                ReceiptMenuOptions.DELETE -> {
+                    viewModel.sendEvent(event = ReceiptEvent.UpdateDeleteReceipt(id = id))
+                }
 
-                ReceiptMenuOptions.CANCEL -> { viewModel.cancelReceipt() }
+                ReceiptMenuOptions.CANCEL -> {
+                    viewModel.sendEvent(event = ReceiptEvent.CancelReceipt(id = id))
+                }
 
                 else -> {}
             }
         },
-        onBackClick = viewModel::onNavigateBack,
-        onDoneClick = viewModel::saveReceipt
+        onBackClick = { viewModel.sendEvent(event = ReceiptEvent.OnNavigateBack) },
+        onDoneClick = { viewModel.saveReceipt(id = id) }
     )
 }
 
@@ -149,6 +170,7 @@ internal fun ReceiptRoute(
 internal fun ReceiptContent(
     modifier: Modifier = Modifier,
     showMenu: Boolean,
+    snackbarHostState: SnackbarHostState,
     screenTitle: String,
     menuItems: List<String>,
     hasInvalidField: Boolean,
@@ -178,7 +200,6 @@ internal fun ReceiptContent(
 
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val snackbarHostState = remember { SnackbarHostState() }
     var datePickerState = rememberDatePickerState()
     var expanded by remember { mutableStateOf(false) }
     var showDateDialog by remember { mutableStateOf(false) }
@@ -434,6 +455,7 @@ private object ReceiptMenuOptions {
 private fun ReceiptPreview() {
     ReceiptContent(
         showMenu = true,
+        snackbarHostState = SnackbarHostState(),
         screenTitle = "Update Receipt",
         menuItems = listOf("Delete", "Cancel"),
         hasInvalidField = true,

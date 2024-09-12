@@ -48,10 +48,10 @@ internal data class ReceiptState(
 internal sealed interface ReceiptEvent : Reducer.ViewEvent {
     data object EditReceipt : ReceiptEvent
     data object NewReceipt : ReceiptEvent
-    data object IsEditing : ReceiptEvent
+    data class IsEditing(val id: Long) : ReceiptEvent
     data object IsAdding : ReceiptEvent
     data class UpdateHasInvalidField(val hasInvalidField: Boolean) : ReceiptEvent
-    data object CancelReceipt : ReceiptEvent
+    data class CancelReceipt(val id: Long) : ReceiptEvent
     data class UpdateCurrentProduct(val product: Product) : ReceiptEvent
     data class UpdateCurrentReceipt(val receipt: Receipt) : ReceiptEvent
     data class UpdateDeleteReceipt(val id: Long) : ReceiptEvent
@@ -64,8 +64,10 @@ internal sealed interface ReceiptEvent : Reducer.ViewEvent {
 
 @Immutable
 internal sealed interface ReceiptEffect : Reducer.ViewEffect {
-    data object UpdateReceipt : ReceiptEffect
+    data class UpdateReceipt(val id: Long) : ReceiptEffect
     data object InsertReceipt : ReceiptEffect
     data class DeleteReceipt(val id: Long) : ReceiptEffect
+    data class CancelReceipt(val id: Long) : ReceiptEffect
+    data object InvalidFieldErrorMessage : ReceiptEffect
     data object NavigateBack : ReceiptEffect
 }

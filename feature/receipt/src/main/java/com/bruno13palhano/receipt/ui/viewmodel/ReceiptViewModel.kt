@@ -33,7 +33,6 @@ internal class ReceiptViewModel @Inject constructor(
     initialState = ReceiptState.INITIAL_STATE,
     reducer = ReceiptReducer()
 ) {
-    private var receiptId: Long =  0L
     private var product = MutableStateFlow(Product(id = 0L, name = "", naturaCode = ""))
 
     var productName by mutableStateOf("")
@@ -114,13 +113,13 @@ internal class ReceiptViewModel @Inject constructor(
         }
     }
 
-    fun saveReceipt() {
+    fun saveReceipt(id: Long) {
         if (!isReceiptValid()) return
 
-        if (receiptId == 0L) {
+        if (id == 0L) {
             sendEvent(event = ReceiptEvent.IsAdding)
         } else {
-            sendEvent(event = ReceiptEvent.IsEditing)
+            sendEvent(event = ReceiptEvent.IsEditing(id = id))
         }
     }
 
@@ -131,35 +130,25 @@ internal class ReceiptViewModel @Inject constructor(
         }
     }
 
-    fun updateReceipt() {
+    fun updateReceipt(id: Long) {
         viewModelScope.launch {
-            receiptRepository.update(data = mapPropertiesToReceipt(id = receiptId))
+            receiptRepository.update(data = mapPropertiesToReceipt(id = id))
             sendEvent(event = ReceiptEvent.OnUpdateReceiptSuccessfully)
         }
     }
 
-    fun onDeleteClick() {
-        sendEvent(event = ReceiptEvent.UpdateDeleteReceipt(id = receiptId))
-    }
-
-    fun deleteReceipt() {
+    fun deleteReceipt(id: Long) {
         viewModelScope.launch {
-            receiptRepository.delete(id = receiptId)
+            receiptRepository.delete(id = id)
             sendEvent(event = ReceiptEvent.OnDeleteReceiptSuccessfully)
         }
     }
 
-    fun cancelReceipt() {
-        sendEvent(event = ReceiptEvent.CancelReceipt)
-
+    fun cancelReceipt(id: Long) {
         viewModelScope.launch {
-            receiptRepository.update(data = mapPropertiesToReceipt(id = receiptId, canceled = true))
+            receiptRepository.update(data = mapPropertiesToReceipt(id = id, canceled = true))
             sendEvent(event = ReceiptEvent.OnCancelReceiptSuccessfully)
         }
-    }
-
-    fun onNavigateBack() {
-        sendEvent(event = ReceiptEvent.OnNavigateBack)
     }
 
     private fun isReceiptValid(): Boolean {
@@ -192,7 +181,6 @@ internal class ReceiptViewModel @Inject constructor(
     }
 
     private fun setReceiptProperties(receipt: Receipt) {
-        receiptId = receipt.id
         product.value = receipt.product
         productName = receipt.product.name
         requestNumber = receipt.requestNumber.toString()
