@@ -81,15 +81,19 @@ internal class HomeViewModel @Inject constructor(
 
     fun getMostSale() {
         viewModelScope.launch {
-            receiptRepository.getLastReceipts(limit = 5)
-                .map {
-                    it.map { receipt ->
-                        MostSaleItem(
-                            id = receipt.id,
-                            productName = receipt.product.name,
-                            unitsSold = 1
-                        )
-                    }
+            receiptRepository.getAll()
+                .map { receipts ->
+                    receipts
+                        .groupBy { receipt -> receipt.product.name }
+                        .map { item ->
+                            val unitsSold = item.value.sumOf { receipt -> receipt.quantity}
+
+                            MostSaleItem(
+                                id = item.value[0].product.id,
+                                productName = item.key,
+                                unitsSold = unitsSold
+                            )
+                        }
                 }
                 .collect {
                     sendEvent(HomeEvent.UpdateMostSale(mostSale = it))
