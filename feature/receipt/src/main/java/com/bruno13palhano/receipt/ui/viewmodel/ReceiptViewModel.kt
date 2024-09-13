@@ -25,7 +25,7 @@ import javax.inject.Inject
 internal class ReceiptViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
     @ProductRep private val productRepository: ProductRepository,
-    val receiptInput: ReceiptInput = ReceiptInput()
+    val receiptFields: ReceiptFields = ReceiptFields()
 ) : BaseViewModel<ReceiptState, ReceiptEvent, ReceiptEffect>(
     initialState = ReceiptState.INITIAL_STATE,
     reducer = ReceiptReducer()
@@ -40,7 +40,7 @@ internal class ReceiptViewModel @Inject constructor(
                 .catch { it.printStackTrace() }
                 .collect {
                     sendEvent(event = ReceiptEvent.UpdateCurrentProduct(product = it))
-                    receiptInput.updateProductName(productName = it.name)
+                    receiptFields.updateProductName(productName = it.name)
                     product.value = it
                 }
         }
@@ -98,12 +98,12 @@ internal class ReceiptViewModel @Inject constructor(
     }
 
     private fun isReceiptValid(): Boolean {
-        val isValid = receiptInput.requestNumber.isNotBlank() &&
-                receiptInput.customerName.isNotBlank() &&
-                receiptInput.quantity.isNotBlank() &&
-                receiptInput.naturaPrice.isNotBlank() &&
-                receiptInput.amazonPrice.isNotBlank() &&
-                receiptInput.paymentOption.isNotBlank()
+        val isValid = receiptFields.requestNumber.isNotBlank() &&
+                receiptFields.customerName.isNotBlank() &&
+                receiptFields.quantity.isNotBlank() &&
+                receiptFields.naturaPrice.isNotBlank() &&
+                receiptFields.amazonPrice.isNotBlank() &&
+                receiptFields.paymentOption.isNotBlank()
 
         sendEvent(event = ReceiptEvent.UpdateHasInvalidField(hasInvalidField = !isValid))
 
@@ -114,28 +114,28 @@ internal class ReceiptViewModel @Inject constructor(
         return Receipt(
             id = id,
             product = product.value,
-            requestNumber = stringToLong(receiptInput.requestNumber),
-            requestDate = receiptInput.requestDate,
-            customerName = receiptInput.customerName,
-            quantity = stringToInt(receiptInput.quantity),
-            naturaPrice = stringToFloat(receiptInput.naturaPrice),
-            amazonPrice = stringToFloat(receiptInput.amazonPrice),
-            paymentOption = receiptInput.paymentOption,
+            requestNumber = stringToLong(receiptFields.requestNumber),
+            requestDate = receiptFields.requestDate,
+            customerName = receiptFields.customerName,
+            quantity = stringToInt(receiptFields.quantity),
+            naturaPrice = stringToFloat(receiptFields.naturaPrice),
+            amazonPrice = stringToFloat(receiptFields.amazonPrice),
+            paymentOption = receiptFields.paymentOption,
             canceled = canceled,
-            observations = receiptInput.observations
+            observations = receiptFields.observations
         )
     }
 
     private fun setReceiptProperties(receipt: Receipt) {
         product.value = receipt.product
-        receiptInput.updateProductName(productName = receipt.product.name)
-        receiptInput.updateRequestNumber(requestNumber = receipt.requestNumber.toString())
-        receiptInput.updateRequestDate(requestDate = receipt.requestDate)
-        receiptInput.updateCustomerName(customerName = receipt.customerName)
-        receiptInput.updateQuantity(quantity = receipt.quantity.toString())
-        receiptInput.updateNaturaPrice(naturaPrice = receipt.naturaPrice.toString())
-        receiptInput.updateAmazonPrice(amazonPrice = receipt.amazonPrice.toString())
-        receiptInput.updatePaymentOption(paymentOption = receipt.paymentOption)
-        receiptInput.updateObservations(observations = receipt.observations)
+        receiptFields.updateProductName(productName = receipt.product.name)
+        receiptFields.updateRequestNumber(requestNumber = receipt.requestNumber.toString())
+        receiptFields.updateRequestDate(requestDate = receipt.requestDate)
+        receiptFields.updateCustomerName(customerName = receipt.customerName)
+        receiptFields.updateQuantity(quantity = receipt.quantity.toString())
+        receiptFields.updateNaturaPrice(naturaPrice = receipt.naturaPrice.toString())
+        receiptFields.updateAmazonPrice(amazonPrice = receipt.amazonPrice.toString())
+        receiptFields.updatePaymentOption(paymentOption = receipt.paymentOption)
+        receiptFields.updateObservations(observations = receipt.observations)
     }
 }

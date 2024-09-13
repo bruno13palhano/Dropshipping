@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 /**
  * An wrapper for Receipt input fields.
  */
-internal class ReceiptInput {
+internal class ReceiptFields {
     var productName by mutableStateOf("")
         private set
     var requestNumber by mutableStateOf("")

@@ -56,7 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
 import com.bruno13palhano.receipt.ui.shared.ReceiptEvent
-import com.bruno13palhano.receipt.ui.viewmodel.ReceiptInput
+import com.bruno13palhano.receipt.ui.viewmodel.ReceiptFields
 import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
 import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
 import com.bruno13palhano.ui.components.clickableWithoutRipple
@@ -131,7 +131,7 @@ internal fun ReceiptRoute(
         screenTitle = title,
         menuItems = items,
         hasInvalidField = state.hasInvalidField,
-        inputs = viewModel.receiptInput,
+        receiptFields = viewModel.receiptFields,
         onMoreVertMenuItemClick = { index ->
             when (index) {
                 ReceiptMenuOptions.DELETE -> {
@@ -159,7 +159,7 @@ internal fun ReceiptContent(
     screenTitle: String,
     menuItems: List<String>,
     hasInvalidField: Boolean,
-    inputs: ReceiptInput,
+    receiptFields: ReceiptFields,
     onMoreVertMenuItemClick: (index: Int) -> Unit,
     onDoneClick: () -> Unit,
     onBackClick: () -> Unit
@@ -251,7 +251,7 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Product name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.productName,
+                value = receiptFields.productName,
                 onValueChange = {},
                 label = "",
                 placeholder = "",
@@ -262,18 +262,18 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Request number" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.requestNumber,
-                onValueChange = inputs::updateRequestNumber,
+                value = receiptFields.requestNumber,
+                onValueChange = receiptFields::updateRequestNumber,
                 label = stringResource(id = R.string.request_number),
                 placeholder = stringResource(id = R.string.enter_request_number),
-                isError = hasInvalidField && inputs.requestNumber.isBlank()
+                isError = hasInvalidField && receiptFields.requestNumber.isBlank()
             )
             CustomClickField(
                 modifier = Modifier
                     .semantics { contentDescription = "Request date" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = dateFormat.format(inputs.requestDate),
+                value = dateFormat.format(receiptFields.requestDate),
                 onClick = { showDateDialog = true },
                 label = stringResource(id = R.string.request_date),
                 placeholder = stringResource(id = R.string.enter_request_date),
@@ -283,63 +283,63 @@ internal fun ReceiptContent(
                     .semantics { contentDescription = "Customer name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.customerName,
-                onValueChange = inputs::updateCustomerName,
+                value = receiptFields.customerName,
+                onValueChange = receiptFields::updateCustomerName,
                 label = stringResource(id = R.string.customer_name),
                 placeholder = stringResource(id = R.string.enter_customer_name),
-                isError = hasInvalidField && inputs.customerName.isBlank()
+                isError = hasInvalidField && receiptFields.customerName.isBlank()
             )
             CustomIntegerField(
                 modifier = Modifier
                     .semantics { contentDescription = "Quantity" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.quantity,
-                onValueChange = inputs::updateQuantity,
+                value = receiptFields.quantity,
+                onValueChange = receiptFields::updateQuantity,
                 label = stringResource(id = R.string.quantity),
                 placeholder = stringResource(id = R.string.enter_quantity),
-                isError = hasInvalidField && inputs.quantity.isBlank()
+                isError = hasInvalidField && receiptFields.quantity.isBlank()
             )
             CustomFloatField(
                 modifier = Modifier
                     .semantics { contentDescription = "Natura price" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.naturaPrice,
-                onValueChange = inputs::updateNaturaPrice,
+                value = receiptFields.naturaPrice,
+                onValueChange = receiptFields::updateNaturaPrice,
                 label = stringResource(id = R.string.natura_price),
                 placeholder = stringResource(id = R.string.enter_natura_price),
-                isError = hasInvalidField && inputs.naturaPrice.isBlank()
+                isError = hasInvalidField && receiptFields.naturaPrice.isBlank()
             )
             CustomFloatField(
                 modifier = Modifier
                     .semantics { contentDescription = "Amazon price" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.amazonPrice,
-                onValueChange = inputs::updateAmazonPrice,
+                value = receiptFields.amazonPrice,
+                onValueChange = receiptFields::updateAmazonPrice,
                 label = stringResource(id = R.string.amazon_price),
                 placeholder = stringResource(id = R.string.enter_amazon_price),
-                isError = hasInvalidField && inputs.amazonPrice.isBlank()
+                isError = hasInvalidField && receiptFields.amazonPrice.isBlank()
             )
             CustomTextField(
                 modifier = Modifier
                     .semantics { contentDescription = "Payment option" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = inputs.paymentOption,
-                onValueChange = inputs::updatePaymentOption,
+                value = receiptFields.paymentOption,
+                onValueChange = receiptFields::updatePaymentOption,
                 label = stringResource(id = R.string.payment_option),
                 placeholder = stringResource(id = R.string.enter_payment_option),
-                isError = hasInvalidField && inputs.paymentOption.isBlank()
+                isError = hasInvalidField && receiptFields.paymentOption.isBlank()
             )
             CustomTextField(
                 modifier = Modifier
                     .semantics { contentDescription = "Observations" }
                     .padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 8.dp)
                     .fillMaxWidth(),
-                value = inputs.observations,
-                onValueChange = inputs::updateObservations,
+                value = receiptFields.observations,
+                onValueChange = receiptFields::updateObservations,
                 label = stringResource(id = R.string.observations),
                 placeholder = stringResource(id = R.string.enter_observations),
                 singleLine = false
@@ -361,7 +361,7 @@ internal fun ReceiptContent(
                     Button(
                         onClick = {
                             datePickerState.selectedDateMillis?.let { newRequestDate ->
-                                inputs.updateRequestDate(requestDate = newRequestDate)
+                                receiptFields.updateRequestDate(requestDate = newRequestDate)
                             }
                             focusManager.clearFocus(force = true)
                             showDateDialog = false
@@ -382,7 +382,7 @@ internal fun ReceiptContent(
                 }
             ) {
                 datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = inputs.requestDate,
+                    initialSelectedDateMillis = receiptFields.requestDate,
                     initialDisplayMode = if (isPortrait) DisplayMode.Picker else DisplayMode.Picker
                 )
 
@@ -408,7 +408,7 @@ private fun getInitialData(
 ) {
     if (receiptId == 0L) {
         viewModel.getProduct(productId = productId)
-        viewModel.receiptInput.updateRequestDate(currentDate())
+        viewModel.receiptFields.updateRequestDate(currentDate())
     } else {
         viewModel.getReceipt(id = receiptId)
     }
@@ -428,7 +428,7 @@ private fun ReceiptPreview() {
         screenTitle = "Update Receipt",
         menuItems = listOf("Delete", "Cancel"),
         hasInvalidField = true,
-        inputs = ReceiptInput(),
+        receiptFields = ReceiptFields(),
         onMoreVertMenuItemClick = {},
         onBackClick = {},
         onDoneClick = {}
