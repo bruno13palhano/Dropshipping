@@ -4,12 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import javax.inject.Inject
 
 /**
  * An wrapper for Receipt input fields.
  */
-internal class ReceiptInput @Inject constructor() {
+internal class ReceiptInput {
     var productName by mutableStateOf("")
         private set
     var requestNumber by mutableStateOf("")
