@@ -37,6 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.shared.ProductEffect
+import com.bruno13palhano.product.ui.shared.ProductEvent
+import com.bruno13palhano.product.ui.viewmodel.ProductFields
 import com.bruno13palhano.product.ui.viewmodel.ProductViewModel
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
@@ -63,22 +65,17 @@ internal fun ProductRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val title =
-        if (id != 0L) stringResource(id = R.string.update_product)
-        else stringResource(id = R.string.add_product)
+    val title = getScreenTitle(productId = id)
 
     LaunchedEffect(effect) {
         effect.collect { action ->
             when(action) {
-                is ProductEffect.EditProduct -> {
-                    viewModel.editProduct()
-                }
-                is ProductEffect.AddNewProduct -> {
-                    viewModel.addNewProduct()
-                }
-                is ProductEffect.DeleteProduct -> {
-                    viewModel.deleteProduct()
-                }
+                is ProductEffect.EditProduct -> viewModel.editProduct(id = action.id)
+
+                is ProductEffect.AddNewProduct -> viewModel.addNewProduct()
+
+                is ProductEffect.DeleteProduct -> viewModel.deleteProduct(id = action.id)
+
                 is ProductEffect.InvalidFieldErrorMessage -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -87,9 +84,8 @@ internal fun ProductRoute(
                         )
                     }
                 }
-                is ProductEffect.NavigateBack -> {
-                    onBackClick()
-                }
+
+                is ProductEffect.NavigateBack -> onBackClick()
             }
         }
     }
@@ -102,17 +98,15 @@ internal fun ProductRoute(
         snackbarHostState = snackbarHostState,
         showEditButton = id != 0L,
         title = title,
-        naturaCode = viewModel.naturaCode,
-        productName = viewModel.productName,
+        productFields = viewModel.productFields,
         hasInvalidField = state.hasInvalidField,
-        onNaturaCodeChange = viewModel::updateNaturaCode,
-        onProductNameChange = viewModel::updateProductName,
-        onDoneClick = {
-            if (id != 0L) viewModel.onEditingProductDoneClick()
-            else viewModel.onAddingNewProductDoneClick()
+        onDoneClick = { viewModel.saveProduct(id = id) },
+        onDeleteClick = {
+            viewModel.sendEvent(event = ProductEvent.UpdateDeletingProduct(id = id))
         },
-        onDeleteClick = viewModel::onDeletingProductClick,
-        onBackClick = viewModel::onBackClick
+        onBackClick = {
+            viewModel.sendEvent(event = ProductEvent.OnBackClick)
+        }
     )
 }
 
@@ -123,11 +117,8 @@ private fun ProductContent(
     snackbarHostState: SnackbarHostState,
     showEditButton: Boolean,
     title: String,
-    naturaCode: String,
-    productName: String,
+    productFields: ProductFields,
     hasInvalidField: Boolean,
-    onNaturaCodeChange: (String) -> Unit,
-    onProductNameChange: (String) -> Unit,
     onDoneClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onBackClick: () -> Unit
@@ -180,11 +171,11 @@ private fun ProductContent(
                     .semantics { contentDescription = "Natura code" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = naturaCode,
-                onValueChange = onNaturaCodeChange,
+                value = productFields.naturaCode,
+                onValueChange = productFields::updateNaturaCode,
                 label = stringResource(id = R.string.natura_code),
                 placeholder = stringResource(id = R.string.enter_natura_code),
-                isError = hasInvalidField && naturaCode.isBlank(),
+                isError = hasInvalidField && productFields.naturaCode.isBlank(),
             )
 
             CustomTextField(
@@ -192,14 +183,20 @@ private fun ProductContent(
                     .semantics { contentDescription = "Product name" }
                     .padding(horizontal = 8.dp, vertical = 2.dp)
                     .fillMaxWidth(),
-                value = productName,
-                onValueChange = onProductNameChange,
+                value = productFields.productName,
+                onValueChange = productFields::updateProductName,
                 label = stringResource(id = R.string.product_name),
                 placeholder = stringResource(id = R.string.enter_product_name),
-                isError = hasInvalidField && productName.isBlank()
+                isError = hasInvalidField && productFields.productName.isBlank()
             )
         }
     }
+}
+
+@Composable
+private fun getScreenTitle(productId: Long): String {
+    return if (productId != 0L) stringResource(id = R.string.update_product)
+        else stringResource(id = R.string.add_product)
 }
 
 @Preview
@@ -209,11 +206,8 @@ private fun ProductContentPreview() {
         snackbarHostState = remember { SnackbarHostState() },
         showEditButton = false,
         title = stringResource(id = R.string.add_product),
-        naturaCode = "1234",
-        productName = "",
+        productFields = ProductFields(),
         hasInvalidField = true,
-        onNaturaCodeChange = {},
-        onProductNameChange = {},
         onDoneClick = {},
         onDeleteClick = {},
         onBackClick = {}

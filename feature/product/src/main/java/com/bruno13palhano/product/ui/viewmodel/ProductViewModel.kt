@@ -1,9 +1,5 @@
 package com.bruno13palhano.product.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.ProductRepository
@@ -20,21 +16,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ProductViewModel @Inject constructor(
-    @ProductRep private val productRepository: ProductRepository
+    @ProductRep private val productRepository: ProductRepository,
+    val productFields: ProductFields = ProductFields()
 ) : BaseViewModel<ProductState, ProductEvent, ProductEffect>(
     initialState = ProductState.INITIAL_STATE,
     reducer = ProductReducer()
 ) {
-    private var productId by mutableLongStateOf(0L)
-    var naturaCode by mutableStateOf("")
-        private set
-    var productName by mutableStateOf("")
-        private set
-
-    fun updateNaturaCode(value: String) { naturaCode = value }
-
-    fun updateProductName(value: String) { productName = value }
-
     fun getProduct(id: Long) {
         if (id == 0L) return
 
@@ -44,69 +31,59 @@ internal class ProductViewModel @Inject constructor(
             productRepository.get(id = id)
                 .catch { it.printStackTrace() }
                 .collect {
-                    productId = id
-                    naturaCode = it.naturaCode
-                    productName = it.name
+                    productFields.updateNaturaCode(naturaCode = it.naturaCode)
+                    productFields.updateProductName(productName = it.name)
                     sendEvent(event = ProductEvent.UpdateCurrentProduct(product = it))
                     sendEvent(event = ProductEvent.UpdateIdleState)
                 }
         }
     }
 
-    fun onEditingProductDoneClick() {
-        if (isProductValid()) {
-            sendEvent(event = ProductEvent.UpdateEditingProduct)
-        } else {
-            sendEvent(event = ProductEvent.UpdateInvalidField(hasInvalidField = true))
-        }
-    }
+    fun saveProduct(id: Long) {
+        if (!isProductValid()) return
 
-    fun onAddingNewProductDoneClick() {
-        if (isProductValid()) {
+        if (id == 0L) {
             sendEvent(event = ProductEvent.UpdateAddingNewProduct)
         } else {
-            sendEvent(event = ProductEvent.UpdateInvalidField(hasInvalidField = true))
+            sendEvent(event = ProductEvent.UpdateEditingProduct(id = id))
         }
     }
 
-    fun onDeletingProductClick() {
-        sendEvent(event = ProductEvent.UpdateDeletingProduct)
-    }
-
-    fun editProduct() {
+    fun editProduct(id: Long) {
         viewModelScope.launch {
-            productRepository.update(saveProduct(id = productId))
+            productRepository.update(mapPropertiesToProduct(id = id))
             sendEvent(event = ProductEvent.OnEditProductSuccessfully)
         }
     }
 
     fun addNewProduct() {
         viewModelScope.launch {
-            productRepository.insert(saveProduct())
+            productRepository.insert(mapPropertiesToProduct())
             sendEvent(event = ProductEvent.OnAddNewProductSuccessfully)
         }
     }
 
-    fun deleteProduct() {
+    fun deleteProduct(id: Long) {
         viewModelScope.launch {
-            productRepository.delete(id = productId)
+            productRepository.delete(id = id)
             sendEvent(event = ProductEvent.OnDeleteProductSuccessfully)
         }
     }
 
-    fun onBackClick() {
-        sendEvent(event = ProductEvent.OnBackClick)
-    }
-
     private fun isProductValid(): Boolean {
-        return naturaCode.isNotBlank() && productName.isNotBlank()
+        val isValid = productFields.naturaCode.isNotBlank()
+                && productFields.productName.isNotBlank()
+
+        sendEvent(event = ProductEvent.UpdateInvalidField(hasInvalidField = !isValid))
+
+        return isValid
     }
 
-    private fun saveProduct(id: Long = 0L): Product {
+    private fun mapPropertiesToProduct(id: Long = 0L): Product {
         return Product(
             id = id,
-            naturaCode = naturaCode,
-            name = productName
+            naturaCode = productFields.naturaCode,
+            name = productFields.productName
         )
     }
 }
