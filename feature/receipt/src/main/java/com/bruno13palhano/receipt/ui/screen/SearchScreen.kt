@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
 import com.bruno13palhano.receipt.ui.shared.SearchEffect
+import com.bruno13palhano.receipt.ui.shared.SearchEvent
 import com.bruno13palhano.receipt.ui.viewmodel.SearchViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
@@ -79,12 +80,24 @@ internal fun SearchRoute(
         active = state.active,
         products = state.products,
         cache = state.cache,
-        onQueryChange = viewModel::onQueryChange,
-        onActiveChange = viewModel::onActiveChange,
-        onSearchClick = viewModel::onSearchClick,
-        onProductItemClick = viewModel::navigateToAddReceipt,
-        onDeleteSearchClick = viewModel::onDeleteSearchClick,
-        onClose = viewModel::onCloseSearchClick
+        onQueryChange = { query ->
+            viewModel.sendEvent(event = SearchEvent.UpdateQuery(query = query))
+        },
+        onActiveChange = { active ->
+            viewModel.sendEvent(event = SearchEvent.UpdateActive(active = active))
+        },
+        onSearchClick = { query ->
+            viewModel.sendEvent(event = SearchEvent.OnSearchDoneClick(query = query))
+        },
+        onProductItemClick = { productId ->
+            viewModel.sendEvent(event = SearchEvent.OnProductItemClick(id = productId))
+        },
+        onDeleteSearchClick = { query ->
+            viewModel.sendEvent(event = SearchEvent.UpdateDeleting(deleting = true, query = query))
+        },
+        onClose = {
+            viewModel.sendEvent(event = SearchEvent.OnCloseSearchClick)
+        }
     )
 }
 

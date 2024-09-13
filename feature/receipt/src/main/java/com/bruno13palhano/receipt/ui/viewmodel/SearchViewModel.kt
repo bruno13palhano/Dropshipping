@@ -25,30 +25,6 @@ internal class SearchViewModel @Inject constructor(
     initialState = SearchState.INITIAL_STATE,
     reducer = SearchReducer()
 ) {
-    fun onQueryChange(query: String) {
-        sendEvent(event = SearchEvent.UpdateQuery(query = query))
-    }
-
-    fun onActiveChange(active: Boolean) {
-        sendEvent(event = SearchEvent.UpdateActive(active = active))
-    }
-
-    fun onSearchClick(query: String) {
-        sendEvent(event = SearchEvent.OnSearchDoneClick(query = query))
-    }
-
-    fun onCloseSearchClick() {
-        sendEvent(event = SearchEvent.OnCloseSearchClick)
-    }
-
-    fun onDeleteSearchClick(query: String) {
-        sendEvent(event = SearchEvent.UpdateDeleting(deleting = true, query = query))
-    }
-
-    fun navigateToAddReceipt(productId: Long) {
-        sendEvent(event = SearchEvent.OnProductItemClick(id = productId))
-    }
-
     fun deleteCache(query: String) {
         viewModelScope.launch {
             cacheRepository.delete(query = query)
