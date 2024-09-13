@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.home.R
+import com.bruno13palhano.home.ui.shared.HomeEvent
 import com.bruno13palhano.home.ui.shared.MostSaleItem
 import com.bruno13palhano.home.ui.shared.ReceiptItem
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
@@ -49,9 +50,7 @@ internal fun HomeRoute(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 =  Unit) { viewModel.getProfit() }
-    LaunchedEffect(key1 =  Unit) { viewModel.getLastReceipts() }
-    LaunchedEffect(key1 =  Unit) { viewModel.getMostSale() }
+    GetInitialData(viewModel = viewModel)
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -60,13 +59,17 @@ internal fun HomeRoute(
         profit = state.profit.profit,
         profitVisible = state.profitVisible,
         receiptsVisible = state.receiptsVisible,
-        expandItemsIds = state.expandedItems,
+        expandItems = state.expandedItems,
         amazonProfit = state.profit.amazonProfit,
         naturaProfit = state.profit.naturaProfit,
         lastReceipts = state.lastReceipts,
         mostSale = state.mostSale,
-        onToggleProfitVisibility = viewModel::toggleProfitVisibility,
-        onExpandReceiptItem = viewModel::expandItem
+        onToggleProfitVisibility = { visible ->
+            viewModel.sendEvent(event = HomeEvent.UpdateProfitVisibility(visible = visible))
+        },
+        onExpandReceiptItem = { id, expanded ->
+            viewModel.sendEvent(event = HomeEvent.UpdateExpandedItem(id = id, expanded = expanded))
+        }
     )
 }
 
@@ -77,7 +80,7 @@ internal fun HomeContent(
     profit: Float,
     profitVisible: Boolean,
     receiptsVisible: Boolean,
-    expandItemsIds: List<Pair<Long, Boolean>>,
+    expandItems: List<Pair<Long, Boolean>>,
     amazonProfit: Float,
     naturaProfit: Float,
     lastReceipts: List<ReceiptItem>,
@@ -149,7 +152,7 @@ internal fun HomeContent(
                                     dateFormat.format(receipt.requestDate),
                                     receipt.customerName
                                 ),
-                                expanded = expandItemsIds.find { item ->
+                                expanded = expandItems.find { item ->
                                     item.first == receipt.id
                                 }?.second ?: false,
                                 shape = RectangleShape,
@@ -257,6 +260,15 @@ private fun ProfitInfo(
     }
 }
 
+@Composable
+internal fun GetInitialData(viewModel: HomeViewModel) {
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getProfit()
+        viewModel.getLastReceipts()
+        viewModel.getMostSale()
+    }
+}
+
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun HomePreview() {
@@ -264,7 +276,7 @@ private fun HomePreview() {
         profit = 245.67f,
         profitVisible = true,
         receiptsVisible = true,
-        expandItemsIds = emptyList(),
+        expandItems = emptyList(),
         amazonProfit = 45.67f,
         naturaProfit = 145.67f,
         lastReceipts = listOf(

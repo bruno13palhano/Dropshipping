@@ -20,8 +20,8 @@ internal class HomeReducer : Reducer<HomeState, HomeEvent, HomeEffect> {
             is HomeEvent.UpdateExpandedItem -> {
                 previousState.copy(
                     expandedItems = previousState.expandedItems.filter {
-                        it.first != event.expandedItem.first
-                    }.plus(event.expandedItem)
+                        it.first != event.id
+                    }.plus(Pair(event.id, event.expanded))
                 ) to null
             }
             is HomeEvent.UpdateLastReceipts -> {

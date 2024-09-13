@@ -31,7 +31,7 @@ internal sealed interface HomeEvent : Reducer.ViewEvent {
     data class UpdateReceiptsVisibility(val visible: Boolean) : HomeEvent
     data class UpdateLastReceipts(val lastReceipts: List<ReceiptItem>) : HomeEvent
     data class UpdateMostSale(val mostSale: List<MostSaleItem>) : HomeEvent
-    data class UpdateExpandedItem(val expandedItem: Pair<Long, Boolean>) : HomeEvent
+    data class UpdateExpandedItem(val id: Long, val expanded: Boolean) : HomeEvent
 }
 
 @Immutable

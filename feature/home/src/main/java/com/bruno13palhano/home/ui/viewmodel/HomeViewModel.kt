@@ -97,16 +97,6 @@ internal class HomeViewModel @Inject constructor(
         }
     }
 
-    fun toggleProfitVisibility(visibility: Boolean) {
-        viewModelScope.launch {
-            sendEvent(HomeEvent.UpdateProfitVisibility(visible = visibility))
-        }
-    }
-
-    fun expandItem(id:  Long, expanded: Boolean) {
-        sendEvent(HomeEvent.UpdateExpandedItem(expandedItem = Pair(id, expanded)))
-    }
-
     private fun calculateProfit(
         amazonPrice: Float,
         naturaPrice: Float,
