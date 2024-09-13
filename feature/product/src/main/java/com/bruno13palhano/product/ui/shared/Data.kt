@@ -70,8 +70,8 @@ internal data class ProductState(
 internal sealed interface ProductEvent : Reducer.ViewEvent {
     data object UpdateLoadingCurrentProduct : ProductEvent
     data class UpdateCurrentProduct(val product: Product) : ProductEvent
-    data object UpdateEditingProduct : ProductEvent
-    data object UpdateDeletingProduct : ProductEvent
+    data class UpdateEditingProduct(val id: Long) : ProductEvent
+    data class UpdateDeletingProduct(val id: Long) : ProductEvent
     data object UpdateAddingNewProduct : ProductEvent
     data object OnEditProductSuccessfully : ProductEvent
     data object OnAddNewProductSuccessfully : ProductEvent
@@ -83,9 +83,9 @@ internal sealed interface ProductEvent : Reducer.ViewEvent {
 
 @Immutable
 internal sealed interface ProductEffect : Reducer.ViewEffect {
-    data object EditProduct : ProductEffect
+    data class EditProduct(val id: Long) : ProductEffect
     data object AddNewProduct : ProductEffect
-    data object DeleteProduct : ProductEffect
+    data class DeleteProduct(val id: Long) : ProductEffect
     data object InvalidFieldErrorMessage : ProductEffect
     data object NavigateBack : ProductEffect
 }
