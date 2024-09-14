@@ -39,9 +39,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.home.R
 import com.bruno13palhano.home.ui.shared.HomeEvent
-import com.bruno13palhano.home.ui.shared.MostSaleItem
-import com.bruno13palhano.home.ui.shared.ReceiptItem
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
+import com.bruno13palhano.model.MostSaleItem
+import com.bruno13palhano.model.ReceiptItem
 import com.bruno13palhano.ui.components.ExpandedListItem
 import com.bruno13palhano.ui.components.dateFormat
 
