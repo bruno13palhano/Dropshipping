@@ -27,4 +27,7 @@ internal interface ReceiptDao : ReceiptDataSource {
 
     @Query("SELECT * FROM ReceiptInternal ORDER BY id DESC LIMIT :limit")
     override fun getLastReceipts(limit: Int): Flow<List<ReceiptInternal>>
+
+    @Query("SELECT * FROM ReceiptInternal ORDER BY id DESC LIMIT :limit OFFSET :offset")
+    override suspend fun pagingReceipts(offset: Int, limit: Int): List<ReceiptInternal>
 }

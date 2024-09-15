@@ -8,4 +8,5 @@ internal interface ReceiptDataSource : DataSource<ReceiptInternal> {
     suspend fun delete(id: Long)
     fun get(id: Long): Flow<ReceiptInternal>
     fun getLastReceipts(limit: Int): Flow<List<ReceiptInternal>>
+    suspend fun pagingReceipts(offset: Int, limit: Int): List<ReceiptInternal>
 }
