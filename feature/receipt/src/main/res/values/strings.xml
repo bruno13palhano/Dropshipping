@@ -29,4 +29,6 @@
     <string name="vert_menu">Vertical menu</string>
     <string name="done">Done</string>
     <string name="delete_receipt_message">Receipt deleted</string>
+    <string name="data_info">The date of sale, %s</string>
+    <string name="units_sold_info">Number of units sold, %d</string>
 </resources>
