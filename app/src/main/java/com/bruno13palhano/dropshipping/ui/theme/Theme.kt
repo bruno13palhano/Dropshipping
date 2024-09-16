@@ -60,7 +60,7 @@ fun DropshippingTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
-            window.navigationBarColor = colorScheme.surfaceColorAtElevation(3.dp).toArgb()
+            window.navigationBarColor = colorScheme.surfaceColorAtElevation(2.dp).toArgb()
         }
     }
 
