@@ -13,7 +13,6 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
                     receiptsLoading = event.isLoading,
                     editReceipt = false,
                     searchProduct = false,
-                    deleteReceipt = false,
                     receipts = event.receipts
                 ) to null
             }
@@ -21,28 +20,15 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
                 previousState.copy(
                     receiptsLoading = false,
                     editReceipt = event.editReceipt,
-                    searchProduct = false,
-                    deleteReceipt = false,
+                    searchProduct = false
                 ) to ReceiptsEffect.NavigateToEditReceipt(id = event.id)
             }
             is ReceiptsEvent.SearchProduct -> {
                 previousState.copy(
                     receiptsLoading = false,
                     editReceipt = false,
-                    searchProduct = event.searching,
-                    deleteReceipt = false
+                    searchProduct = event.searching
                 ) to ReceiptsEffect.NavigateToSearchProduct
-            }
-            is ReceiptsEvent.UpdateDeletingReceipt -> {
-                previousState.copy(
-                    receiptsLoading = false,
-                    editReceipt = false,
-                    searchProduct = false,
-                    deleteReceipt = event.isDeleting
-                ) to ReceiptsEffect.DeleteReceipt(id = event.id)
-            }
-            is ReceiptsEvent.OnDeleteReceiptSuccessfully -> {
-                previousState.copy(deleteReceipt = false) to ReceiptsEffect.ShowDeletedMessage
             }
         }
     }

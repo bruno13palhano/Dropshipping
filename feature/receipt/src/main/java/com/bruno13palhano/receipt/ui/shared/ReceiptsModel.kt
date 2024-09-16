@@ -1,41 +1,38 @@
 package com.bruno13palhano.receipt.ui.shared
 
 import androidx.compose.runtime.Immutable
-import com.bruno13palhano.ui.components.CommonItem
+import androidx.paging.PagingData
+import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.ui.shared.Reducer
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Immutable
 internal data class ReceiptsState(
     val receiptsLoading: Boolean,
     val editReceipt: Boolean,
     val searchProduct: Boolean,
-    val deleteReceipt: Boolean,
-    val receipts: List<CommonItem>,
+    val receipts: Flow<PagingData<Receipt>>
 ) : Reducer.ViewState {
     companion object {
         val INITIAL_STATE = ReceiptsState(
             receiptsLoading = false,
             editReceipt = false,
             searchProduct = false,
-            deleteReceipt = false,
-            receipts = emptyList()
+            receipts = emptyFlow()
         )
     }
 }
 
 @Immutable
 internal sealed interface ReceiptsEvent : Reducer.ViewEvent {
-    data class UpdateReceipts(val isLoading: Boolean, val receipts: List<CommonItem>) : ReceiptsEvent
+    data class UpdateReceipts(val isLoading: Boolean, val receipts: Flow<PagingData<Receipt>>) : ReceiptsEvent
     data class EditReceipt(val editReceipt: Boolean, val id: Long) : ReceiptsEvent
     data class SearchProduct(val searching: Boolean) : ReceiptsEvent
-    data class UpdateDeletingReceipt(val isDeleting: Boolean, val id: Long) : ReceiptsEvent
-    data object OnDeleteReceiptSuccessfully : ReceiptsEvent
 }
 
 @Immutable
 internal sealed interface ReceiptsEffect : Reducer.ViewEffect {
     data class NavigateToEditReceipt(val id: Long) : ReceiptsEffect
     data object NavigateToSearchProduct : ReceiptsEffect
-    data class DeleteReceipt(val id: Long) : ReceiptsEffect
-    data object ShowDeletedMessage : ReceiptsEffect
 }
