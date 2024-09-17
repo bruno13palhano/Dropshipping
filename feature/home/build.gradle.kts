@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.molecule)
 }

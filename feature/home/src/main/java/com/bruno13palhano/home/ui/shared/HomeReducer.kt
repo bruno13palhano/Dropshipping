@@ -11,24 +11,17 @@ internal class HomeReducer : Reducer<HomeState, HomeEvent, HomeEffect> {
             is HomeEvent.UpdateProfitVisibility -> {
                 previousState.copy(profitVisible = event.visible) to null
             }
-            is HomeEvent.UpdateProfit -> {
-                previousState.copy(profit = event.profit) to null
-            }
+
             is HomeEvent.UpdateReceiptsVisibility -> {
                 previousState.copy(receiptsVisible = event.visible) to null
             }
+
             is HomeEvent.UpdateExpandedItem -> {
                 previousState.copy(
                     expandedItems = previousState.expandedItems.filter {
                         it.first != event.id
                     }.plus(Pair(event.id, event.expanded))
                 ) to null
-            }
-            is HomeEvent.UpdateLastReceipts -> {
-                previousState.copy(lastReceipts = event.lastReceipts) to null
-            }
-            is HomeEvent.UpdateMostSale -> {
-                previousState.copy(mostSale = event.mostSale) to null
             }
         }
     }

@@ -26,7 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.home.R
 import com.bruno13palhano.home.ui.shared.HomeEvent
 import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
@@ -50,25 +49,28 @@ internal fun HomeRoute(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    GetInitialData(viewModel = viewModel)
-
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val model by viewModel.state.collectAsState()
 
     HomeContent(
         modifier = modifier,
-        profit = state.profit.profit,
-        profitVisible = state.profitVisible,
-        receiptsVisible = state.receiptsVisible,
-        expandItems = state.expandedItems,
-        amazonProfit = state.profit.amazonProfit,
-        naturaProfit = state.profit.naturaProfit,
-        lastReceipts = state.lastReceipts,
-        mostSale = state.mostSale,
+        profit = model.profit.profit,
+        profitVisible = model.profitVisible,
+        receiptsVisible = model.receiptsVisible,
+        expandItems = model.expandedItems,
+        amazonProfit = model.profit.amazonProfit,
+        naturaProfit = model.profit.naturaProfit,
+        lastReceipts = model.lastReceipts,
+        mostSale = model.mostSale,
         onToggleProfitVisibility = { visible ->
             viewModel.sendEvent(event = HomeEvent.UpdateProfitVisibility(visible = visible))
         },
         onExpandReceiptItem = { id, expanded ->
-            viewModel.sendEvent(event = HomeEvent.UpdateExpandedItem(id = id, expanded = expanded))
+            viewModel.sendEvent(
+                event = HomeEvent.UpdateExpandedItem(
+                    id = id,
+                    expanded = expanded
+                )
+            )
         }
     )
 }
@@ -257,15 +259,6 @@ private fun ProfitInfo(
                 )
             }
         }
-    }
-}
-
-@Composable
-internal fun GetInitialData(viewModel: HomeViewModel) {
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getProfit()
-        viewModel.getLastReceipts()
-        viewModel.getMostSale()
     }
 }
 
