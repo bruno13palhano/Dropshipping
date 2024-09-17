@@ -145,7 +145,7 @@ internal fun ReceiptRoute(
                 else -> {}
             }
         },
-        onBackClick = { viewModel.sendEvent(event = ReceiptEvent.OnNavigateBack) },
+        onBackClick = { viewModel.sendEffect(effect = ReceiptEffect.NavigateBack) },
         onDoneClick = { viewModel.saveReceipt(id = id) }
     )
 }

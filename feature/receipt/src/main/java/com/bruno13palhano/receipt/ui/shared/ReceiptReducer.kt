@@ -81,10 +81,6 @@ internal class ReceiptReducer : Reducer<ReceiptState, ReceiptEvent, ReceiptEffec
                     navigateBack = true
                 ) to ReceiptEffect.NavigateBack
             }
-
-            is ReceiptEvent.OnNavigateBack -> {
-                previousState.copy(navigateBack = true) to ReceiptEffect.NavigateBack
-            }
         }
     }
 }

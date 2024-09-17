@@ -47,7 +47,6 @@ internal sealed interface ReceiptEvent : Reducer.ViewEvent {
     data object OnAddReceiptSuccessfully : ReceiptEvent
     data object OnCancelReceiptSuccessfully : ReceiptEvent
     data object OnDeleteReceiptSuccessfully : ReceiptEvent
-    data object OnNavigateBack : ReceiptEvent
 }
 
 @Immutable
