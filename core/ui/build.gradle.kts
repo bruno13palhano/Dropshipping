@@ -59,4 +59,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.hilt.android)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.molecule)
 }
