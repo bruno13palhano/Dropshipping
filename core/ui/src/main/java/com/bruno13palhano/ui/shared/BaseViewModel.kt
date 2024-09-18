@@ -23,7 +23,7 @@ abstract class BaseViewModel<State: Reducer.ViewState, Event: Reducer.ViewEvent,
 
     val state: StateFlow<State> by lazy(LazyThreadSafetyMode.NONE) {
         scope.launchMolecule(mode = ContextClock) {
-            states(events, effects)
+            states(events)
         }
     }
 
@@ -36,5 +36,5 @@ abstract class BaseViewModel<State: Reducer.ViewState, Event: Reducer.ViewEvent,
     }
 
     @Composable
-    protected abstract fun states(events: Flow<Event>, effects: Flow<Effect>?): State
+    protected abstract fun states(events: Flow<Event>): State
 }
