@@ -23,12 +23,15 @@ internal class HomeViewModel @Inject constructor(
     private val homeUseCase: HomeUseCase
 ) : BaseViewModel<HomeState, HomeEvent, HomeEffect>() {
     @Composable
-    override fun states(events: Flow<HomeEvent>, effects: Flow<HomeEffect>?): HomeState {
-        return homePresenter(useCase = homeUseCase)
+    override fun states(events: Flow<HomeEvent>): HomeState {
+        return homePresenter(useCase = homeUseCase, events = events)
     }
 
     @Composable
-    fun homePresenter(useCase: HomeUseCase): HomeState {
+    fun homePresenter(
+        useCase: HomeUseCase,
+        events: Flow<HomeEvent>
+    ): HomeState {
         var profit by remember { mutableStateOf(Profit(0f, 0f, 0f)) }
         var lastReceipts by remember { mutableStateOf(emptyList<ReceiptItem>()) }
         var mostSale by remember { mutableStateOf(emptyList<MostSaleItem>()) }
