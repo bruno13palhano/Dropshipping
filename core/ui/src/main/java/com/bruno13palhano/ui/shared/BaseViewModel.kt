@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
-abstract class BaseViewModel<State: ViewState, Event: ViewEvent, Effect: ViewEffect> : ViewModel() {
+abstract class BaseViewModel<State: ViewState, Action: ViewAction, Event: ViewEvent, Effect: ViewEffect>(
+    protected val actionProcessor: ActionProcessor<Action, Event>
+) : ViewModel() {
     private val scope =
         CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
 
