@@ -1,5 +1,6 @@
 package com.bruno13palhano.receipt.ui.viewmodel
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.di.ReceiptRep
@@ -7,15 +8,17 @@ import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.data.repository.ReceiptRepository
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
-import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
-import com.bruno13palhano.receipt.ui.shared.ReceiptEvent
-import com.bruno13palhano.receipt.ui.shared.ReceiptReducer
-import com.bruno13palhano.receipt.ui.shared.ReceiptState
+import com.bruno13palhano.receipt.ui.receipt.ReceiptAction
+import com.bruno13palhano.receipt.ui.shared.ReceiptActionProcessor
+import com.bruno13palhano.receipt.ui.receipt.ReceiptEffect
+import com.bruno13palhano.receipt.ui.receipt.ReceiptEvent
+import com.bruno13palhano.receipt.ui.receipt.ReceiptState
 import com.bruno13palhano.ui.shared.BaseViewModel
 import com.bruno13palhano.ui.shared.stringToFloat
 import com.bruno13palhano.ui.shared.stringToInt
 import com.bruno13palhano.ui.shared.stringToLong
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -26,9 +29,8 @@ internal class ReceiptViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
     @ProductRep private val productRepository: ProductRepository,
     val receiptFields: ReceiptFields = ReceiptFields()
-) : BaseViewModel<ReceiptState, ReceiptEvent, ReceiptEffect>(
-    initialState = ReceiptState.INITIAL_STATE,
-    reducer = ReceiptReducer()
+) : BaseViewModel<ReceiptState, ReceiptAction, ReceiptEvent, ReceiptEffect>(
+    actionProcessor = ReceiptActionProcessor()
 ) {
     private var product = MutableStateFlow(Product(id = 0L, name = "", naturaCode = ""))
 
@@ -137,5 +139,10 @@ internal class ReceiptViewModel @Inject constructor(
         receiptFields.updateAmazonPrice(amazonPrice = receipt.amazonPrice.toString())
         receiptFields.updatePaymentOption(paymentOption = receipt.paymentOption)
         receiptFields.updateObservations(observations = receipt.observations)
+    }
+
+    @Composable
+    override fun states(events: Flow<ReceiptEvent>): ReceiptState {
+        TODO("Not yet implemented")
     }
 }

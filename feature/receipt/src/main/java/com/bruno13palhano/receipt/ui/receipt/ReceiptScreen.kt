@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui.screen
+package com.bruno13palhano.receipt.ui.receipt
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -89,7 +89,7 @@ internal fun ReceiptRoute(
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effects)
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage = stringResource(id = R.string.empty_fields_error)

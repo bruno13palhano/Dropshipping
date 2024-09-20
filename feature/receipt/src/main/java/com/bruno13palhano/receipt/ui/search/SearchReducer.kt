@@ -1,5 +1,8 @@
 package com.bruno13palhano.receipt.ui.shared
 
+import com.bruno13palhano.receipt.ui.search.SearchEffect
+import com.bruno13palhano.receipt.ui.search.SearchEvent
+import com.bruno13palhano.receipt.ui.search.SearchState
 import com.bruno13palhano.ui.shared.Reducer
 
 internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {

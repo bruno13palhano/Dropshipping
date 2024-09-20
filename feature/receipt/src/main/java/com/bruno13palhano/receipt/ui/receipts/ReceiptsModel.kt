@@ -1,9 +1,9 @@
-package com.bruno13palhano.receipt.ui.shared
+package com.bruno13palhano.receipt.ui.receipts
 
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import com.bruno13palhano.model.Receipt
-import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
@@ -19,7 +19,8 @@ internal data class ReceiptsState(
 
 @Immutable
 internal sealed interface ReceiptsEvent : ViewEvent {
-    data class UpdateReceipts(val isLoading: Boolean, val receipts: Flow<PagingData<Receipt>>) : ReceiptsEvent
+    data class UpdateReceipts(val isLoading: Boolean, val receipts: Flow<PagingData<Receipt>>) :
+        ReceiptsEvent
     data class EditReceipt(val editReceipt: Boolean, val id: Long) : ReceiptsEvent
     data class SearchProduct(val searching: Boolean) : ReceiptsEvent
 }
@@ -29,3 +30,5 @@ internal sealed interface ReceiptsEffect : ViewEffect {
     data class NavigateToEditReceipt(val id: Long) : ReceiptsEffect
     data object NavigateToSearchProduct : ReceiptsEffect
 }
+
+internal sealed interface ReceiptsAction : ViewAction

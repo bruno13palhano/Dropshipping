@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui.screen
+package com.bruno13palhano.receipt.ui.search
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -18,9 +18,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -30,11 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
-import com.bruno13palhano.receipt.ui.shared.SearchEffect
-import com.bruno13palhano.receipt.ui.shared.SearchEvent
-import com.bruno13palhano.receipt.ui.viewmodel.SearchViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
@@ -46,58 +44,27 @@ internal fun SearchRoute(
     navigateBack: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) { viewModel.getCache() }
-    LaunchedEffect(Unit) { viewModel.getProducts() }
-
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
+    val state by viewModel.state.collectAsState()
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effects)
 
     LaunchedEffect(effect) {
         effect.collect { action ->
             when (action) {
-                is SearchEffect.NavigateToAddReceipt -> {
-                    navigateToAddReceipt(action.productId)
-                }
-                is SearchEffect.NavigateBack -> {
-                    navigateBack()
-                }
-                is SearchEffect.SearchingProducts -> {
-                    viewModel.searchProducts(query = action.query)
-                }
-                is SearchEffect.DeleteCache -> {
-                    viewModel.deleteCache(query = action.query)
-                }
-                is SearchEffect.RefreshProducts -> {
-                    viewModel.getProducts()
-                }
+                is SearchEffect.NavigateToAddReceipt -> navigateToAddReceipt(action.productId)
+
+                is SearchEffect.NavigateBack -> navigateBack()
             }
         }
     }
 
     SearchContent(
         modifier = modifier,
-        query = state.query,
+        query = viewModel.query,
         active = state.active,
         products = state.products,
         cache = state.cache,
-        onQueryChange = { query ->
-            viewModel.sendEvent(event = SearchEvent.UpdateQuery(query = query))
-        },
-        onActiveChange = { active ->
-            viewModel.sendEvent(event = SearchEvent.UpdateActive(active = active))
-        },
-        onSearchClick = { query ->
-            viewModel.sendEvent(event = SearchEvent.OnSearchDoneClick(query = query))
-        },
-        onProductItemClick = { productId ->
-            viewModel.sendEvent(event = SearchEvent.OnProductItemClick(id = productId))
-        },
-        onDeleteSearchClick = { query ->
-            viewModel.sendEvent(event = SearchEvent.UpdateDeleting(deleting = true, query = query))
-        },
-        onClose = {
-            viewModel.sendEvent(event = SearchEvent.OnCloseSearchClick)
-        }
+        onQueryChange = viewModel::updateQuery,
+        onAction = viewModel::onAction
     )
 }
 
@@ -109,11 +76,7 @@ private fun SearchContent(
     products: List<CommonItem>,
     cache: List<String>,
     onQueryChange: (query: String) -> Unit,
-    onActiveChange: (active: Boolean) -> Unit,
-    onSearchClick: (query: String) -> Unit,
-    onProductItemClick: (id: Long) -> Unit,
-    onDeleteSearchClick: (query: String) -> Unit,
-    onClose: () -> Unit
+    onAction: (action: SearchAction) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -126,10 +89,12 @@ private fun SearchContent(
                 active = active,
                 cache = cache,
                 onQueryChange = onQueryChange,
-                onActiveChange = onActiveChange,
-                onSearchClick = onSearchClick,
-                onDeleteSearchClick = onDeleteSearchClick,
-                onClose = onClose
+                onActiveChange = { onAction(SearchAction.OnActiveChange(it)) },
+                onSearchClick = { onAction(SearchAction.OnSearchDoneClick(it)) },
+                onDeleteSearchClick = {
+                    onAction(SearchAction.DeleteSearchClick(deleting = true, query = it))
+                },
+                onClose = { onAction(SearchAction.OnCloseSearchClick) }
             )
         }
     ) {
@@ -144,8 +109,8 @@ private fun SearchContent(
                     modifier = Modifier.padding(4.dp),
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
                     iconDescription = "",
-                    onItemClick = { onProductItemClick(it.id) },
-                    onIconClick = { onProductItemClick(it.id) }
+                    onItemClick = { onAction(SearchAction.OnProductItemClick(it.id)) },
+                    onIconClick = { onAction(SearchAction.OnProductItemClick(it.id)) }
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
@@ -171,57 +136,64 @@ private fun SearchProducts(
     onClose: () -> Unit
 ) {
     SearchBar(
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = { onSearchClick(it) },
+                expanded = active,
+                onExpandedChange = onActiveChange,
+                leadingIcon = {
+                    IconButton(
+                        modifier = Modifier.semantics { contentDescription = "Close button" },
+                        onClick = onClose
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                },
+                trailingIcon = {
+                    IconButton(
+                        modifier = Modifier.semantics { contentDescription = "Search button" },
+                        onClick = { onSearchClick(query) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(id = R.string.search_products)
+                        )
+                    }
+                }
+            )
+        },
+        expanded = active,
+        onExpandedChange = onActiveChange,
         modifier = modifier
             .padding(horizontal = 8.dp)
             .fillMaxWidth(),
-        query = query,
-        onQueryChange = onQueryChange,
-        onSearch = { onSearchClick(it) },
-        active = active,
-        onActiveChange = onActiveChange,
-        leadingIcon = {
-            IconButton(
-                modifier = Modifier.semantics { contentDescription = "Close button" },
-                onClick = onClose
+        content = {
+            LazyColumn(
+                modifier = Modifier.semantics { contentDescription = "List of queries" },
+                reverseLayout = true
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null
-                )
-            }
-        },
-        trailingIcon = {
-            IconButton(
-                modifier = Modifier.semantics { contentDescription = "Search button" },
-                onClick = { onSearchClick(query) }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(id = R.string.search_products)
-                )
-            }
-        }
-    ) {
-        LazyColumn(
-            modifier = Modifier.semantics { contentDescription = "List of queries" },
-            reverseLayout = true
-        ) {
-            items(items = cache, key = { it }) {
-                ElevatedListItem(
-                    icon = Icons.Filled.Close,
-                    iconDescription = stringResource(id = R.string.delete),
-                    shape = RectangleShape,
-                    onItemClick = { onSearchClick(it) },
-                    onIconClick = { onDeleteSearchClick(it) }
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = it
-                    )
+                items(items = cache, key = { it }) {
+                    ElevatedListItem(
+                        icon = Icons.Filled.Close,
+                        iconDescription = stringResource(id = R.string.delete),
+                        shape = RectangleShape,
+                        onItemClick = { onSearchClick(it) },
+                        onIconClick = { onDeleteSearchClick(it) }
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = it
+                        )
+                    }
                 }
             }
-        }
-    }
+        },
+    )
 }
 
 @Preview
@@ -241,10 +213,6 @@ private fun SearchContentPreview() {
             "search 3"
         ),
         onQueryChange = {},
-        onActiveChange = {},
-        onSearchClick = {},
-        onProductItemClick = {},
-        onDeleteSearchClick = {},
-        onClose = {}
+        onAction = {}
     )
 }

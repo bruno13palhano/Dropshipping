@@ -2,6 +2,7 @@ package com.bruno13palhano.receipt.ui.shared
 
 import androidx.compose.runtime.Immutable
 import com.bruno13palhano.ui.components.CommonItem
+import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
@@ -44,7 +45,7 @@ internal sealed interface SearchEffect : ViewEffect {
     data object NavigateBack : SearchEffect
 }
 
-internal sealed interface SearchAction {
+internal sealed interface SearchAction : ViewAction {
     data class DeleteSearchClick(val deleting: Boolean, val query: String) : SearchAction
     data class OnActiveChange(val active: Boolean) : SearchAction
     data class OnSearchDoneClick(val query: String) : SearchAction

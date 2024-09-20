@@ -1,9 +1,9 @@
-package com.bruno13palhano.receipt.ui.shared
+package com.bruno13palhano.receipt.ui.receipt
 
 import androidx.compose.runtime.Immutable
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
-import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
@@ -61,3 +61,5 @@ internal sealed interface ReceiptEffect : ViewEffect {
     data object InvalidFieldErrorMessage : ReceiptEffect
     data object NavigateBack : ReceiptEffect
 }
+
+internal sealed interface ReceiptAction : ViewAction

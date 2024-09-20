@@ -1,5 +1,8 @@
 package com.bruno13palhano.receipt.ui.shared
 
+import com.bruno13palhano.receipt.ui.receipts.ReceiptsEffect
+import com.bruno13palhano.receipt.ui.receipts.ReceiptsEvent
+import com.bruno13palhano.receipt.ui.receipts.ReceiptsState
 import com.bruno13palhano.ui.shared.Reducer
 
 internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsEffect> {
