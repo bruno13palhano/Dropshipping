@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui.shared
+package com.bruno13palhano.receipt.ui.search
 
 import androidx.compose.runtime.Immutable
 import com.bruno13palhano.ui.components.CommonItem

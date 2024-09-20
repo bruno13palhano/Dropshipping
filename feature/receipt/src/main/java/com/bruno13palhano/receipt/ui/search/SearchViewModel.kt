@@ -1,4 +1,4 @@
-package com.bruno13palhano.receipt.ui.viewmodel
+package com.bruno13palhano.receipt.ui.search
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,11 +8,6 @@ import com.bruno13palhano.data.di.CacheRep
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.CacheRepository
 import com.bruno13palhano.data.repository.ProductRepository
-import com.bruno13palhano.receipt.ui.shared.SearchAction
-import com.bruno13palhano.receipt.ui.shared.SearchActionProcessor
-import com.bruno13palhano.receipt.ui.shared.SearchEffect
-import com.bruno13palhano.receipt.ui.shared.SearchEvent
-import com.bruno13palhano.receipt.ui.shared.SearchState
 import com.bruno13palhano.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
