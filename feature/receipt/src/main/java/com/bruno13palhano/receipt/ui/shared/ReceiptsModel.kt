@@ -4,8 +4,10 @@ import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewEffect
+import com.bruno13palhano.ui.shared.ViewEvent
+import com.bruno13palhano.ui.shared.ViewState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Immutable
 internal data class ReceiptsState(
@@ -13,26 +15,17 @@ internal data class ReceiptsState(
     val editReceipt: Boolean,
     val searchProduct: Boolean,
     val receipts: Flow<PagingData<Receipt>>
-) : Reducer.ViewState {
-    companion object {
-        val INITIAL_STATE = ReceiptsState(
-            receiptsLoading = false,
-            editReceipt = false,
-            searchProduct = false,
-            receipts = emptyFlow()
-        )
-    }
-}
+) : ViewState
 
 @Immutable
-internal sealed interface ReceiptsEvent : Reducer.ViewEvent {
+internal sealed interface ReceiptsEvent : ViewEvent {
     data class UpdateReceipts(val isLoading: Boolean, val receipts: Flow<PagingData<Receipt>>) : ReceiptsEvent
     data class EditReceipt(val editReceipt: Boolean, val id: Long) : ReceiptsEvent
     data class SearchProduct(val searching: Boolean) : ReceiptsEvent
 }
 
 @Immutable
-internal sealed interface ReceiptsEffect : Reducer.ViewEffect {
+internal sealed interface ReceiptsEffect : ViewEffect {
     data class NavigateToEditReceipt(val id: Long) : ReceiptsEffect
     data object NavigateToSearchProduct : ReceiptsEffect
 }

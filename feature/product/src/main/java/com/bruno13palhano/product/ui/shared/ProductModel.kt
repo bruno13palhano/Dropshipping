@@ -3,6 +3,9 @@ package com.bruno13palhano.product.ui.shared
 import androidx.compose.runtime.Immutable
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewEffect
+import com.bruno13palhano.ui.shared.ViewEvent
+import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
 internal data class ProductState(
@@ -14,7 +17,7 @@ internal data class ProductState(
     val hasInvalidField: Boolean,
     val navigateBack: Boolean,
     val currentProduct: Product
-) : Reducer.ViewState {
+) : ViewState {
     companion object {
         val INITIAL_STATE = ProductState(
             loadingCurrentProduct = false,
@@ -30,7 +33,7 @@ internal data class ProductState(
 }
 
 @Immutable
-internal sealed interface ProductEvent : Reducer.ViewEvent {
+internal sealed interface ProductEvent : ViewEvent {
     data object UpdateLoadingCurrentProduct : ProductEvent
     data class UpdateCurrentProduct(val product: Product) : ProductEvent
     data class UpdateEditingProduct(val id: Long) : ProductEvent
@@ -45,7 +48,7 @@ internal sealed interface ProductEvent : Reducer.ViewEvent {
 }
 
 @Immutable
-internal sealed interface ProductEffect : Reducer.ViewEffect {
+internal sealed interface ProductEffect : ViewEffect {
     data class EditProduct(val id: Long) : ProductEffect
     data object AddNewProduct : ProductEffect
     data class DeleteProduct(val id: Long) : ProductEffect

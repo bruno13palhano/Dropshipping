@@ -13,8 +13,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
-abstract class BaseViewModel<State: Reducer.ViewState, Event: Reducer.ViewEvent, Effect: Reducer.ViewEffect> : ViewModel() {
-    private val scope = CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
+abstract class BaseViewModel<State: ViewState, Event: ViewEvent, Effect: ViewEffect> : ViewModel() {
+    private val scope =
+        CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
 
     val events: MutableSharedFlow<Event> = MutableSharedFlow(extraBufferCapacity = 20)
 

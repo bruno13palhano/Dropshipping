@@ -9,19 +9,11 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
     ): Pair<SearchState, SearchEffect?> {
         return when (event) {
             is SearchEvent.UpdateDeleting -> {
-                val effect =
-                    if (event.deleting) SearchEffect.DeleteCache(query = event.query)
-                    else null
-
                 previousState.copy(
                     deleting = event.deleting
-                ) to effect
-            }
-            is SearchEvent.UpdateQuery -> {
-                previousState.copy(
-                    query = event.query
                 ) to null
             }
+
             is SearchEvent.UpdateActive -> {
                 previousState.copy(
                     updatingCache = false,
@@ -29,25 +21,15 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
                     active = event.active
                 ) to null
             }
-            is SearchEvent.UpdateProducts -> {
-                previousState.copy(
-                    updatingProducts = true,
-                    products = event.products
-                ) to null
-            }
-            is SearchEvent.UpdateCache -> {
-                previousState.copy(
-                    updatingCache = true,
-                    cache = event.cache
-                ) to null
-            }
+
             is SearchEvent.OnSearchDoneClick -> {
                 previousState.copy(
                     updatingCache = true,
                     active = false,
                     query = event.query
-                ) to SearchEffect.SearchingProducts(query = event.query)
+                ) to null
             }
+
             is SearchEvent.OnCloseSearchClick -> {
                 if (previousState.active) {
                     previousState.copy(
@@ -55,15 +37,15 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
                         updatingProducts = false,
                         query = "",
                         active = false
-                    ) to SearchEffect.RefreshProducts
+                    ) to null
                 } else {
                     previousState.copy(
                         updatingCache = false,
-                        updatingProducts = false,
-                        navigateBack = true
+                        updatingProducts = false
                     ) to SearchEffect.NavigateBack
                 }
             }
+
             is SearchEvent.OnProductItemClick -> {
                 previousState.copy(
                     active = false

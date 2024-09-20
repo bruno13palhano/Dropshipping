@@ -4,6 +4,9 @@ import androidx.compose.runtime.Immutable
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewEffect
+import com.bruno13palhano.ui.shared.ViewEvent
+import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
 internal data class ReceiptState(
@@ -16,7 +19,7 @@ internal data class ReceiptState(
     val canceled: Boolean,
     val receipt: Receipt,
     val navigateBack: Boolean
-) : Reducer.ViewState {
+) : ViewState {
     companion object {
         val INITIAL_STATE = ReceiptState(
             editReceipt = false,
@@ -33,7 +36,7 @@ internal data class ReceiptState(
 }
 
 @Immutable
-internal sealed interface ReceiptEvent : Reducer.ViewEvent {
+internal sealed interface ReceiptEvent : ViewEvent {
     data object EditReceipt : ReceiptEvent
     data object NewReceipt : ReceiptEvent
     data class IsEditing(val id: Long) : ReceiptEvent
@@ -50,7 +53,7 @@ internal sealed interface ReceiptEvent : Reducer.ViewEvent {
 }
 
 @Immutable
-internal sealed interface ReceiptEffect : Reducer.ViewEffect {
+internal sealed interface ReceiptEffect : ViewEffect {
     data class UpdateReceipt(val id: Long) : ReceiptEffect
     data object InsertReceipt : ReceiptEffect
     data class DeleteReceipt(val id: Long) : ReceiptEffect
