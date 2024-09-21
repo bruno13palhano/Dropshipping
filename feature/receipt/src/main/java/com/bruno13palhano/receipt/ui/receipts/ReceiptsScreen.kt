@@ -36,9 +36,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.bruno13palhano.model.Product
 import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.receipt.R
-import com.bruno13palhano.receipt.ui.shared.ReceiptsEffect
-import com.bruno13palhano.receipt.ui.shared.ReceiptsEvent
-import com.bruno13palhano.receipt.ui.viewmodel.ReceiptsViewModel
 import com.bruno13palhano.ui.components.dateFormat
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 import kotlinx.coroutines.flow.flowOf
@@ -51,7 +48,6 @@ internal fun ReceiptsRoute(
     viewModel: ReceiptsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val receipts = state.receipts.collectAsLazyPagingItems()
     val effects = rememberFlowWithLifecycle(flow = viewModel.effects)
 
     LaunchedEffect(effects) {
@@ -66,15 +62,8 @@ internal fun ReceiptsRoute(
 
     ReceiptsContent(
         modifier = modifier,
-        receipts = receipts,
-        onReceiptItemClick = { id ->
-            viewModel.sendEvent(
-                event = ReceiptsEvent.EditReceipt(editReceipt = true, id = id)
-            )
-        },
-        onAddNewReceiptClick = {
-            viewModel.sendEvent(event = ReceiptsEvent.SearchProduct(searching = true))
-        }
+        receipts = state.receipts,
+        onAction = viewModel::onAction
     )
 }
 
@@ -83,8 +72,7 @@ internal fun ReceiptsRoute(
 internal fun ReceiptsContent(
     modifier: Modifier = Modifier,
     receipts: LazyPagingItems<Receipt>,
-    onReceiptItemClick: (id: Long) -> Unit,
-    onAddNewReceiptClick: () -> Unit
+    onAction: (action: ReceiptsAction) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -93,7 +81,11 @@ internal fun ReceiptsContent(
             .semantics { contentDescription = "Receipts content" },
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.receipts)) }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddNewReceiptClick) {
+            FloatingActionButton(
+                onClick = {
+                    onAction(ReceiptsAction.OnSearchProductClick(searching = true))
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_receipt)
@@ -114,7 +106,14 @@ internal fun ReceiptsContent(
                 receipts[index]?.let { receipt ->
                     ElevatedCard(
                         modifier = Modifier.padding(4.dp),
-                        onClick = { onReceiptItemClick(receipt.id) }
+                        onClick = {
+                            onAction(
+                                ReceiptsAction.OnEditReceiptClick(
+                                    editReceipt = true,
+                                    id = receipt.id
+                                )
+                            )
+                        }
                     ) {
                         Text(
                             modifier = Modifier
@@ -189,7 +188,6 @@ private fun ReceiptsContentPreview() {
                 )
             )
         ).collectAsLazyPagingItems(),
-        onReceiptItemClick = {},
-        onAddNewReceiptClick = {}
+        onAction = {}
     )
 }
