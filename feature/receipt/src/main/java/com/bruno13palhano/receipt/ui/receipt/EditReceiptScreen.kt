@@ -54,10 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.receipt.R
-import com.bruno13palhano.receipt.ui.shared.ReceiptEffect
-import com.bruno13palhano.receipt.ui.shared.ReceiptEvent
-import com.bruno13palhano.receipt.ui.viewmodel.ReceiptFields
-import com.bruno13palhano.receipt.ui.viewmodel.ReceiptViewModel
 import com.bruno13palhano.ui.components.clearFocusOnKeyboardDismiss
 import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.CustomClickField
@@ -78,15 +74,16 @@ internal fun ReceiptRoute(
     onBackClick: () -> Unit,
     viewModel: ReceiptViewModel = hiltViewModel()
 ) {
-    val title = getScreenTitle(receiptId = id)
-
     LaunchedEffect(key1 = Unit) {
-        getInitialData(
-            receiptId = id,
-            productId = productId,
-            viewModel = viewModel
-        )
+        if (id == 0L) {
+            viewModel.onAction(action = ReceiptAction.OnAddNewReceiptClick(productId = productId))
+            viewModel.onAction(action = ReceiptAction.OnUpdateRequestDate(requestDate = currentDate()))
+        } else {
+            viewModel.onAction(action = ReceiptAction.OnEditReceiptClick(id = id))
+        }
     }
+
+    val title = getScreenTitle(receiptId = id)
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(flow = viewModel.effects)
@@ -97,14 +94,6 @@ internal fun ReceiptRoute(
     LaunchedEffect(key1 = effect) {
         effect.collect { action ->
             when (action) {
-                is ReceiptEffect.UpdateReceipt -> viewModel.updateReceipt(id = action.id)
-
-                is ReceiptEffect.InsertReceipt -> viewModel.insertReceipt()
-
-                is ReceiptEffect.DeleteReceipt -> viewModel.deleteReceipt(id = action.id)
-
-                is ReceiptEffect.CancelReceipt -> viewModel.cancelReceipt(id = action.id)
-
                 is ReceiptEffect.NavigateBack -> onBackClick()
 
                 is ReceiptEffect.InvalidFieldErrorMessage -> {
@@ -135,18 +124,18 @@ internal fun ReceiptRoute(
         onMoreVertMenuItemClick = { index ->
             when (index) {
                 ReceiptMenuOptions.DELETE -> {
-                    viewModel.sendEvent(event = ReceiptEvent.UpdateDeleteReceipt(id = id))
+                    viewModel.onAction(action = ReceiptAction.OnDeleteReceiptClick(id = id))
+                    // TODO: Split Receipt into NewReceipt and EditReceipt
                 }
 
                 ReceiptMenuOptions.CANCEL -> {
-                    viewModel.sendEvent(event = ReceiptEvent.CancelReceipt(id = id))
+                    viewModel.onAction(action = ReceiptAction.OnCancelReceiptClick(id = id))
                 }
 
                 else -> {}
             }
         },
-        onBackClick = { viewModel.sendEffect(effect = ReceiptEffect.NavigateBack) },
-        onDoneClick = { viewModel.saveReceipt(id = id) }
+        onAction = viewModel::onAction
     )
 }
 
@@ -161,8 +150,7 @@ internal fun ReceiptContent(
     hasInvalidField: Boolean,
     receiptFields: ReceiptFields,
     onMoreVertMenuItemClick: (index: Int) -> Unit,
-    onDoneClick: () -> Unit,
-    onBackClick: () -> Unit
+    onAction: (action: ReceiptAction) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -189,7 +177,7 @@ internal fun ReceiptContent(
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.semantics { contentDescription = "Navigate back" },
-                        onClick = onBackClick
+                        onClick = { onAction(ReceiptAction.OnBackClick) }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -231,7 +219,7 @@ internal fun ReceiptContent(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.semantics { contentDescription = "Add button" },
-                onClick = onDoneClick
+                onClick = { onAction(ReceiptAction.OnDoneReceiptClick) }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Done,
@@ -401,19 +389,6 @@ private fun getScreenTitle(receiptId: Long): String {
         else stringResource(id = R.string.add_receipt)
 }
 
-private fun getInitialData(
-    receiptId: Long,
-    productId: Long,
-    viewModel: ReceiptViewModel
-) {
-    if (receiptId == 0L) {
-        viewModel.getProduct(productId = productId)
-        viewModel.receiptFields.updateRequestDate(currentDate())
-    } else {
-        viewModel.getReceipt(id = receiptId)
-    }
-}
-
 private object ReceiptMenuOptions {
     const val DELETE = 0
     const val CANCEL = 1
@@ -430,7 +405,6 @@ private fun ReceiptPreview() {
         hasInvalidField = true,
         receiptFields = ReceiptFields(),
         onMoreVertMenuItemClick = {},
-        onBackClick = {},
-        onDoneClick = {}
+        onAction = {}
     )
 }

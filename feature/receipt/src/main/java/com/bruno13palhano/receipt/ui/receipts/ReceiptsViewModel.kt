@@ -1,7 +1,6 @@
 package com.bruno13palhano.receipt.ui.receipts
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ReceiptRep
 import com.bruno13palhano.data.repository.ReceiptRepository
 import com.bruno13palhano.ui.shared.BaseViewModel
@@ -19,7 +18,6 @@ internal class ReceiptsViewModel @Inject constructor(
     override fun states(events: Flow<ReceiptsEvent>): ReceiptsState {
         return receiptsPresenter(
             receiptRepository = receiptRepository,
-            scope = viewModelScope,
             events = events,
             sendEffect = ::sendEffect
         )

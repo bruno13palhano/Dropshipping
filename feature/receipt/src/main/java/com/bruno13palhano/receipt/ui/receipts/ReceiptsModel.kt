@@ -1,7 +1,6 @@
 package com.bruno13palhano.receipt.ui.receipts
 
 import androidx.compose.runtime.Immutable
-import androidx.paging.compose.LazyPagingItems
 import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
@@ -12,7 +11,7 @@ import com.bruno13palhano.ui.shared.ViewState
 internal data class ReceiptsState(
     val editReceipt: Boolean,
     val searchProduct: Boolean,
-    val receipts: LazyPagingItems<Receipt>
+    val receipts: List<Receipt>
 ) : ViewState
 
 @Immutable
@@ -27,6 +26,7 @@ internal sealed interface ReceiptsEffect : ViewEffect {
     data object NavigateToSearchProduct : ReceiptsEffect
 }
 
+@Immutable
 internal sealed interface ReceiptsAction : ViewAction  {
     data class OnEditReceiptClick(val editReceipt: Boolean, val id: Long) : ReceiptsAction
     data class OnSearchProductClick(val searching: Boolean) : ReceiptsAction
