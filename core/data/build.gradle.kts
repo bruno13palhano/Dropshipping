@@ -48,7 +48,6 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockitoCore)
     testImplementation(libs.mockitoKotlin)
-    androidTestImplementation(libs.paging.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.coroutines.test)
@@ -61,8 +60,5 @@ dependencies {
     ksp(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.coroutines)
-    implementation(libs.room.paging)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.paging.runtime)
-    implementation(libs.room.paging)
 }
