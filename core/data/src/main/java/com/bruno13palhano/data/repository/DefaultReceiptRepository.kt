@@ -1,8 +1,5 @@
 package com.bruno13palhano.data.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.bruno13palhano.data.di.ReceiptInternalDataSource
 import com.bruno13palhano.data.internal.datasource.ReceiptDataSource
 import com.bruno13palhano.data.internal.entity.asExternal
@@ -19,19 +16,6 @@ internal class DefaultReceiptRepository @Inject constructor(
         return receiptDataSource.getLastReceipts(limit = limit).map {
             it.map { receiptInternal -> receiptInternal.asExternal() }
         }
-    }
-
-    override fun pagingReceipts(): Flow<PagingData<Receipt>> {
-        return Pager(
-            config = PagingConfig(pageSize = 20),
-            pagingSourceFactory = {
-                ReceiptsPagingSource(
-                    receiptDataSource = receiptDataSource,
-                    offset = 0,
-                    limit = 20
-                )
-            }
-        ).flow
     }
 
     override suspend fun insert(data: Receipt) {

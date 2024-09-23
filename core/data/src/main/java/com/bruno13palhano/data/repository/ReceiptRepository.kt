@@ -1,6 +1,5 @@
 package com.bruno13palhano.data.repository
 
-import androidx.paging.PagingData
 import com.bruno13palhano.data.shared.DataSource
 import com.bruno13palhano.model.Receipt
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +10,4 @@ interface ReceiptRepository : DataSource<Receipt> {
     fun get(id: Long): Flow<Receipt>
 
     fun getLastReceipts(limit: Int): Flow<List<Receipt>>
-
-    fun pagingReceipts(): Flow<PagingData<Receipt>>
 }
