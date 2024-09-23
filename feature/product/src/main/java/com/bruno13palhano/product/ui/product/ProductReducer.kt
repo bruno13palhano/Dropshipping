@@ -1,5 +1,8 @@
 package com.bruno13palhano.product.ui.shared
 
+import com.bruno13palhano.product.ui.product.ProductEffect
+import com.bruno13palhano.product.ui.product.ProductEvent
+import com.bruno13palhano.product.ui.product.ProductState
 import com.bruno13palhano.ui.shared.Reducer
 
 internal class ProductReducer : Reducer<ProductState, ProductEvent, ProductEffect> {

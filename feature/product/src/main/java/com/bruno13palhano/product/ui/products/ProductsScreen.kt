@@ -1,4 +1,4 @@
-package com.bruno13palhano.product.ui.screen
+package com.bruno13palhano.product.ui.products
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -15,15 +15,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -33,12 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
+import com.bruno13palhano.product.ui.shared.ProductsAction
 import com.bruno13palhano.product.ui.shared.ProductsEffect
 import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun ProductsRoute(
@@ -47,15 +43,8 @@ internal fun ProductsRoute(
     navigateToAddProduct: () -> Unit,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) { viewModel.getProducts() }
-
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val effect = rememberFlowWithLifecycle(flow = viewModel.effect)
-
-    val deleteMessage = stringResource(id = R.string.product_deleted)
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val effect = rememberFlowWithLifecycle(flow = viewModel.effects)
 
     LaunchedEffect(effect) {
         effect.collect { action ->
@@ -66,28 +55,14 @@ internal fun ProductsRoute(
                 is ProductsEffect.NavigateToAddProduct -> {
                     navigateToAddProduct()
                 }
-                is ProductsEffect.DeleteProduct -> {
-                    viewModel.deleteProduct(id = action.id)
-                }
-                is ProductsEffect.ShowDeletedMessage -> {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = deleteMessage,
-                            withDismissAction = true
-                        )
-                    }
-                }
             }
         }
     }
 
     ProductsContent(
         modifier = modifier,
-        snackbarHostState = snackbarHostState,
         products = state.products,
-        onEditProductItemClick = viewModel::onEditProductClick,
-        onDeleteItemClick = viewModel::onDeleteProductClick,
-        onAddNewProductClick = viewModel::onAddProductClick
+        onAction = viewModel::onAction
     )
 }
 
@@ -95,11 +70,8 @@ internal fun ProductsRoute(
 @Composable
 internal fun ProductsContent(
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState,
     products: List<CommonItem>,
-    onEditProductItemClick: (id: Long) -> Unit,
-    onDeleteItemClick: (id: Long) -> Unit,
-    onAddNewProductClick: () -> Unit
+    onAction: (action: ProductsAction) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -107,11 +79,12 @@ internal fun ProductsContent(
             .consumeWindowInsets(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.safeDrawing),
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.products)) }) },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.semantics { contentDescription = "Add button" },
-                onClick = onAddNewProductClick
+                onClick = {
+                    onAction(ProductsAction.OnAddProductClick(addProduct = true))
+                }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -131,8 +104,12 @@ internal fun ProductsContent(
                     modifier = Modifier.padding(4.dp),
                     icon = Icons.Filled.Delete,
                     iconDescription = stringResource(id = R.string.delete),
-                    onItemClick = { onEditProductItemClick(product.id) },
-                    onIconClick = { onDeleteItemClick(product.id) }
+                    onItemClick = {
+                        onAction(
+                            ProductsAction.OnEditProductClick(editProduct = true, id = product.id)
+                        )
+                    },
+                    onIconClick = {  }
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
@@ -148,7 +125,6 @@ internal fun ProductsContent(
 @Composable
 private fun ProductsContentPreview() {
     ProductsContent(
-        snackbarHostState = remember { SnackbarHostState() },
         products = listOf(
             CommonItem(id = 1, title = "product 1"),
             CommonItem(id = 2, title = "product 2"),
@@ -157,8 +133,6 @@ private fun ProductsContentPreview() {
             CommonItem(id = 5, title = "product 5"),
             CommonItem(id = 6, title = "product 6"),
         ),
-        onEditProductItemClick = {},
-        onDeleteItemClick = {},
-        onAddNewProductClick = {}
+        onAction = {}
     )
 }

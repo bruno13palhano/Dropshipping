@@ -1,15 +1,18 @@
 package com.bruno13palhano.product.ui.viewmodel
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewModelScope
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.model.Product
-import com.bruno13palhano.product.ui.shared.ProductEffect
-import com.bruno13palhano.product.ui.shared.ProductEvent
-import com.bruno13palhano.product.ui.shared.ProductReducer
-import com.bruno13palhano.product.ui.shared.ProductState
+import com.bruno13palhano.product.ui.product.ProductAction
+import com.bruno13palhano.product.ui.product.ProductActionProcessor
+import com.bruno13palhano.product.ui.product.ProductEffect
+import com.bruno13palhano.product.ui.product.ProductEvent
+import com.bruno13palhano.product.ui.product.ProductState
 import com.bruno13palhano.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,9 +21,8 @@ import javax.inject.Inject
 internal class ProductViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository,
     val productFields: ProductFields = ProductFields()
-) : BaseViewModel<ProductState, ProductEvent, ProductEffect>(
-    initialState = ProductState.INITIAL_STATE,
-    reducer = ProductReducer()
+) : BaseViewModel<ProductState, ProductAction, ProductEvent, ProductEffect>(
+    actionProcessor = ProductActionProcessor()
 ) {
     fun getProduct(id: Long) {
         if (id == 0L) return
@@ -85,5 +87,10 @@ internal class ProductViewModel @Inject constructor(
             naturaCode = productFields.naturaCode,
             name = productFields.productName
         )
+    }
+
+    @Composable
+    override fun states(events: Flow<ProductEvent>): ProductState {
+        TODO("Not yet implemented")
     }
 }

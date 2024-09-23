@@ -56,7 +56,7 @@ internal fun ProductRoute(
     LaunchedEffect(key1 = Unit) { viewModel.getProduct(id = id) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val effect = rememberFlowWithLifecycle(viewModel.effect)
+    val effect = rememberFlowWithLifecycle(viewModel.effects)
 
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current

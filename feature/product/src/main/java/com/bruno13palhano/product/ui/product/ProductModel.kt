@@ -1,8 +1,8 @@
-package com.bruno13palhano.product.ui.shared
+package com.bruno13palhano.product.ui.product
 
 import androidx.compose.runtime.Immutable
 import com.bruno13palhano.model.Product
-import com.bruno13palhano.ui.shared.Reducer
+import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
@@ -55,3 +55,6 @@ internal sealed interface ProductEffect : ViewEffect {
     data object InvalidFieldErrorMessage : ProductEffect
     data object NavigateBack : ProductEffect
 }
+
+@Immutable
+internal sealed interface ProductAction : ViewAction
