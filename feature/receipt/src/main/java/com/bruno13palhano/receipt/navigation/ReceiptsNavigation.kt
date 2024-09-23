@@ -6,9 +6,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.receipt.ui.screen.ReceiptsRoute
-import com.bruno13palhano.receipt.ui.screen.SearchRoute
-import com.bruno13palhano.receipt.ui.screen.ReceiptRoute
+import com.bruno13palhano.receipt.ui.receipt.EditReceiptRoute
+import com.bruno13palhano.receipt.ui.receipt.NewReceiptRoute
+import com.bruno13palhano.receipt.ui.receipts.ReceiptsRoute
+import com.bruno13palhano.receipt.ui.search.SearchRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.receiptsScreen(
@@ -39,21 +40,31 @@ fun NavGraphBuilder.receiptsScreen(
         composable<ReceiptsRoutes.AddReceipt> {
             val productId = it.toRoute<ReceiptsRoutes.AddReceipt>().productId
 
-            ReceiptRoute(
+            NewReceiptRoute(
                 modifier = modifier,
-                id = 0L,
                 productId = productId,
-                onBackClick = { navController.navigateUp() }
+                onBackClick = {
+                    navController.navigate(route = ReceiptsRoutes.Receipts) {
+                        popUpTo(route = ReceiptsRoutes.Receipts) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         composable<ReceiptsRoutes.UpdateReceipt> {
             val id = it.toRoute<ReceiptsRoutes.UpdateReceipt>().id
 
-            ReceiptRoute(
+            EditReceiptRoute(
                 modifier = modifier,
                 id = id,
-                productId = 0L,
-                onBackClick = { navController.navigateUp() }
+                onBackClick = {
+                    navController.navigate(route = ReceiptsRoutes.Receipts) {
+                        popUpTo(route = ReceiptsRoutes.Receipts) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }

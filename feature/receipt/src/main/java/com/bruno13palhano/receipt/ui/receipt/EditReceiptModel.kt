@@ -8,48 +8,38 @@ import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class ReceiptState(
-    val newReceipt: Boolean,
+internal data class EditReceiptState(
     val hasInvalidField: Boolean,
-    val deleteReceipt: Boolean,
-    val canceled: Boolean,
     val receipt: Receipt
 ) : ViewState {
     companion object {
-        val INITIAL_STATE = ReceiptState(
-            newReceipt = false,
+        val INITIAL_STATE = EditReceiptState(
             hasInvalidField = false,
-            deleteReceipt = false,
-            canceled = false,
             receipt = Receipt.EMPTY
         )
     }
 }
 
 @Immutable
-internal sealed interface ReceiptEvent : ViewEvent {
-    data class UpdateRequestDate(val requestDate: Long): ReceiptEvent
-    data class EditReceipt(val id: Long) : ReceiptEvent
-    data class AddReceipt(val productId: Long) : ReceiptEvent
-    data class CancelReceipt(val id: Long) : ReceiptEvent
-    data class DeleteReceipt(val id: Long) : ReceiptEvent
-    data object DoneReceipt : ReceiptEvent
-    data object NavigateBack : ReceiptEvent
+internal sealed interface EditReceiptEvent : ViewEvent {
+    data class SetInitialData(val id: Long) : EditReceiptEvent
+    data class Cancel(val id: Long) : EditReceiptEvent
+    data class Delete(val id: Long) : EditReceiptEvent
+    data object Done : EditReceiptEvent
+    data object NavigateBack : EditReceiptEvent
 }
 
 @Immutable
-internal sealed interface ReceiptEffect : ViewEffect {
-    data object InvalidFieldErrorMessage : ReceiptEffect
-    data object NavigateBack : ReceiptEffect
+internal sealed interface EditReceiptEffect : ViewEffect {
+    data object InvalidFieldErrorMessage : EditReceiptEffect
+    data object NavigateBack : EditReceiptEffect
 }
 
 @Immutable
-internal sealed interface ReceiptAction : ViewAction {
-    data class OnUpdateRequestDate(val requestDate: Long) : ReceiptAction
-    data class OnAddNewReceiptClick(val productId: Long) : ReceiptAction
-    data class OnEditReceiptClick(val id: Long) : ReceiptAction
-    data class OnCancelReceiptClick(val id: Long) : ReceiptAction
-    data class OnDeleteReceiptClick(val id: Long) : ReceiptAction
-    data object OnDoneReceiptClick : ReceiptAction
-    data object OnBackClick : ReceiptAction
+internal sealed interface EditReceiptAction : ViewAction {
+    data class OnSetInitialData(val id: Long) : EditReceiptAction
+    data class OnCancelClick(val id: Long) : EditReceiptAction
+    data class OnDeleteClick(val id: Long) : EditReceiptAction
+    data object OnDoneClick : EditReceiptAction
+    data object OnBackClick : EditReceiptAction
 }
