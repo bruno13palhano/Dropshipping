@@ -1,4 +1,4 @@
-package com.bruno13palhano.home.ui.screen
+package com.bruno13palhano.home.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -37,9 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bruno13palhano.home.R
-import com.bruno13palhano.home.ui.shared.HomeEvent
-import com.bruno13palhano.home.ui.viewmodel.HomeViewModel
 import com.bruno13palhano.model.MostSaleItem
+import com.bruno13palhano.model.Profit
 import com.bruno13palhano.model.ReceiptItem
 import com.bruno13palhano.ui.components.ExpandedListItem
 import com.bruno13palhano.ui.components.dateFormat
@@ -49,29 +48,12 @@ internal fun HomeRoute(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val model by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     HomeContent(
         modifier = modifier,
-        profit = model.profit.profit,
-        profitVisible = model.profitVisible,
-        receiptsVisible = model.receiptsVisible,
-        expandItems = model.expandedItems,
-        amazonProfit = model.profit.amazonProfit,
-        naturaProfit = model.profit.naturaProfit,
-        lastReceipts = model.lastReceipts,
-        mostSale = model.mostSale,
-        onToggleProfitVisibility = { visible ->
-            viewModel.sendEvent(event = HomeEvent.UpdateProfitVisibility(visible = visible))
-        },
-        onExpandReceiptItem = { id, expanded ->
-            viewModel.sendEvent(
-                event = HomeEvent.UpdateExpandedItem(
-                    id = id,
-                    expanded = expanded
-                )
-            )
-        }
+        state = state,
+        onAction = viewModel::onAction
     )
 }
 
@@ -79,16 +61,8 @@ internal fun HomeRoute(
 @Composable
 internal fun HomeContent(
     modifier: Modifier = Modifier,
-    profit: Float,
-    profitVisible: Boolean,
-    receiptsVisible: Boolean,
-    expandItems: List<Pair<Long, Boolean>>,
-    amazonProfit: Float,
-    naturaProfit: Float,
-    lastReceipts: List<ReceiptItem>,
-    mostSale: List<MostSaleItem>,
-    onToggleProfitVisibility: (visibility: Boolean) -> Unit,
-    onExpandReceiptItem: (id: Long, expand: Boolean) -> Unit
+    state: HomeState,
+    onAction: (action: HomeAction) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -103,9 +77,11 @@ internal fun HomeContent(
                 .verticalScroll(rememberScrollState())
         ) {
             ProfitInfo(
-                profitAmount = profit,
-                profitVisibility = profitVisible,
-                onToggleProfitVisibility = onToggleProfitVisibility
+                profitAmount = state.profit.profit,
+                profitVisibility = state.profitVisible,
+                onToggleProfitVisibility = { visible ->
+                    onAction(HomeAction.OnProfitVisibilityChanged(visible = visible))
+                }
             )
 
             OutlinedCard(
@@ -118,20 +94,24 @@ internal fun HomeContent(
                         modifier = Modifier
                             .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 4.dp)
                             .fillMaxWidth(),
-                        text = stringResource(id = R.string.amazon_profit, amazonProfit),
+                        text = stringResource(
+                            id = R.string.amazon_profit, state.profit.amazonProfit
+                        ),
                         style = MaterialTheme.typography.titleLarge,
                     )
                     Text(
                         modifier = Modifier
                             .padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)
                             .fillMaxWidth(),
-                        text = stringResource(id = R.string.natura_profit, naturaProfit),
+                        text = stringResource(
+                            id = R.string.natura_profit, state.profit.naturaProfit
+                        ),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
             }
 
-            if (receiptsVisible) {
+            if (state.receiptsVisible) {
                 Text(
                     modifier = Modifier
                         .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
@@ -146,7 +126,7 @@ internal fun HomeContent(
                         .fillMaxWidth()
                 ) {
                     Column {
-                        lastReceipts.forEach { receipt ->
+                        state.lastReceipts.forEach { receipt ->
                             ExpandedListItem(
                                 modifier = Modifier.padding(vertical = 1.dp),
                                 title = stringResource(
@@ -154,11 +134,18 @@ internal fun HomeContent(
                                     dateFormat.format(receipt.requestDate),
                                     receipt.customerName
                                 ),
-                                expanded = expandItems.find { item ->
+                                expanded = state.expandedItems.find { item ->
                                     item.first == receipt.id
                                 }?.second ?: false,
                                 shape = RectangleShape,
-                                onClick = { expanded -> onExpandReceiptItem(receipt.id, expanded) }
+                                onClick = { expanded ->
+                                    onAction(
+                                        HomeAction.OnExpandedItemChanged(
+                                            id = receipt.id,
+                                            expanded = expanded
+                                        )
+                                    )
+                                }
                             ) {
                                 Text(
                                     text = stringResource(
@@ -195,7 +182,7 @@ internal fun HomeContent(
                         .fillMaxWidth()
                 ) {
                     Column {
-                        mostSale.forEach {
+                        state.mostSale.forEach {
                             Card(
                                 modifier = Modifier.padding(vertical = 1.dp),
                                 shape = RectangleShape
@@ -266,53 +253,52 @@ private fun ProfitInfo(
 @Composable
 private fun HomePreview() {
     HomeContent(
-        profit = 245.67f,
-        profitVisible = true,
-        receiptsVisible = true,
-        expandItems = emptyList(),
-        amazonProfit = 45.67f,
-        naturaProfit = 145.67f,
-        lastReceipts = listOf(
-            ReceiptItem(
-                id = 1,
-                customerName = "customer 1",
-                productName = "product 1",
-                amazonPrice = 1f,
-                requestDate = 1L
+        state = HomeState(
+            profitVisible = true,
+            receiptsVisible = true,
+            profit = Profit(0f, 0f, 0f),
+            lastReceipts = listOf(
+                ReceiptItem(
+                    id = 1,
+                    customerName = "customer 1",
+                    productName = "product 1",
+                    amazonPrice = 1f,
+                    requestDate = 1L
+                ),
+                ReceiptItem(
+                    id = 2,
+                    customerName = "customer 2",
+                    productName = "product 2",
+                    amazonPrice = 2f,
+                    requestDate = 2L
+                ),
+                ReceiptItem(
+                    id = 3,
+                    customerName = "customer 3",
+                    productName = "product 3",
+                    amazonPrice = 3f,
+                    requestDate = 3L
+                )
             ),
-            ReceiptItem(
-                id = 2,
-                customerName = "customer 2",
-                productName = "product 2",
-                amazonPrice = 2f,
-                requestDate = 2L
+            mostSale = listOf(
+                MostSaleItem(
+                    id = 1,
+                    productName = "product 1",
+                    unitsSold = 1
+                ),
+                MostSaleItem(
+                    id = 2,
+                    productName = "product 2",
+                    unitsSold = 2
+                ),
+                MostSaleItem(
+                    id = 3,
+                    productName = "product 3",
+                    unitsSold = 3
+                )
             ),
-            ReceiptItem(
-                id = 3,
-                customerName = "customer 3",
-                productName = "product 3",
-                amazonPrice = 3f,
-                requestDate = 3L
-            )
+            expandedItems = emptyList()
         ),
-        mostSale = listOf(
-            MostSaleItem(
-                id = 1,
-                productName = "product 1",
-                unitsSold = 1
-            ),
-            MostSaleItem(
-                id = 2,
-                productName = "product 2",
-                unitsSold = 2
-            ),
-            MostSaleItem(
-                id = 3,
-                productName = "product 3",
-                unitsSold = 3
-            )
-        ),
-        onToggleProfitVisibility = {},
-        onExpandReceiptItem = { _, _ -> }
+        onAction = {}
     )
 }
