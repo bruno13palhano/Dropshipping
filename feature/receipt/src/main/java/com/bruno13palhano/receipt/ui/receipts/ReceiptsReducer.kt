@@ -9,16 +9,10 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
     ): Pair<ReceiptsState, ReceiptsEffect?> {
         return when (event) {
             is ReceiptsEvent.EditReceipt -> {
-                previousState.copy(
-                    editReceipt = event.editReceipt,
-                    searchProduct = false
-                ) to ReceiptsEffect.NavigateToEditReceipt(id = event.id)
+                previousState to ReceiptsEffect.NavigateToEditReceipt(id = event.id)
             }
             is ReceiptsEvent.SearchProduct -> {
-                previousState.copy(
-                    editReceipt = false,
-                    searchProduct = event.searching
-                ) to ReceiptsEffect.NavigateToSearchProduct
+                previousState to ReceiptsEffect.NavigateToSearchProduct
             }
         }
     }

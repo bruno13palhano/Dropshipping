@@ -1,4 +1,4 @@
-package com.bruno13palhano.product.ui.screen
+package com.bruno13palhano.product.ui.product
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -36,10 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
-import com.bruno13palhano.product.ui.shared.ProductEffect
-import com.bruno13palhano.product.ui.shared.ProductEvent
-import com.bruno13palhano.product.ui.viewmodel.ProductFields
-import com.bruno13palhano.product.ui.viewmodel.ProductViewModel
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.clickableWithoutRipple

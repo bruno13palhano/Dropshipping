@@ -6,12 +6,10 @@ internal class ReceiptsActionProcessor : ActionProcessor<ReceiptsAction, Receipt
     override fun processAction(viewAction: ReceiptsAction): ReceiptsEvent {
         return when (viewAction) {
             is ReceiptsAction.OnEditReceiptClick -> {
-                ReceiptsEvent.EditReceipt(editReceipt = viewAction.editReceipt, id = viewAction.id)
+                ReceiptsEvent.EditReceipt(id = viewAction.id)
             }
 
-            is ReceiptsAction.OnSearchProductClick -> {
-                ReceiptsEvent.SearchProduct(searching = viewAction.searching)
-            }
+            is ReceiptsAction.OnSearchProductClick -> ReceiptsEvent.SearchProduct
         }
     }
 }

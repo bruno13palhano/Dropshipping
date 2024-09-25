@@ -78,11 +78,7 @@ internal fun ReceiptsContent(
             .semantics { contentDescription = "Receipts content" },
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.receipts)) }) },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onAction(ReceiptsAction.OnSearchProductClick(searching = true))
-                }
-            ) {
+            FloatingActionButton(onClick = { onAction(ReceiptsAction.OnSearchProductClick) }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_receipt)
@@ -102,14 +98,7 @@ internal fun ReceiptsContent(
             items(items = receipts, key = { receipt -> receipt.id}) { receipt ->
                 ElevatedCard(
                     modifier = Modifier.padding(4.dp),
-                    onClick = {
-                        onAction(
-                            ReceiptsAction.OnEditReceiptClick(
-                                editReceipt = true,
-                                id = receipt.id
-                            )
-                        )
-                    }
+                    onClick = { onAction(ReceiptsAction.OnEditReceiptClick(id = receipt.id)) }
                 ) {
                     Text(
                         modifier = Modifier

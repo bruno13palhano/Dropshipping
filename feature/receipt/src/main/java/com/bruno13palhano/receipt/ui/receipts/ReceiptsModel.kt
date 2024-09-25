@@ -8,16 +8,12 @@ import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class ReceiptsState(
-    val editReceipt: Boolean,
-    val searchProduct: Boolean,
-    val receipts: List<Receipt>
-) : ViewState
+internal data class ReceiptsState(val receipts: List<Receipt>) : ViewState
 
 @Immutable
 internal sealed interface ReceiptsEvent : ViewEvent {
-    data class EditReceipt(val editReceipt: Boolean, val id: Long) : ReceiptsEvent
-    data class SearchProduct(val searching: Boolean) : ReceiptsEvent
+    data class EditReceipt(val id: Long) : ReceiptsEvent
+    data object SearchProduct : ReceiptsEvent
 }
 
 @Immutable
@@ -28,6 +24,6 @@ internal sealed interface ReceiptsEffect : ViewEffect {
 
 @Immutable
 internal sealed interface ReceiptsAction : ViewAction  {
-    data class OnEditReceiptClick(val editReceipt: Boolean, val id: Long) : ReceiptsAction
-    data class OnSearchProductClick(val searching: Boolean) : ReceiptsAction
+    data class OnEditReceiptClick(val id: Long) : ReceiptsAction
+    data object OnSearchProductClick : ReceiptsAction
 }
