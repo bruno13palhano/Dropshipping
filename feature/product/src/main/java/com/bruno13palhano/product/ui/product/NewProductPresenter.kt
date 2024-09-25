@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.bruno13palhano.data.repository.ProductRepository
-import com.bruno13palhano.model.Product
 import kotlinx.coroutines.flow.Flow
 
 @Composable
