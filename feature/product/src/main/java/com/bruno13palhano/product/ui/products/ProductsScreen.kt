@@ -29,9 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
-import com.bruno13palhano.product.ui.shared.ProductsAction
-import com.bruno13palhano.product.ui.shared.ProductsEffect
-import com.bruno13palhano.product.ui.viewmodel.ProductsViewModel
 import com.bruno13palhano.ui.components.CommonItem
 import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
@@ -82,9 +79,7 @@ internal fun ProductsContent(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.semantics { contentDescription = "Add button" },
-                onClick = {
-                    onAction(ProductsAction.OnAddProductClick(addProduct = true))
-                }
+                onClick = { onAction(ProductsAction.OnAddProductClick) }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -106,7 +101,7 @@ internal fun ProductsContent(
                     iconDescription = stringResource(id = R.string.delete),
                     onItemClick = {
                         onAction(
-                            ProductsAction.OnEditProductClick(editProduct = true, id = product.id)
+                            ProductsAction.OnEditProductClick(id = product.id)
                         )
                     },
                     onIconClick = {  }

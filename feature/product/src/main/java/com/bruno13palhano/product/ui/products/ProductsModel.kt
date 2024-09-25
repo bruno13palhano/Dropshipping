@@ -8,24 +8,12 @@ import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class ProductsState(
-    val editProduct: Boolean,
-    val addProduct: Boolean,
-    val products: List<CommonItem>
-) : ViewState {
-    companion object {
-        val INITIAL_STATE = ProductsState(
-            editProduct = false,
-            addProduct = false,
-            products = emptyList()
-        )
-    }
-}
+internal data class ProductsState(val products: List<CommonItem>) : ViewState
 
 @Immutable
 internal sealed interface ProductsEvent : ViewEvent {
-    data class EditProduct(val editProduct: Boolean, val id: Long) : ProductsEvent
-    data class AddProduct(val addProduct: Boolean) : ProductsEvent
+    data class EditProduct(val id: Long) : ProductsEvent
+    data object AddProduct : ProductsEvent
 }
 
 @Immutable
@@ -36,6 +24,6 @@ internal sealed interface ProductsEffect : ViewEffect {
 
 @Immutable
 internal sealed interface ProductsAction : ViewAction {
-    data class OnEditProductClick(val editProduct: Boolean, val id: Long) : ProductsAction
-    data class OnAddProductClick(val addProduct: Boolean) : ProductsAction
+    data class OnEditProductClick(val id: Long) : ProductsAction
+    data object OnAddProductClick : ProductsAction
 }

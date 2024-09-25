@@ -1,4 +1,4 @@
-package com.bruno13palhano.product.ui.shared
+package com.bruno13palhano.product.ui.products
 
 import com.bruno13palhano.ui.shared.Reducer
 
@@ -9,16 +9,10 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
     ): Pair<ProductsState, ProductsEffect?> {
         return when (event) {
             is ProductsEvent.EditProduct -> {
-                previousState.copy(
-                    editProduct = event.editProduct,
-                    addProduct = false
-                ) to ProductsEffect.NavigateToEditProduct(event.id)
+                previousState to ProductsEffect.NavigateToEditProduct(event.id)
             }
             is ProductsEvent.AddProduct -> {
-                previousState.copy(
-                    editProduct = false,
-                    addProduct = event.addProduct
-                ) to ProductsEffect.NavigateToAddProduct
+                previousState to ProductsEffect.NavigateToAddProduct
             }
         }
     }

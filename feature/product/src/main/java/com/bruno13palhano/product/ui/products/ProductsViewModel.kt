@@ -1,14 +1,8 @@
-package com.bruno13palhano.product.ui.viewmodel
+package com.bruno13palhano.product.ui.products
 
 import androidx.compose.runtime.Composable
 import com.bruno13palhano.data.di.ProductRep
 import com.bruno13palhano.data.repository.ProductRepository
-import com.bruno13palhano.product.ui.products.ProductsAction
-import com.bruno13palhano.product.ui.shared.ProductsActionProcessor
-import com.bruno13palhano.product.ui.products.ProductsEffect
-import com.bruno13palhano.product.ui.products.ProductsEvent
-import com.bruno13palhano.product.ui.products.ProductsState
-import com.bruno13palhano.product.ui.products.productsPresenter
 import com.bruno13palhano.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
