@@ -71,8 +71,9 @@ internal class ReceiptFields @Inject constructor() {
     }
 
     fun isReceiptValid(): Boolean {
-        return requestNumber.isNotBlank() && customerName.isNotBlank() && quantity.isNotBlank() &&
-                naturaPrice.isNotBlank() && amazonPrice.isNotBlank() && paymentOption.isNotBlank()
+        return requestNumber.isNotBlank() && customerName.isNotBlank() &&
+                quantity.isNotBlank() && stringToInt(quantity) > 0 && naturaPrice.isNotBlank() &&
+                amazonPrice.isNotBlank() && paymentOption.isNotBlank()
     }
 
     /**

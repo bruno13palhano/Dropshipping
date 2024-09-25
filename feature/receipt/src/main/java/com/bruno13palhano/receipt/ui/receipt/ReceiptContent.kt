@@ -32,6 +32,7 @@ import com.bruno13palhano.ui.components.CustomFloatField
 import com.bruno13palhano.ui.components.CustomIntegerField
 import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.dateFormat
+import com.bruno13palhano.ui.shared.stringToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +101,8 @@ internal fun ReceiptContent(
             onValueChange = receiptFields::updateQuantity,
             label = stringResource(id = R.string.quantity),
             placeholder = stringResource(id = R.string.enter_quantity),
-            isError = hasInvalidField && receiptFields.quantity.isBlank()
+            isError = hasInvalidField && (receiptFields.quantity.isBlank()
+                    || stringToInt(receiptFields.quantity) <= 0)
         )
         CustomFloatField(
             modifier = Modifier
