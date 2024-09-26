@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.bruno13palhano.data.repository.ProductRepository
 import com.bruno13palhano.data.repository.ReceiptRepository
+import com.bruno13palhano.model.Product
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -20,10 +21,9 @@ internal fun newReceiptPresenter(
     events: Flow<NewReceiptEvent>,
     sendEffect: (effect: NewReceiptEffect) -> Unit
 ): NewReceiptState {
-    val state = remember { mutableStateOf(NewReceiptState.INITIAL_STATE) }
+    val currentProduct = remember { mutableStateOf(Product.EMPTY) }
     var hasInvalidField by remember { mutableStateOf(false) }
     var currentProductId by remember { mutableLongStateOf(0L) }
-    var done by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -38,7 +38,14 @@ internal fun newReceiptPresenter(
                         hasInvalidField = true
                     } else {
                         hasInvalidField = false
-                        done = true
+
+                        insertReceipt(
+                            receiptRepository = receiptRepository,
+                            receiptFields = receiptFields,
+                            product = currentProduct.value
+                        )
+
+                        sendEffect(NewReceiptEffect.NavigateBack)
                     }
                 }
 
@@ -54,7 +61,7 @@ internal fun newReceiptPresenter(
 
         getProduct(
             productId = currentProductId,
-            previousState = state,
+            product = currentProduct,
             productRepository = productRepository,
             receiptFields = receiptFields
         )
@@ -64,47 +71,25 @@ internal fun newReceiptPresenter(
         if (hasInvalidField) sendEffect(NewReceiptEffect.InvalidFieldErrorMessage)
     }
 
-    LaunchedEffect(done) {
-        if (done) {
-            insertReceipt(
-                receiptRepository = receiptRepository,
-                receiptFields = receiptFields,
-                state = state
-            )
-
-            sendEffect(NewReceiptEffect.NavigateBack)
-        }
-    }
-
-    return NewReceiptState(
-        hasInvalidField = hasInvalidField,
-        receipt = state.value.receipt
-    )
+    return NewReceiptState(hasInvalidField = hasInvalidField)
 }
 
 private suspend fun insertReceipt(
     receiptRepository: ReceiptRepository,
     receiptFields: ReceiptFields,
-    state: MutableState<NewReceiptState>
+    product: Product
 ) {
-    receiptRepository.insert(
-        data = receiptFields.toReceipt(product = state.value.receipt.product)
-    )
+    receiptRepository.insert(data = receiptFields.toReceipt(product = product))
 }
 
 private suspend fun getProduct(
     productId: Long,
-    previousState: MutableState<NewReceiptState>,
+    product: MutableState<Product>,
     productRepository: ProductRepository,
     receiptFields: ReceiptFields
 ) {
     productRepository.get(id = productId).collect {
-        previousState.value =
-            previousState.value.copy(
-                receipt = previousState.value.receipt.copy(
-                    product = it
-                )
-            )
+        product.value = it
 
         receiptFields.updateProductName(productName = it.name)
     }

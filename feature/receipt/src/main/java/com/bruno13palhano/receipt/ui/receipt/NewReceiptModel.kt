@@ -1,24 +1,13 @@
 package com.bruno13palhano.receipt.ui.receipt
 
 import androidx.compose.runtime.Immutable
-import com.bruno13palhano.model.Receipt
 import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class NewReceiptState(
-    val hasInvalidField: Boolean,
-    val receipt: Receipt
-) : ViewState {
-    companion object {
-        val INITIAL_STATE = NewReceiptState(
-            hasInvalidField = false,
-            receipt = Receipt.EMPTY
-        )
-    }
-}
+internal data class NewReceiptState(val hasInvalidField: Boolean) : ViewState
 
 @Immutable
 internal sealed interface NewReceiptEvent : ViewEvent {
