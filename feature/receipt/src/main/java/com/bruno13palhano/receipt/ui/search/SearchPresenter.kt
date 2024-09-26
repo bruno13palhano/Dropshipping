@@ -22,16 +22,13 @@ internal fun searchPresenter(
     sendEffect: (effect: SearchEffect) -> Unit
 ): SearchState {
     val state = remember { mutableStateOf(SearchState.INITIAL_STATE) }
-    var deleting by remember { mutableStateOf(false) }
-    var updatingCache by remember { mutableStateOf(false) }
-    var updatingProducts by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
 
     LaunchedEffect(active) {
         events.collect { event ->
             when (event) {
-                SearchEvent.OnCloseSearchClick -> {
+                SearchEvent.Close -> {
                     if (active) {
                         active = false
                         query = ""
@@ -41,25 +38,23 @@ internal fun searchPresenter(
                     }
                 }
 
-                is SearchEvent.OnProductItemClick -> {
+                is SearchEvent.ProductItem -> {
                     sendEffect(SearchEffect.NavigateToAddReceipt(productId = event.id))
                 }
 
-                is SearchEvent.OnSearchDoneClick -> {
+                is SearchEvent.Done -> {
                     query = event.query
 
                     if (event.query.isNotBlank()) {
-                        updatingCache = true
-                        updatingProducts = true
+                        active = false
+
+                        cacheRepository.insert(data = Cache(query = query.trim()))
                     }
                 }
 
-                is SearchEvent.UpdateActive -> active = event.active
+                is SearchEvent.Active -> active = event.active
 
-                is SearchEvent.UpdateDeleting -> {
-                    deleting = event.deleting
-                    query = event.query
-                }
+                is SearchEvent.Delete -> cacheRepository.delete(query = event.query)
             }
         }
     }
@@ -68,32 +63,11 @@ internal fun searchPresenter(
         getCache(previousState = state, cacheRepository = cacheRepository)
     }
 
-    LaunchedEffect(query, updatingCache) {
-        if (updatingCache) {
-            active = false
-            cacheRepository.insert(data = Cache(query = query.trim()))
-            updatingCache = false
-        }
-    }
-
-    LaunchedEffect(deleting) {
-        if (deleting) {
-            cacheRepository.delete(query = query)
-
-            deleting = false
-        }
-    }
-
     LaunchedEffect(query) {
         getProducts(query = query, previousState = state, productRepository = productRepository)
-
-        if (updatingProducts) updatingProducts = false
     }
 
     return SearchState(
-        deleting = deleting,
-        updatingCache = updatingCache,
-        updatingProducts = updatingProducts,
         query = query,
         active = active,
         products = state.value.products,

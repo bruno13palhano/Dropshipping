@@ -8,48 +8,24 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
         event: SearchEvent
     ): Pair<SearchState, SearchEffect?> {
         return when (event) {
-            is SearchEvent.UpdateDeleting -> {
-                previousState.copy(
-                    deleting = event.deleting
-                ) to null
+            is SearchEvent.Delete -> {
+                previousState to null
             }
 
-            is SearchEvent.UpdateActive -> {
-                previousState.copy(
-                    updatingCache = false,
-                    updatingProducts = false,
-                    active = event.active
-                ) to null
+            is SearchEvent.Active -> {
+                previousState to null
             }
 
-            is SearchEvent.OnSearchDoneClick -> {
-                previousState.copy(
-                    updatingCache = true,
-                    active = false,
-                    query = event.query
-                ) to null
+            is SearchEvent.Done -> {
+                previousState to null
             }
 
-            is SearchEvent.OnCloseSearchClick -> {
-                if (previousState.active) {
-                    previousState.copy(
-                        updatingCache = false,
-                        updatingProducts = false,
-                        query = "",
-                        active = false
-                    ) to null
-                } else {
-                    previousState.copy(
-                        updatingCache = false,
-                        updatingProducts = false
-                    ) to SearchEffect.NavigateBack
-                }
+            is SearchEvent.Close -> {
+                previousState to null
             }
 
-            is SearchEvent.OnProductItemClick -> {
-                previousState.copy(
-                    active = false
-                ) to SearchEffect.NavigateToAddReceipt(event.id)
+            is SearchEvent.ProductItem -> {
+                previousState to SearchEffect.NavigateToAddReceipt(event.id)
             }
         }
     }

@@ -60,9 +60,7 @@ internal fun SearchRoute(
     SearchContent(
         modifier = modifier,
         query = viewModel.query,
-        active = state.active,
-        products = state.products,
-        cache = state.cache,
+        state = state,
         onQueryChange = viewModel::updateQuery,
         onAction = viewModel::onAction
     )
@@ -72,9 +70,7 @@ internal fun SearchRoute(
 private fun SearchContent(
     modifier: Modifier = Modifier,
     query: String,
-    active: Boolean,
-    products: List<CommonItem>,
-    cache: List<String>,
+    state: SearchState,
     onQueryChange: (query: String) -> Unit,
     onAction: (action: SearchAction) -> Unit
 ) {
@@ -86,15 +82,13 @@ private fun SearchContent(
         topBar = {
             SearchProducts(
                 query = query,
-                active = active,
-                cache = cache,
+                active = state.active,
+                cache = state.cache,
                 onQueryChange = onQueryChange,
                 onActiveChange = { onAction(SearchAction.OnActiveChange(it)) },
-                onSearchClick = { onAction(SearchAction.OnSearchDoneClick(it)) },
-                onDeleteSearchClick = {
-                    onAction(SearchAction.DeleteSearchClick(deleting = true, query = it))
-                },
-                onClose = { onAction(SearchAction.OnCloseSearchClick) }
+                onSearchClick = { onAction(SearchAction.OnDoneClick(it)) },
+                onDeleteSearchClick = { onAction(SearchAction.OnDeleteClick(query = it)) },
+                onClose = { onAction(SearchAction.OnCloseClick) }
             )
         }
     ) {
@@ -104,7 +98,7 @@ private fun SearchContent(
                 .consumeWindowInsets(it),
             contentPadding = it
         ) {
-            items(items = products, key = { product -> product.id }) {
+            items(items = state.products, key = { product -> product.id }) {
                 ElevatedListItem(
                     modifier = Modifier.padding(4.dp),
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
@@ -201,16 +195,19 @@ private fun SearchProducts(
 private fun SearchContentPreview() {
     SearchContent(
         query = "product 1",
-        active = false,
-        products = listOf(
-            CommonItem(id = 1, title = "product 1"),
-            CommonItem(id = 2, title = "product 2"),
-            CommonItem(id = 3, title = "product 3")
-        ),
-        cache = listOf(
-            "search 1",
-            "search 2",
-            "search 3"
+        state = SearchState(
+            query = "",
+            active = false,
+            products = listOf(
+                CommonItem(id = 1, title = "product 1"),
+                CommonItem(id = 2, title = "product 2"),
+                CommonItem(id = 3, title = "product 3")
+            ),
+            cache = listOf(
+                "search 1",
+                "search 2",
+                "search 3"
+            )
         ),
         onQueryChange = {},
         onAction = {}
