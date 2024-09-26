@@ -4,23 +4,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.bruno13palhano.data.repository.ProductRepository
+import com.bruno13palhano.model.Product
 import com.bruno13palhano.ui.components.CommonItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 @Composable
 internal fun productsPresenter(
-    productRepository: ProductRepository,
+    products: Flow<List<Product>>,
     events: Flow<ProductsEvent>,
     sendEffect: (ProductsEffect) -> Unit
 ): ProductsState {
-    val products by productRepository.getAll()
-        .map { products ->
-            products.map {
+    val productList by products
+        .map {
+            it.map { product ->
                 CommonItem(
-                    id = it.id,
-                    title = it.name
+                    id = product.id,
+                    title = product.name
                 )
             }
         }
@@ -38,5 +38,5 @@ internal fun productsPresenter(
         }
     }
 
-    return ProductsState(products = products)
+    return ProductsState(products = productList)
 }

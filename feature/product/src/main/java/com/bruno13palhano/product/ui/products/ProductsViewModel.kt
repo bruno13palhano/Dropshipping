@@ -17,7 +17,7 @@ internal class ProductsViewModel @Inject constructor(
     @Composable
     override fun states(events: Flow<ProductsEvent>): ProductsState {
         return productsPresenter(
-            productRepository = productRepository,
+            products = productRepository.getAll(),
             events = events,
             sendEffect = ::sendEffect
         )
