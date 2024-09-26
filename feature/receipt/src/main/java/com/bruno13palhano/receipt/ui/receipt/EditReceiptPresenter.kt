@@ -21,16 +21,19 @@ internal fun editReceiptPresenter(
 ): EditReceiptState {
     val state = remember { mutableStateOf(EditReceiptState.INITIAL_STATE) }
     var hasInvalidField by remember { mutableStateOf(false) }
-    var canceled by remember { mutableStateOf(false) }
-    var deleteReceipt by remember { mutableStateOf(false) }
     var currentReceiptId by remember { mutableLongStateOf(0L) }
-    var done by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
                 is EditReceiptEvent.Cancel -> {
-                    canceled = true
+                    cancelReceipt(
+                        receiptId = currentReceiptId,
+                        previousState = state,
+                        receiptRepository = receiptRepository
+                    )
+
+                    sendEffect(EditReceiptEffect.NavigateBack)
                 }
 
                 is EditReceiptEvent.SetInitialData -> {
@@ -38,8 +41,12 @@ internal fun editReceiptPresenter(
                 }
 
                 is EditReceiptEvent.Delete -> {
-                    currentReceiptId = event.id
-                    deleteReceipt = true
+                    deleteReceipt(
+                        receiptId = currentReceiptId,
+                        receiptRepository = receiptRepository
+                    )
+
+                    sendEffect(EditReceiptEffect.NavigateBack)
                 }
 
                 is EditReceiptEvent.Done -> {
@@ -47,13 +54,19 @@ internal fun editReceiptPresenter(
                         hasInvalidField = true
                     } else {
                         hasInvalidField = false
-                        done = true
+
+                        updateReceipt(
+                            receiptId = currentReceiptId,
+                            receiptRepository = receiptRepository,
+                            receiptFields = receiptFields,
+                            state = state
+                        )
+
+                        sendEffect(EditReceiptEffect.NavigateBack)
                     }
                 }
 
-                is EditReceiptEvent.NavigateBack -> {
-                    sendEffect(EditReceiptEffect.NavigateBack)
-                }
+                is EditReceiptEvent.NavigateBack -> sendEffect(EditReceiptEffect.NavigateBack)
             }
         }
     }
@@ -71,42 +84,6 @@ internal fun editReceiptPresenter(
 
     LaunchedEffect(hasInvalidField) {
         if (hasInvalidField) sendEffect(EditReceiptEffect.InvalidFieldErrorMessage)
-    }
-
-    LaunchedEffect(deleteReceipt) {
-        if (deleteReceipt) {
-            deleteReceipt(
-                receiptId = currentReceiptId,
-                receiptRepository = receiptRepository
-            )
-
-            sendEffect(EditReceiptEffect.NavigateBack)
-        }
-    }
-
-    LaunchedEffect(canceled) {
-        if (canceled) {
-            cancelReceipt(
-                receiptId = currentReceiptId,
-                previousState = state,
-                receiptRepository = receiptRepository
-            )
-
-            sendEffect(EditReceiptEffect.NavigateBack)
-        }
-    }
-
-    LaunchedEffect(done) {
-        if (done) {
-            updateReceipt(
-                receiptId = currentReceiptId,
-                receiptRepository = receiptRepository,
-                receiptFields = receiptFields,
-                state = state
-            )
-
-            sendEffect(EditReceiptEffect.NavigateBack)
-        }
     }
 
     return EditReceiptState(
