@@ -17,7 +17,6 @@ internal fun newProductPresenter(
     sendEffect: (effect: NewProductEffect) -> Unit
 ): NewProductState {
     var hasInvalidField by remember { mutableStateOf(false) }
-    var done by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -27,7 +26,13 @@ internal fun newProductPresenter(
                         hasInvalidField = true
                     } else {
                         hasInvalidField = false
-                        done = true
+
+                        insertProduct(
+                            productFields = productFields,
+                            productRepository = productRepository
+                        )
+
+                        sendEffect(NewProductEffect.NavigateBack)
                     }
                 }
 
@@ -38,21 +43,11 @@ internal fun newProductPresenter(
         }
     }
 
-    LaunchedEffect(done) {
-        if (done) {
-            insertProduct(productFields = productFields, productRepository = productRepository)
-
-            sendEffect(NewProductEffect.NavigateBack)
-        }
-    }
-
     LaunchedEffect(hasInvalidField) {
         if (hasInvalidField) sendEffect(NewProductEffect.InvalidFieldErrorMessage)
     }
 
-    return NewProductState(
-        hasInvalidField = hasInvalidField
-    )
+    return NewProductState(hasInvalidField = hasInvalidField)
 }
 
 private suspend fun insertProduct(
