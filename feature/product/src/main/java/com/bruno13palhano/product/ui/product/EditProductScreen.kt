@@ -1,9 +1,7 @@
 package com.bruno13palhano.product.ui.product
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
@@ -32,24 +30,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
-import com.bruno13palhano.ui.components.CustomIntegerField
-import com.bruno13palhano.ui.components.CustomTextField
 import com.bruno13palhano.ui.components.clickableWithoutRipple
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun ProductRoute(
+internal fun EditProductRoute(
     modifier: Modifier,
     id: Long,
     onBackClick: () -> Unit,
-    viewModel: ProductViewModel = hiltViewModel()
+    viewModel: EditProductViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) { viewModel.getProduct(id = id) }
+    LaunchedEffect(Unit) {
+        viewModel.onAction(EditProductAction.OnSetInitialData(id = id))
+    }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val effect = rememberFlowWithLifecycle(viewModel.effects)
@@ -61,18 +58,10 @@ internal fun ProductRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val title = getScreenTitle(productId = id)
-
     LaunchedEffect(effect) {
         effect.collect { action ->
             when(action) {
-                is ProductEffect.EditProduct -> viewModel.editProduct(id = action.id)
-
-                is ProductEffect.AddNewProduct -> viewModel.addNewProduct()
-
-                is ProductEffect.DeleteProduct -> viewModel.deleteProduct(id = action.id)
-
-                is ProductEffect.InvalidFieldErrorMessage -> {
+                is EditProductEffect.InvalidFieldErrorMessage -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = errorMessage,
@@ -81,43 +70,31 @@ internal fun ProductRoute(
                     }
                 }
 
-                is ProductEffect.NavigateBack -> onBackClick()
+                is EditProductEffect.NavigateBack -> onBackClick()
             }
         }
     }
 
-    ProductContent(
+    EditProductContent(
         modifier = modifier.clickableWithoutRipple {
             keyboardController?.hide()
             focusManager.clearFocus(force = true)
         },
         snackbarHostState = snackbarHostState,
-        showEditButton = id != 0L,
-        title = title,
         productFields = viewModel.productFields,
         hasInvalidField = state.hasInvalidField,
-        onDoneClick = { viewModel.saveProduct(id = id) },
-        onDeleteClick = {
-            viewModel.sendEvent(event = ProductEvent.UpdateDeletingProduct(id = id))
-        },
-        onBackClick = {
-            viewModel.sendEvent(event = ProductEvent.OnBackClick)
-        }
+        onAction = viewModel::onAction
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProductContent(
+private fun EditProductContent(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
-    showEditButton: Boolean,
-    title: String,
     productFields: ProductFields,
     hasInvalidField: Boolean,
-    onDoneClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onBackClick: () -> Unit
+    onAction: (action: EditProductAction) -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -126,9 +103,9 @@ private fun ProductContent(
             .semantics { contentDescription = "Product Content" },
         topBar = {
             TopAppBar(
-                title = { Text(text = title) },
+                title = { Text(text = stringResource(id = R.string.update_product)) },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { onAction(EditProductAction.OnBackClick) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.navigate_back)
@@ -136,20 +113,19 @@ private fun ProductContent(
                     }
                 },
                 actions = {
-                    if (showEditButton) {
-                        IconButton(onClick = onDeleteClick) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(id = R.string.delete)
-                            )
-                        }
+                    IconButton(
+                        onClick = { onAction.invoke(EditProductAction.OnDeleteClick) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(id = R.string.delete)
+                        )
                     }
                 }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onDoneClick) {
+            FloatingActionButton(onClick = { onAction(EditProductAction.OnDoneClick) }) {
                 Icon(
                     imageVector = Icons.Filled.Done,
                     contentDescription = stringResource(id = R.string.done)
@@ -157,55 +133,23 @@ private fun ProductContent(
             }
         }
     ) {
-        Column(
+        ProductContent(
             modifier = Modifier
                 .padding(it)
                 .consumeWindowInsets(it),
-        ) {
-            CustomIntegerField(
-                modifier = Modifier
-                    .semantics { contentDescription = "Natura code" }
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .fillMaxWidth(),
-                value = productFields.naturaCode,
-                onValueChange = productFields::updateNaturaCode,
-                label = stringResource(id = R.string.natura_code),
-                placeholder = stringResource(id = R.string.enter_natura_code),
-                isError = hasInvalidField && productFields.naturaCode.isBlank(),
-            )
-
-            CustomTextField(
-                modifier = Modifier
-                    .semantics { contentDescription = "Product name" }
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .fillMaxWidth(),
-                value = productFields.productName,
-                onValueChange = productFields::updateProductName,
-                label = stringResource(id = R.string.product_name),
-                placeholder = stringResource(id = R.string.enter_product_name),
-                isError = hasInvalidField && productFields.productName.isBlank()
-            )
-        }
+            productFields = productFields,
+            hasInvalidField = hasInvalidField
+        )
     }
-}
-
-@Composable
-private fun getScreenTitle(productId: Long): String {
-    return if (productId != 0L) stringResource(id = R.string.update_product)
-        else stringResource(id = R.string.add_product)
 }
 
 @Preview
 @Composable
-private fun ProductContentPreview() {
-    ProductContent(
+private fun EditProductContentPreview() {
+    EditProductContent(
         snackbarHostState = remember { SnackbarHostState() },
-        showEditButton = false,
-        title = stringResource(id = R.string.add_product),
         productFields = ProductFields(),
         hasInvalidField = true,
-        onDoneClick = {},
-        onDeleteClick = {},
-        onBackClick = {}
+        onAction = {}
     )
 }

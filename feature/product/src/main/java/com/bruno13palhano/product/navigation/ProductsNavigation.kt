@@ -6,8 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.product.ui.screen.ProductRoute
-import com.bruno13palhano.product.ui.screen.ProductsRoute
+import com.bruno13palhano.product.ui.product.NewProductRoute
+import com.bruno13palhano.product.ui.product.EditProductRoute
+import com.bruno13palhano.product.ui.products.ProductsRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.productsScreen(
@@ -29,16 +30,15 @@ fun NavGraphBuilder.productsScreen(
         composable<ProductsRoutes.UpdateProduct> {
             val id = it.toRoute<ProductsRoutes.UpdateProduct>().id
 
-            ProductRoute(
+            EditProductRoute(
                 modifier = modifier,
                 id = id,
                 onBackClick = { navController.navigateUp() }
             )
         }
         composable<ProductsRoutes.AddProduct> {
-            ProductRoute(
+            NewProductRoute(
                 modifier = modifier,
-                id = 0L,
                 onBackClick = { navController.navigateUp() }
             )
         }
