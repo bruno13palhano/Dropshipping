@@ -1,16 +1,13 @@
 package com.bruno13palhano.product.ui.product
 
 import androidx.compose.runtime.Immutable
-import com.bruno13palhano.model.Product
 import com.bruno13palhano.ui.shared.ViewAction
 import com.bruno13palhano.ui.shared.ViewEffect
 import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class NewProductState(
-    val hasInvalidField: Boolean
-) : ViewState
+internal data class NewProductState(val hasInvalidField: Boolean) : ViewState
 
 @Immutable
 internal sealed interface NewProductEvent : ViewEvent {
