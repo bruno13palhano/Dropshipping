@@ -17,7 +17,7 @@ internal class ReceiptsViewModel @Inject constructor(
     @Composable
     override fun states(events: Flow<ReceiptsEvent>): ReceiptsState {
         return receiptsPresenter(
-            receiptRepository = receiptRepository,
+            receipts = receiptRepository.getAll(),
             events = events,
             sendEffect = ::sendEffect
         )

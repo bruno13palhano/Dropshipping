@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.bruno13palhano.data.repository.ReceiptRepository
+import com.bruno13palhano.model.Receipt
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun receiptsPresenter(
-    receiptRepository: ReceiptRepository,
+    receipts: Flow<List<Receipt>>,
     events: Flow<ReceiptsEvent>,
     sendEffect: (ReceiptsEffect) -> Unit,
 ): ReceiptsState {
-    val receipts by receiptRepository.getAll().collectAsState(initial = emptyList())
+    val receiptList by receipts.collectAsState(initial = emptyList())
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -29,5 +29,5 @@ internal fun receiptsPresenter(
         }
     }
 
-    return ReceiptsState(receipts = receipts)
+    return ReceiptsState(receipts = receiptList)
 }
