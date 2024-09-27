@@ -11,6 +11,8 @@ import com.bruno13palhano.ui.shared.ViewState
 internal data class SearchState(
     val query: String,
     val active: Boolean,
+    val insert: Boolean,
+    val delete: Boolean,
     val products: List<CommonItem>,
     val cache: List<String>
 ) : ViewState {
@@ -18,6 +20,8 @@ internal data class SearchState(
         val INITIAL_STATE = SearchState(
             query = "",
             active = false,
+            insert = false,
+            delete = false,
             products = emptyList(),
             cache = emptyList()
         )
