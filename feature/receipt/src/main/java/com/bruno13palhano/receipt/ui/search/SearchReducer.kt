@@ -8,24 +8,56 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
         event: SearchEvent
     ): Pair<SearchState, SearchEffect?> {
         return when (event) {
-            is SearchEvent.Delete -> {
-                previousState to null
-            }
-
-            is SearchEvent.Active -> {
-                previousState to null
-            }
-
-            is SearchEvent.Done -> {
-                previousState to null
-            }
-
             is SearchEvent.Close -> {
-                previousState to null
+                if (previousState.active) {
+                    previousState.copy(
+                        active = false,
+                        query = "",
+                        insert = false,
+                        delete = false
+                    ) to null
+                } else {
+                    previousState to SearchEffect.NavigateBack
+                }
             }
 
             is SearchEvent.ProductItem -> {
-                previousState to SearchEffect.NavigateToAddReceipt(event.id)
+                previousState.copy(
+                    active = false,
+                    query = "",
+                    insert = false,
+                    delete = false
+                ) to SearchEffect.NavigateToAddReceipt(productId = event.id)
+            }
+
+            is SearchEvent.Done -> {
+                if (event.query.isNotBlank()) {
+                    previousState.copy(
+                        active = false,
+                        query = event.query,
+                        insert = true,
+                        delete = false
+                    ) to null
+                } else {
+                    previousState to null
+                }
+            }
+
+            is SearchEvent.Active -> {
+                previousState.copy(
+                    active = event.active,
+                    insert = false,
+                    delete = false
+                ) to null
+            }
+
+            is SearchEvent.Delete -> {
+                previousState.copy(
+                    query = event.query,
+                    delete = true,
+                    insert = false,
+                    active = true
+                ) to null
             }
         }
     }
