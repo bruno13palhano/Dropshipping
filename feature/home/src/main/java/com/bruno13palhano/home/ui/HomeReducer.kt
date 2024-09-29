@@ -23,6 +23,23 @@ internal class HomeReducer : Reducer<HomeState, HomeEvent, HomeEffect> {
                     }.plus(Pair(event.id, event.expanded))
                 ) to null
             }
+
+            is HomeEvent.UpdateLastReceipts -> {
+                val receiptsVisible = previousState.lastReceipts.isNotEmpty()
+
+                previousState.copy(
+                    lastReceipts = event.receipts,
+                    receiptsVisible = receiptsVisible
+                ) to null
+            }
+
+            is HomeEvent.UpdateMostSale -> {
+                previousState.copy(mostSale = event.mostSale) to null
+            }
+
+            is HomeEvent.UpdateProfit -> {
+                previousState.copy(profit = event.profit) to null
+            }
         }
     }
 }
