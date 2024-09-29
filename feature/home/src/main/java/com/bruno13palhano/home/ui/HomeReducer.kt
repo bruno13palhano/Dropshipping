@@ -25,7 +25,7 @@ internal class HomeReducer : Reducer<HomeState, HomeEvent, HomeEffect> {
             }
 
             is HomeEvent.UpdateLastReceipts -> {
-                val receiptsVisible = previousState.lastReceipts.isNotEmpty()
+                val receiptsVisible = event.receipts.isNotEmpty()
 
                 previousState.copy(
                     lastReceipts = event.receipts,
