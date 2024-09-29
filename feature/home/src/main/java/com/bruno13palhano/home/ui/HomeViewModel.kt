@@ -11,14 +11,18 @@ import javax.inject.Inject
 internal class HomeViewModel @Inject constructor(
     private val homeUseCase: HomeUseCase
 ) : BaseViewModel<HomeState, HomeAction, HomeEvent, HomeEffect>(
-    actionProcessor = HomeActionProcessor()
+    actionProcessor = HomeActionProcessor(),
+    reducer = HomeReducer()
 ) {
     @Composable
     override fun states(events: Flow<HomeEvent>): HomeState {
-        return homePresenter(useCase = homeUseCase, events = events)
-    }
-
-    fun onAction(action: HomeAction) {
-        sendEvent(event = actionProcessor.processAction(viewAction = action))
+        return homePresenter(
+            reducer = reducer,
+            profit = homeUseCase.getProfit(),
+            lastReceipts = homeUseCase.getLastReceipts(limit = 5),
+            mostSale = homeUseCase.getMostSale(limit = 5),
+            sendEvent = ::sendEvent,
+            events = events
+        )
     }
 }

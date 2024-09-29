@@ -2,57 +2,65 @@ package com.bruno13palhano.home.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.bruno13palhano.domain.HomeUseCase
+import com.bruno13palhano.model.MostSaleItem
 import com.bruno13palhano.model.Profit
+import com.bruno13palhano.model.ReceiptItem
+import com.bruno13palhano.ui.shared.Reducer
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun homePresenter(
-    useCase: HomeUseCase,
+    reducer: Reducer<HomeState, HomeEvent, HomeEffect>,
+    profit: Flow<Profit>,
+    lastReceipts: Flow<List<ReceiptItem>>,
+    mostSale: Flow<List<MostSaleItem>>,
+    sendEvent: (event: HomeEvent) -> Unit,
     events: Flow<HomeEvent>
 ): HomeState {
-    val profit by useCase.getProfit().collectAsState(initial = Profit(0f, 0f, 0f))
-    val lastReceipts by useCase.getLastReceipts(limit = 5).collectAsState(initial = emptyList())
-    val mostSale by useCase.getMostSale(limit = 5).collectAsState(initial = emptyList())
-    var profitVisible by remember { mutableStateOf(false) }
-    var receiptsVisible by remember { mutableStateOf(false) }
-    var expandedItems by remember { mutableStateOf(emptyList<Pair<Long, Boolean>>()) }
-
-    LaunchedEffect(lastReceipts.isNotEmpty()) {
-        receiptsVisible = true
-    }
+    val state = remember { mutableStateOf(HomeState.INITIAL_STATE) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
-            when (event) {
-                is HomeEvent.ExpandedItem -> {
-                    expandedItems = expandedItems.filter {
-                        it.first != event.id
-                    }.plus(Pair(event.id, event.expanded))
-                }
-
-                is HomeEvent.ProfitVisibility -> {
-                    profitVisible = event.visible
-                }
-
-                is HomeEvent.ReceiptsVisibility -> {
-                    receiptsVisible = event.visible
-                }
+            reducer.reduce(event = event, previousState = state.value).let {
+                state.value = it.first
             }
         }
     }
 
-    return HomeState(
-        profitVisible = profitVisible,
-        receiptsVisible = receiptsVisible,
-        profit = profit,
-        lastReceipts = lastReceipts,
-        mostSale = mostSale,
-        expandedItems = expandedItems
-    )
+    LaunchedEffect(Unit) {
+        getProfit(profit = profit, sendEvent = sendEvent)
+    }
+
+    LaunchedEffect(Unit) {
+        getLastReceipts(lastReceipts = lastReceipts, sendEvent = sendEvent)
+    }
+
+    LaunchedEffect(Unit) {
+        getMostSales(mostSale = mostSale, sendEvent = sendEvent)
+    }
+
+    return state.value
+}
+
+private suspend fun getProfit(
+    profit: Flow<Profit>,
+    sendEvent: (event: HomeEvent) -> Unit
+) {
+    profit.collect { sendEvent(HomeEvent.UpdateProfit(profit = it)) }
+}
+
+private suspend fun getLastReceipts(
+    lastReceipts: Flow<List<ReceiptItem>>,
+    sendEvent: (event: HomeEvent) -> Unit
+) {
+    lastReceipts.collect { sendEvent(HomeEvent.UpdateLastReceipts(receipts = it)) }
+}
+
+private suspend fun getMostSales(
+    mostSale: Flow<List<MostSaleItem>>,
+    sendEvent: (event: HomeEvent) -> Unit
+) {
+    mostSale.collect { sendEvent(HomeEvent.UpdateMostSale(mostSale = it)) }
 }
