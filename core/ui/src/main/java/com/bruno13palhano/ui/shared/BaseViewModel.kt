@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
 abstract class BaseViewModel<State: ViewState, Action: ViewAction, Event: ViewEvent, Effect: ViewEffect>(
-    protected val actionProcessor: ActionProcessor<Action, Event>
+    protected val actionProcessor: ActionProcessor<Action, Event>,
+    protected val reducer: Reducer<State, Event, Effect>
 ) : ViewModel() {
     private val scope =
         CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
@@ -30,14 +31,18 @@ abstract class BaseViewModel<State: ViewState, Action: ViewAction, Event: ViewEv
         }
     }
 
-    fun sendEffect(effect: Effect) {
-        _effect.trySend(effect)
+    @Composable
+    protected abstract fun states(events: Flow<Event>): State
+
+    fun onAction(action: Action) {
+        sendEvent(event = actionProcessor.processAction(action))
     }
 
-    fun sendEvent(event: Event) {
+    protected fun sendEvent(event: Event) {
         events.tryEmit(event)
     }
 
-    @Composable
-    protected abstract fun states(events: Flow<Event>): State
+    fun sendEffect(effect: Effect) {
+        _effect.trySend(effect)
+    }
 }
