@@ -17,13 +17,27 @@ internal data class HomeState(
     val lastReceipts: List<ReceiptItem>,
     val mostSale: List<MostSaleItem>,
     val expandedItems: List<Pair<Long, Boolean>>
-) : ViewState
+) : ViewState {
+    companion object {
+        val INITIAL_STATE = HomeState(
+            profitVisible = false,
+            profit = Profit(0f, 0f, 0f),
+            receiptsVisible = false,
+            lastReceipts = emptyList(),
+            mostSale = emptyList(),
+            expandedItems = emptyList()
+        )
+    }
+}
 
 @Immutable
 internal sealed interface HomeEvent : ViewEvent {
     data class ProfitVisibility(val visible: Boolean) : HomeEvent
     data class ReceiptsVisibility(val visible: Boolean) : HomeEvent
     data class ExpandedItem(val id: Long, val expanded: Boolean) : HomeEvent
+    data class UpdateProfit(val profit: Profit) : HomeEvent
+    data class UpdateLastReceipts(val receipts: List<ReceiptItem>) : HomeEvent
+    data class UpdateMostSale(val mostSale: List<MostSaleItem>) : HomeEvent
 }
 
 @Immutable
