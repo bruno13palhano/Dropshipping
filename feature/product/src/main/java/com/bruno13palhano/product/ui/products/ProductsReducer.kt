@@ -11,8 +11,13 @@ internal class ProductsReducer : Reducer<ProductsState, ProductsEvent, ProductsE
             is ProductsEvent.EditProduct -> {
                 previousState to ProductsEffect.NavigateToEditProduct(event.id)
             }
+
             is ProductsEvent.AddProduct -> {
                 previousState to ProductsEffect.NavigateToAddProduct
+            }
+
+            is ProductsEvent.UpdateProducts -> {
+                previousState.copy(products = event.products) to null
             }
         }
     }
