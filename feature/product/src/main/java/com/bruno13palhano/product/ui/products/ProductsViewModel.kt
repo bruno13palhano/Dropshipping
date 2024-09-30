@@ -12,18 +12,17 @@ import javax.inject.Inject
 internal class ProductsViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository
 ): BaseViewModel<ProductsState, ProductsAction, ProductsEvent, ProductsEffect>(
-    actionProcessor = ProductsActionProcessor()
+    actionProcessor = ProductsActionProcessor(),
+    reducer = ProductsReducer()
 ) {
     @Composable
     override fun states(events: Flow<ProductsEvent>): ProductsState {
         return productsPresenter(
             products = productRepository.getAll(),
             events = events,
+            reducer = reducer,
+            sendEvent = ::sendEvent,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: ProductsAction) {
-        sendEvent(event = actionProcessor.processAction(viewAction = action))
     }
 }
