@@ -2,52 +2,38 @@ package com.bruno13palhano.product.ui.product
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.bruno13palhano.data.repository.ProductRepository
+import com.bruno13palhano.ui.shared.Reducer
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun newProductPresenter(
     productFields: ProductFields,
     productRepository: ProductRepository,
+    reducer: Reducer<NewProductState, NewProductEvent, NewProductEffect>,
     events: Flow<NewProductEvent>,
     sendEffect: (effect: NewProductEffect) -> Unit
 ): NewProductState {
-    var hasInvalidField by remember { mutableStateOf(false) }
+    val state = remember { mutableStateOf(NewProductState.INITIAL_STATE) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
-            when (event) {
-                is NewProductEvent.Done -> {
-                    if (!productFields.isValid()) {
-                        hasInvalidField = true
-                    } else {
-                        hasInvalidField = false
-
-                        insertProduct(
-                            productFields = productFields,
-                            productRepository = productRepository
-                        )
-
-                        sendEffect(NewProductEffect.NavigateBack)
-                    }
-                }
-
-                is NewProductEvent.NavigateBack -> {
-                    sendEffect(NewProductEffect.NavigateBack)
-                }
+            reducer.reduce(event = event, previousState = state.value).let {
+                state.value = it.first
+                it.second?.let(sendEffect)
             }
         }
     }
 
-    LaunchedEffect(hasInvalidField) {
-        if (hasInvalidField) sendEffect(NewProductEffect.InvalidFieldErrorMessage)
+    LaunchedEffect(state.value.insert) {
+        if (state.value.insert) {
+            insertProduct(productFields = productFields, productRepository = productRepository)
+        }
     }
 
-    return NewProductState(hasInvalidField = hasInvalidField)
+    return state.value
 }
 
 private suspend fun insertProduct(

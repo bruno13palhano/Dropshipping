@@ -13,19 +13,17 @@ internal class NewProductViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository,
     val productFields: ProductFields
 ): BaseViewModel<NewProductState, NewProductAction, NewProductEvent, NewProductEffect>(
-    actionProcessor = NewProductActionProcessor()
+    actionProcessor = NewProductActionProcessor(),
+    reducer = NewProductReducer(productFields = productFields)
 ) {
     @Composable
     override fun states(events: Flow<NewProductEvent>): NewProductState {
         return newProductPresenter(
             productFields = productFields,
             productRepository = productRepository,
+            reducer = reducer,
             events = events,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: NewProductAction) {
-        sendEvent(event = actionProcessor.processAction(viewAction = action))
     }
 }
