@@ -13,19 +13,17 @@ internal class EditProductViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository,
     val productFields: ProductFields = ProductFields()
 ) : BaseViewModel<EditProductState, EditProductAction, EditProductEvent, EditProductEffect>(
-    actionProcessor = EditProductActionProcessor()
+    actionProcessor = EditProductActionProcessor(),
+    reducer = EditProductReducer(productFields = productFields)
 ) {
     @Composable
     override fun states(events: Flow<EditProductEvent>): EditProductState {
         return editProductPresenter(
             productFields = productFields,
             productRepository = productRepository,
+            reducer = reducer,
             events = events,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: EditProductAction) {
-        sendEvent(event = actionProcessor.processAction(viewAction = action))
     }
 }

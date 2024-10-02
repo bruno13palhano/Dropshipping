@@ -7,7 +7,21 @@ import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class EditProductState(val hasInvalidField: Boolean) : ViewState
+internal data class EditProductState(
+    val update: Boolean,
+    val delete: Boolean,
+    val hasInvalidField: Boolean,
+    val id: Long
+) : ViewState {
+    companion object {
+        val INITIAL_STATE = EditProductState(
+            update = false,
+            delete = false,
+            hasInvalidField = false,
+            id = 0L
+        )
+    }
+}
 
 @Immutable
 internal sealed interface EditProductEvent : ViewEvent {
