@@ -8,12 +8,17 @@ import com.bruno13palhano.ui.shared.ViewEvent
 import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
-internal data class ReceiptsState(val receipts: List<Receipt>) : ViewState
+internal data class ReceiptsState(val receipts: List<Receipt>) : ViewState {
+    companion object {
+        val INITIAL_STATE = ReceiptsState(receipts = emptyList())
+    }
+}
 
 @Immutable
 internal sealed interface ReceiptsEvent : ViewEvent {
     data class EditReceipt(val id: Long) : ReceiptsEvent
     data object SearchProduct : ReceiptsEvent
+    data class UpdateReceipts(val receipts: List<Receipt>) : ReceiptsEvent
 }
 
 @Immutable

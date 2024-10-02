@@ -11,8 +11,13 @@ internal class ReceiptsReducer : Reducer<ReceiptsState, ReceiptsEvent, ReceiptsE
             is ReceiptsEvent.EditReceipt -> {
                 previousState to ReceiptsEffect.NavigateToEditReceipt(id = event.id)
             }
+
             is ReceiptsEvent.SearchProduct -> {
                 previousState to ReceiptsEffect.NavigateToSearchProduct
+            }
+
+            is ReceiptsEvent.UpdateReceipts -> {
+                previousState.copy(receipts = event.receipts) to null
             }
         }
     }

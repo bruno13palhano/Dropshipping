@@ -12,18 +12,17 @@ import javax.inject.Inject
 internal class ReceiptsViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository
 ) : BaseViewModel<ReceiptsState, ReceiptsAction, ReceiptsEvent, ReceiptsEffect>(
-    actionProcessor = ReceiptsActionProcessor()
+    actionProcessor = ReceiptsActionProcessor(),
+    reducer = ReceiptsReducer()
 ) {
     @Composable
     override fun states(events: Flow<ReceiptsEvent>): ReceiptsState {
         return receiptsPresenter(
             receipts = receiptRepository.getAll(),
             events = events,
+            reducer = reducer,
+            sendEvent = ::sendEvent,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: ReceiptsAction) {
-        sendEvent(event = actionProcessor.processAction(action))
     }
 }
