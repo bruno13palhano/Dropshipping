@@ -1,5 +1,6 @@
 package com.bruno13palhano.receipt.ui.receipt
 
+import com.bruno13palhano.model.Product
 import com.bruno13palhano.ui.shared.ActionProcessor
 
 internal class NewReceiptActionProcessor : ActionProcessor<NewReceiptAction, NewReceiptEvent> {
@@ -7,7 +8,11 @@ internal class NewReceiptActionProcessor : ActionProcessor<NewReceiptAction, New
         return when (viewAction) {
             is NewReceiptAction.OnSetInitialData -> {
                 NewReceiptEvent.SetInitialData(
-                    productId = viewAction.productId,
+                    product = Product(
+                        id = viewAction.productId,
+                        naturaCode = "",
+                        name = ""
+                    ),
                     requestDate = viewAction.requestDate
                 )
             }

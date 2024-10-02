@@ -16,7 +16,8 @@ internal class NewReceiptViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
     val receiptFields: ReceiptFields = ReceiptFields()
 ) : BaseViewModel<NewReceiptState, NewReceiptAction, NewReceiptEvent, NewReceiptEffect> (
-    actionProcessor = NewReceiptActionProcessor()
+    actionProcessor = NewReceiptActionProcessor(),
+    reducer = NewReceiptReducer(receiptFields = receiptFields)
 ) {
     @Composable
     override fun states(events: Flow<NewReceiptEvent>): NewReceiptState {
@@ -24,12 +25,10 @@ internal class NewReceiptViewModel @Inject constructor(
             receiptFields = receiptFields,
             productRepository = productRepository,
             receiptRepository = receiptRepository,
+            reducer = reducer,
             events = events,
+            sendEvent = ::sendEvent,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: NewReceiptAction) {
-        sendEvent(event = actionProcessor.processAction(action))
     }
 }
