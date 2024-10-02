@@ -45,12 +45,12 @@ internal fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val effect = rememberFlowWithLifecycle(flow = viewModel.effects)
+    val effects = rememberFlowWithLifecycle(flow = viewModel.effects)
 
-    LaunchedEffect(effect) {
-        effect.collect { action ->
-            when (action) {
-                is SearchEffect.NavigateToAddReceipt -> navigateToAddReceipt(action.productId)
+    LaunchedEffect(effects) {
+        effects.collect { effect ->
+            when (effect) {
+                is SearchEffect.NavigateToAddReceipt -> navigateToAddReceipt(effect.productId)
 
                 is SearchEffect.NavigateBack -> navigateBack()
             }
@@ -98,18 +98,20 @@ private fun SearchContent(
                 .consumeWindowInsets(it),
             contentPadding = it
         ) {
-            items(items = state.products, key = { product -> product.id }) {
-                ElevatedListItem(
-                    modifier = Modifier.padding(4.dp),
-                    icon = Icons.AutoMirrored.Filled.ArrowForward,
-                    iconDescription = "",
-                    onItemClick = { onAction(SearchAction.OnProductItemClick(it.id)) },
-                    onIconClick = { onAction(SearchAction.OnProductItemClick(it.id)) }
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = it.title
-                    )
+            if (!state.active) {
+                items(items = state.products, key = { product -> product.id }) {
+                    ElevatedListItem(
+                        modifier = Modifier.padding(4.dp),
+                        icon = Icons.AutoMirrored.Filled.ArrowForward,
+                        iconDescription = "",
+                        onItemClick = { onAction(SearchAction.OnProductItemClick(it.id)) },
+                        onIconClick = { onAction(SearchAction.OnProductItemClick(it.id)) }
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = it.title
+                        )
+                    }
                 }
             }
         }
@@ -198,6 +200,8 @@ private fun SearchContentPreview() {
         state = SearchState(
             query = "",
             active = false,
+            insert = false,
+            delete = false,
             products = listOf(
                 CommonItem(id = 1, title = "product 1"),
                 CommonItem(id = 2, title = "product 2"),

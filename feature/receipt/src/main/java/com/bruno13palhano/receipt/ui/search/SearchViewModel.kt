@@ -18,7 +18,8 @@ internal class SearchViewModel @Inject constructor(
     @ProductRep private val productRepository: ProductRepository,
     @CacheRep private val cacheRepository: CacheRepository
 ): BaseViewModel<SearchState, SearchAction, SearchEvent, SearchEffect>(
-    actionProcessor = SearchActionProcessor()
+    actionProcessor = SearchActionProcessor(),
+    reducer = SearchReducer()
 ) {
     var query by mutableStateOf("")
         private set
@@ -27,15 +28,13 @@ internal class SearchViewModel @Inject constructor(
         this.query = query
     }
 
-    fun onAction(action: SearchAction) {
-        sendEvent(event = actionProcessor.processAction(action))
-    }
-
     @Composable
     override fun states(events: Flow<SearchEvent>): SearchState {
         return searchPresenter(
             events = events,
+            sendEvent = ::sendEvent,
             sendEffect = ::sendEffect,
+            reducer = reducer,
             productRepository = productRepository,
             cacheRepository = cacheRepository
         )

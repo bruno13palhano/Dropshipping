@@ -35,6 +35,8 @@ internal sealed interface SearchEvent : ViewEvent {
     data class Done(val query: String) : SearchEvent
     data object Close : SearchEvent
     data class ProductItem(val id: Long) : SearchEvent
+    data class UpdateCache(val cache: List<String>) : SearchEvent
+    data class UpdateProducts(val products: List<CommonItem>) : SearchEvent
 }
 
 @Immutable

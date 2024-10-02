@@ -59,6 +59,16 @@ internal class SearchReducer : Reducer<SearchState, SearchEvent, SearchEffect> {
                     active = true
                 ) to null
             }
+
+            is SearchEvent.UpdateCache -> {
+                previousState.copy(
+                    cache = event.cache,
+                    insert = false,
+                    delete = false
+                ) to null
+            }
+
+            is SearchEvent.UpdateProducts -> previousState.copy(products = event.products) to null
         }
     }
 }
