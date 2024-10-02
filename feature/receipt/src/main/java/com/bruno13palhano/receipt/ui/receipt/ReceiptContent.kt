@@ -45,7 +45,10 @@ internal fun ReceiptContent(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     val focusManager = LocalFocusManager.current
-    var datePickerState = rememberDatePickerState()
+    var datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = receiptFields.requestDate,
+        initialDisplayMode = if (isPortrait) DisplayMode.Picker else DisplayMode.Input
+    )
     var showDateDialog by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
@@ -185,15 +188,15 @@ internal fun ReceiptContent(
                 }
             }
         ) {
-            datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = receiptFields.requestDate,
-                initialDisplayMode = if (isPortrait) DisplayMode.Picker else DisplayMode.Picker
-            )
-
             DatePicker(
                 state = datePickerState,
                 showModeToggle = isPortrait
             )
         }
+
+        datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = receiptFields.requestDate,
+            initialDisplayMode = if (isPortrait) DisplayMode.Picker else DisplayMode.Input
+        )
     }
 }
