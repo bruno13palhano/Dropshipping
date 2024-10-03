@@ -8,11 +8,7 @@ internal class NewReceiptActionProcessor : ActionProcessor<NewReceiptAction, New
         return when (viewAction) {
             is NewReceiptAction.OnSetInitialData -> {
                 NewReceiptEvent.SetInitialData(
-                    product = Product(
-                        id = viewAction.productId,
-                        naturaCode = "",
-                        name = ""
-                    ),
+                    product = Product.EMPTY.copy(id = viewAction.productId),
                     requestDate = viewAction.requestDate
                 )
             }
