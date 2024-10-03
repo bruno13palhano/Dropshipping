@@ -53,7 +53,7 @@ internal class NewReceiptReducer(
             previousState.copy(
                 insert = true,
                 hasInvalidField = false
-            ) to null
+            ) to NewReceiptEffect.NavigateBack
         } else {
             previousState.copy(
                 insert = false,
