@@ -55,7 +55,7 @@ internal fun EditReceiptRoute(
     viewModel: EditReceiptViewModel = hiltViewModel()
 ) {
     LaunchedEffect(key1 = Unit) {
-        viewModel.onAction(action = EditReceiptAction.OnSetInitialData(id = id))
+        viewModel.onAction(action = EditReceiptAction.OnUpdateReceipt(id = id))
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,11 +95,11 @@ internal fun EditReceiptRoute(
         onMoreVertMenuItemClick = { index ->
             when (index) {
                 ReceiptMenuOptions.DELETE -> {
-                    viewModel.onAction(action = EditReceiptAction.OnDeleteClick(id = id))
+                    viewModel.onAction(action = EditReceiptAction.OnDeleteClick)
                 }
 
                 ReceiptMenuOptions.CANCEL -> {
-                    viewModel.onAction(action = EditReceiptAction.OnCancelClick(id = id))
+                    viewModel.onAction(action = EditReceiptAction.OnCancelClick)
                 }
 
                 else -> {}

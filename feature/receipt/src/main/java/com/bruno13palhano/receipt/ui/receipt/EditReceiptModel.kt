@@ -9,11 +9,17 @@ import com.bruno13palhano.ui.shared.ViewState
 
 @Immutable
 internal data class EditReceiptState(
+    val edit: Boolean,
+    val cancel: Boolean,
+    val delete: Boolean,
     val hasInvalidField: Boolean,
     val receipt: Receipt
 ) : ViewState {
     companion object {
         val INITIAL_STATE = EditReceiptState(
+            edit = false,
+            cancel = false,
+            delete = false,
             hasInvalidField = false,
             receipt = Receipt.EMPTY
         )
@@ -22,9 +28,9 @@ internal data class EditReceiptState(
 
 @Immutable
 internal sealed interface EditReceiptEvent : ViewEvent {
-    data class SetInitialData(val id: Long) : EditReceiptEvent
-    data class Cancel(val id: Long) : EditReceiptEvent
-    data class Delete(val id: Long) : EditReceiptEvent
+    data class UpdateReceipt(val receipt: Receipt) : EditReceiptEvent
+    data object Cancel : EditReceiptEvent
+    data object Delete : EditReceiptEvent
     data object Done : EditReceiptEvent
     data object NavigateBack : EditReceiptEvent
 }
@@ -37,9 +43,9 @@ internal sealed interface EditReceiptEffect : ViewEffect {
 
 @Immutable
 internal sealed interface EditReceiptAction : ViewAction {
-    data class OnSetInitialData(val id: Long) : EditReceiptAction
-    data class OnCancelClick(val id: Long) : EditReceiptAction
-    data class OnDeleteClick(val id: Long) : EditReceiptAction
+    data class OnUpdateReceipt(val id: Long) : EditReceiptAction
+    data object OnCancelClick : EditReceiptAction
+    data object OnDeleteClick : EditReceiptAction
     data object OnDoneClick : EditReceiptAction
     data object OnBackClick : EditReceiptAction
 }

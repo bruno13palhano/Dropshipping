@@ -2,13 +2,12 @@ package com.bruno13palhano.receipt.ui.receipt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.bruno13palhano.data.repository.ReceiptRepository
+import com.bruno13palhano.model.Product
+import com.bruno13palhano.model.Receipt
+import com.bruno13palhano.ui.shared.Reducer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 
@@ -16,92 +15,74 @@ import kotlinx.coroutines.flow.catch
 internal fun editReceiptPresenter(
     receiptFields: ReceiptFields,
     receiptRepository: ReceiptRepository,
+    reducer: Reducer<EditReceiptState, EditReceiptEvent, EditReceiptEffect>,
     events: Flow<EditReceiptEvent>,
+    sendEvent: (event: EditReceiptEvent) -> Unit,
     sendEffect: (effect: EditReceiptEffect) -> Unit
 ): EditReceiptState {
     val state = remember { mutableStateOf(EditReceiptState.INITIAL_STATE) }
-    var hasInvalidField by remember { mutableStateOf(false) }
-    var currentReceiptId by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
-            when (event) {
-                is EditReceiptEvent.Cancel -> {
-                    cancelReceipt(
-                        receiptId = currentReceiptId,
-                        previousState = state,
-                        receiptRepository = receiptRepository
-                    )
-
-                    sendEffect(EditReceiptEffect.NavigateBack)
-                }
-
-                is EditReceiptEvent.SetInitialData -> {
-                    currentReceiptId = event.id
-                }
-
-                is EditReceiptEvent.Delete -> {
-                    deleteReceipt(
-                        receiptId = currentReceiptId,
-                        receiptRepository = receiptRepository
-                    )
-
-                    sendEffect(EditReceiptEffect.NavigateBack)
-                }
-
-                is EditReceiptEvent.Done -> {
-                    if (!receiptFields.isReceiptValid()) {
-                        hasInvalidField = true
-                    } else {
-                        hasInvalidField = false
-
-                        updateReceipt(
-                            receiptId = currentReceiptId,
-                            receiptRepository = receiptRepository,
-                            receiptFields = receiptFields,
-                            state = state
-                        )
-
-                        sendEffect(EditReceiptEffect.NavigateBack)
-                    }
-                }
-
-                is EditReceiptEvent.NavigateBack -> sendEffect(EditReceiptEffect.NavigateBack)
+            reducer.reduce(previousState = state.value, event = event).let {
+                state.value = it.first
+                it.second?.let { effect -> sendEffect(effect) }
             }
         }
     }
 
-    LaunchedEffect(currentReceiptId) {
-        if (currentReceiptId == 0L) return@LaunchedEffect
+    LaunchedEffect(state.value.edit) {
+        if (state.value.edit) {
+            updateReceipt(
+                receiptId = state.value.receipt.id,
+                receiptRepository = receiptRepository,
+                receiptFields = receiptFields,
+                product = state.value.receipt.product
+            )
+        }
+    }
+
+    LaunchedEffect(state.value.cancel) {
+        if (state.value.cancel) {
+            cancelReceipt(
+                receipt = state.value.receipt,
+                receiptRepository = receiptRepository
+            )
+        }
+    }
+
+    LaunchedEffect(state.value.delete) {
+        if (state.value.delete) {
+            deleteReceipt(
+                receiptId = state.value.receipt.id,
+                receiptRepository = receiptRepository
+            )
+        }
+    }
+
+    LaunchedEffect(state.value.receipt.id) {
+        if (state.value.receipt.id == 0L) return@LaunchedEffect
 
         getReceipt(
-            receiptId = currentReceiptId,
-            previousState = state,
+            receiptId = state.value.receipt.id,
             receiptRepository = receiptRepository,
-            receiptFields = receiptFields
+            sendEvent = sendEvent
         )
     }
 
-    LaunchedEffect(hasInvalidField) {
-        if (hasInvalidField) sendEffect(EditReceiptEffect.InvalidFieldErrorMessage)
-    }
-
-    return EditReceiptState(
-        hasInvalidField = hasInvalidField,
-        receipt = state.value.receipt
-    )
+    return state.value
 }
 
 private suspend fun updateReceipt(
     receiptId: Long,
     receiptRepository: ReceiptRepository,
     receiptFields: ReceiptFields,
-    state: MutableState<EditReceiptState>
+    product: Product
 ) {
     receiptRepository.update(
         data = receiptFields.toReceipt(
             id = receiptId,
-            product = state.value.receipt.product
+            product = product
         )
     )
 }
@@ -114,32 +95,20 @@ private suspend fun deleteReceipt(
 }
 
 private suspend fun cancelReceipt(
-    receiptId: Long,
-    previousState: MutableState<EditReceiptState>,
+    receipt: Receipt,
     receiptRepository: ReceiptRepository
 ) {
-    receiptRepository.update(
-        data = previousState.value.receipt.copy(
-            id = receiptId,
-            canceled = true
-        )
-    )
+    receiptRepository.update(data = receipt.copy(canceled = true))
 }
 
 private suspend fun getReceipt(
     receiptId: Long,
-    previousState: MutableState<EditReceiptState>,
     receiptRepository: ReceiptRepository,
-    receiptFields: ReceiptFields
+    sendEvent: (event: EditReceiptEvent) -> Unit
 ) {
     receiptRepository.get(id = receiptId)
         .catch { it.printStackTrace() }
         .collect {
-            previousState.value =
-                previousState.value.copy(
-                    receipt = it
-                )
-
-            receiptFields.setFields(receipt = it)
-    }
+            sendEvent(EditReceiptEvent.UpdateReceipt(receipt = it))
+        }
 }

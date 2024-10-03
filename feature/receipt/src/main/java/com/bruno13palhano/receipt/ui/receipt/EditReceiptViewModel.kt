@@ -13,19 +13,18 @@ internal class EditReceiptViewModel @Inject constructor(
     @ReceiptRep private val receiptRepository: ReceiptRepository,
     val receiptFields: ReceiptFields = ReceiptFields()
 ) : BaseViewModel<EditReceiptState, EditReceiptAction, EditReceiptEvent, EditReceiptEffect>(
-    actionProcessor = EditReceiptActionProcessor()
+    actionProcessor = EditReceiptActionProcessor(),
+    reducer = EditReceiptReducer(receiptFields = receiptFields)
 ) {
     @Composable
     override fun states(events: Flow<EditReceiptEvent>): EditReceiptState {
         return editReceiptPresenter(
             receiptFields = receiptFields,
             receiptRepository = receiptRepository,
+            reducer = reducer,
             events = events,
+            sendEvent = ::sendEvent,
             sendEffect = ::sendEffect
         )
-    }
-
-    fun onAction(action: EditReceiptAction) {
-        sendEvent(event = actionProcessor.processAction(action))
     }
 }
