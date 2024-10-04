@@ -6,9 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.product.ui.product.NewProductRoute
-import com.bruno13palhano.product.ui.product.EditProductRoute
-import com.bruno13palhano.product.ui.products.ProductsRoute
+import com.bruno13palhano.product.ui.product.presenter.NewProductRoute
+import com.bruno13palhano.product.ui.product.presenter.EditProductRoute
+import com.bruno13palhano.product.ui.products.presenter.ProductsRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.productsScreen(

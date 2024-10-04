@@ -6,10 +6,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.bruno13palhano.receipt.ui.receipt.EditReceiptRoute
-import com.bruno13palhano.receipt.ui.receipt.NewReceiptRoute
-import com.bruno13palhano.receipt.ui.receipts.ReceiptsRoute
-import com.bruno13palhano.receipt.ui.search.SearchRoute
+import com.bruno13palhano.receipt.ui.receipt.presenter.EditReceiptRoute
+import com.bruno13palhano.receipt.ui.receipt.presenter.NewReceiptRoute
+import com.bruno13palhano.receipt.ui.receipts.presenter.ReceiptsRoute
+import com.bruno13palhano.receipt.ui.search.presenter.SearchRoute
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.receiptsScreen(
