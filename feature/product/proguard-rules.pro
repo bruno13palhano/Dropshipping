@@ -23,4 +23,7 @@
 -keeppackagenames
 
 -keep class com.bruno13palhano.product.navigation.** { *; }
--keep class com.bruno13palhano.product.ui.viewmodel.** { *; }
+-keep class com.bruno13palhano.product.ui.product.presenter.ProductFields_Factory
+-keep class com.bruno13palhano.product.ui.product.presenter.ProductFields
+-keep class com.bruno13palhano.product.ui.product.viewmodel.** { *; }
+-keep class com.bruno13palhano.product.ui.products.viewmodel.** { *; }

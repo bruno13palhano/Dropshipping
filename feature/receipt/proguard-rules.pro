@@ -23,4 +23,8 @@
 -keeppackagenames
 
 -keep class com.bruno13palhano.receipt.navigation.** { *; }
--keep class com.bruno13palhano.receipt.ui.viewmodel.** { *; }
+-keep class com.bruno13palhano.receipt.ui.receipt.presenter.ReceiptFields
+-keep class com.bruno13palhano.receipt.ui.receipt.presenter.ReceiptFields_Factory
+-keep class com.bruno13palhano.receipt.ui.receipt.viewmodel.** { *; }
+-keep class com.bruno13palhano.receipt.ui.receipts.viewmodel.** { *; }
+-keep class com.bruno13palhano.receipt.ui.search.viewmodel.** { *; }
