@@ -1,6 +1,8 @@
 package com.bruno13palhano.product.ui.products.presenter
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,13 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.products.viewmodel.ProductsViewModel
 import com.bruno13palhano.ui.components.CommonItem
-import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 
 @Composable
@@ -79,7 +81,7 @@ internal fun ProductsContent(
         topBar = { TopAppBar(title = { Text(text = stringResource(id = R.string.products)) }) },
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.semantics { contentDescription = "Add button" },
+                modifier = Modifier.semantics { contentDescription = "Add product" },
                 onClick = { onAction(ProductsAction.OnAddProductClick) }
             ) {
                 Icon(
@@ -93,22 +95,24 @@ internal fun ProductsContent(
             modifier = Modifier
                 .semantics { contentDescription = "List of products" }
                 .consumeWindowInsets(it),
-            contentPadding = it
+            contentPadding = PaddingValues(
+                vertical = 4.dp + it.calculateTopPadding(),
+                horizontal = 4.dp + it.calculateStartPadding(LayoutDirection.Ltr),
+            )
         ) {
             items(items = products, key = { product -> product.id }) { product ->
-                ElevatedListItem(
+                ElevatedCard(
                     modifier = Modifier.padding(4.dp),
-                    icon = Icons.Filled.Delete,
-                    iconDescription = stringResource(id = R.string.delete),
-                    onItemClick = {
+                    onClick = {
                         onAction(
                             ProductsAction.OnEditProductClick(id = product.id)
                         )
-                    },
-                    onIconClick = {  }
+                    }
                 ) {
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 16.dp)
+                            .fillMaxWidth(),
                         text = product.title
                     )
                 }
