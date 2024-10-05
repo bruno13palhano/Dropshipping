@@ -1,6 +1,8 @@
 package com.bruno13palhano.receipt.ui.search.presenter
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bruno13palhano.receipt.R
@@ -97,7 +100,10 @@ private fun SearchContent(
             modifier = Modifier
                 .semantics { contentDescription = "List of products" }
                 .consumeWindowInsets(it),
-            contentPadding = it
+            contentPadding = PaddingValues(
+                vertical = 4.dp + it.calculateTopPadding(),
+                horizontal = 4.dp + it.calculateStartPadding(LayoutDirection.Ltr),
+            )
         ) {
             if (!state.active) {
                 items(items = state.products, key = { product -> product.id }) {
