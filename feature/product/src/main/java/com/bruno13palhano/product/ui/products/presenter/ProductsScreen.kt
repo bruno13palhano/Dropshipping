@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bruno13palhano.product.R
 import com.bruno13palhano.product.ui.products.viewmodel.ProductsViewModel
 import com.bruno13palhano.ui.components.CommonItem
+import com.bruno13palhano.ui.components.ElevatedListItem
 import com.bruno13palhano.ui.components.rememberFlowWithLifecycle
 
 @Composable
@@ -101,18 +102,15 @@ internal fun ProductsContent(
             )
         ) {
             items(items = products, key = { product -> product.id }) { product ->
-                ElevatedCard(
+                ElevatedListItem(
                     modifier = Modifier.padding(4.dp),
-                    onClick = {
-                        onAction(
-                            ProductsAction.OnEditProductClick(id = product.id)
-                        )
-                    }
+                    icon = Icons.AutoMirrored.Filled.ArrowForward,
+                    iconDescription = "",
+                    onItemClick = { onAction(ProductsAction.OnEditProductClick(id = product.id)) },
+                    onIconClick = { onAction(ProductsAction.OnEditProductClick(id = product.id)) }
                 ) {
                     Text(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 16.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         text = product.title
                     )
                 }
