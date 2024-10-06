@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receipts">Recibos</string>
+    <string name="receipt">Recibo</string>
+    <string name="add_receipt">Adicionar receibo</string>
+    <string name="update_receipt">Modificar recibo</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Remover</string>
+    <string name="empty_fields_error">Preencha os campos obrigatórios</string>
+    <string name="search_products">Pesquisar produtos</string>
+    <string name="request_number">Número do pedido</string>
+    <string name="enter_request_number">Insira o número do pedido"</string>
+    <string name="request_date">Data do pedido</string>
+    <string name="enter_request_date">Insira a data do pedido</string>
+    <string name="customer_name">Nome do cliente</string>
+    <string name="enter_customer_name">Insira o nome do cliente</string>
+    <string name="quantity">Quantidade</string>
+    <string name="enter_quantity">Insira a quantidade</string>
+    <string name="natura_price">Preço na Natura</string>
+    <string name="enter_natura_price">Insira o preço na Natura</string>
+    <string name="amazon_price">Preço na Amazon</string>
+    <string name="enter_amazon_price">Insira o preço na Amazon</string>
+    <string name="payment_option">Opções de pagamento</string>
+    <string name="enter_payment_option">Insira a opção de pagamento</string>
+    <string name="observations">Observações</string>
+    <string name="enter_observations">Insira as observações</string>
+    <string name="navigate_back">Navegar de volta</string>
+    <string name="vert_menu">Menu vertical</string>
+    <string name="done">Finalizar</string>
+    <string name="delete_receipt_message">Remover recibo</string>
+    <string name="data_info">Data da venda, %s</string>
+    <string name="units_sold_info">Quantidade de unidades vendidas, %d</string>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="products">Produtos</string>
+    <string name="natura_code">Código Natura</string>
+    <string name="enter_natura_code">Insira o código Natura</string>
+    <string name="product_name">Product name</string>
+    <string name="enter_product_name">Enter product name</string>
+    <string name="add_product">Adicionar produto</string>
+    <string name="update_product">Modificar produto</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Remover</string>
+    <string name="done">Finalizar</string>
+    <string name="empty_fields_error">Preencha os campos obrigatórios</string>
+    <string name="product_deleted">Remover produto</string>"
+    <string name="navigate_back">Navegar de volta</string>
+</resources>

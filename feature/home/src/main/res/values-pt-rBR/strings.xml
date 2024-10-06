@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dropshipping</string>
+    <string name="profit">Lucro</string>
+    <string name="amazon_profit">Lucro na Amazon R$%.2f</string>
+    <string name="natura_profit">Lucro na Natura R$%.2f</string>
+    <string name="last_receipts">Últimos recibos</string>
+    <string name="visible">Visível</string>
+    <string name="not_visible">Invisível</string>
+    <string name="most_sale_info">Mais vendidos</string>
+    <string name="customer_info">Nome do cliente, %s</string>
+    <string name="product_info">Nome do produto, %s</string>
+    <string name="amazon_price_info">Preço na Amazon, R$%.2f</string>
+    <string name="date_info">Data da venda, %s</string>
+    <string name="title_info">%s, %s</string>
+    <string name="most_sale_title_info">%s, quantidate de unidades vendidas %d</string>
+    <string name="profit_amount_info">Lucro \nR$%.2f</string>
+    <string name="dots">Lucro\nR$\u25CF\u25CF\u25CF\u25CF</string>
+</resources>
