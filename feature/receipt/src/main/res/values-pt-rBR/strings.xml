@@ -21,6 +21,14 @@
     <string name="enter_natura_price">Insira o preço na Natura</string>
     <string name="amazon_price">Preço na Amazon</string>
     <string name="enter_amazon_price">Insira o preço na Amazon</string>
+    <string name="amazon_percentage_tax">Taxa na Amazon</string>
+    <string name="enter_amazon_percentage_tax">Insira a taxa na Amazon</string>
+    <string name="natura_percentage_gain">Ganho na Natura</string>
+    <string name="enter_natura_percentage_gain">Insira o ganho na Natura</string>
+    <string name="other_taxes">Outras taxas</string>
+    <string name="enter_other_taxes">Insira outras taxas</string>
+    <string name="extras">Valores extras</string>
+    <string name="enter_extras">Insira os valores extras</string>
     <string name="payment_option">Opções de pagamento</string>
     <string name="enter_payment_option">Insira a opção de pagamento</string>
     <string name="observations">Observações</string>

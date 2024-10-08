@@ -29,6 +29,14 @@ internal class ReceiptFields @Inject constructor() {
         private set
     var amazonPrice by mutableStateOf("")
         private set
+    var amazonTax by mutableStateOf("")
+        private set
+    var naturaPercentageGain by mutableStateOf("")
+        private set
+    var taxes by mutableStateOf("")
+        private set
+    var extras by mutableStateOf("")
+        private set
     var paymentOption by mutableStateOf("")
         private set
     var observations by mutableStateOf("")
@@ -62,6 +70,22 @@ internal class ReceiptFields @Inject constructor() {
         this.amazonPrice = amazonPrice
     }
 
+    fun updateAmazonTax(amazonTax: String) {
+        this.amazonTax = amazonTax
+    }
+
+    fun updateNaturaPercentageGain(naturaPercentageGain: String) {
+        this.naturaPercentageGain = naturaPercentageGain
+    }
+
+    fun updateTaxes(taxes: String) {
+        this.taxes = taxes
+    }
+
+    fun updateExtras(extras: String) {
+        this.extras = extras
+    }
+
     fun updatePaymentOption(paymentOption: String) {
         this.paymentOption = paymentOption
     }
@@ -73,7 +97,8 @@ internal class ReceiptFields @Inject constructor() {
     fun isReceiptValid(): Boolean {
         return requestNumber.isNotBlank() && customerName.isNotBlank() &&
                 quantity.isNotBlank() && stringToInt(quantity) > 0 && naturaPrice.isNotBlank() &&
-                amazonPrice.isNotBlank() && paymentOption.isNotBlank()
+                amazonPrice.isNotBlank() && paymentOption.isNotBlank() && amazonTax.isNotBlank() &&
+                naturaPercentageGain.isNotBlank() && taxes.isNotBlank() && extras.isNotBlank()
     }
 
     /**
@@ -96,6 +121,10 @@ internal class ReceiptFields @Inject constructor() {
             quantity = stringToInt(quantity),
             naturaPrice = stringToFloat(naturaPrice),
             amazonPrice = stringToFloat(amazonPrice),
+            amazonTax = stringToFloat(amazonTax) / 100,
+            naturaPercentageGain = stringToFloat(naturaPercentageGain) / 100,
+            taxes = stringToFloat(taxes) / 100,
+            extras = stringToFloat(extras),
             paymentOption = paymentOption,
             canceled = false,
             observations = observations
@@ -115,6 +144,12 @@ internal class ReceiptFields @Inject constructor() {
         updateQuantity(quantity = receipt.quantity.toString())
         updateNaturaPrice(naturaPrice = receipt.naturaPrice.toString())
         updateAmazonPrice(amazonPrice = receipt.amazonPrice.toString())
+        updateAmazonTax(amazonTax = "%.2f".format(receipt.amazonTax * 100))
+        updateNaturaPercentageGain(
+            naturaPercentageGain = "%.2f".format(receipt.naturaPercentageGain * 100.00)
+        )
+        updateTaxes(taxes = "%.2f".format(receipt.taxes * 100.00))
+        updateExtras(extras = receipt.extras.toString())
         updatePaymentOption(paymentOption = receipt.paymentOption)
         updateObservations(observations = receipt.observations)
     }

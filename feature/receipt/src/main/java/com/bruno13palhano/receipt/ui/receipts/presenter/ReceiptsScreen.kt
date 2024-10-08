@@ -152,6 +152,10 @@ private fun ReceiptsContentPreview() {
                     quantity = 1,
                     naturaPrice = 56.99f,
                     amazonPrice = 88.9f,
+                    amazonTax = .13f,
+                    naturaPercentageGain = .20f,
+                    taxes = 0f,
+                    extras = 0f,
                     paymentOption = "cash",
                     canceled = false,
                     observations = ""
@@ -165,6 +169,10 @@ private fun ReceiptsContentPreview() {
                     quantity = 2,
                     naturaPrice = 56.99f,
                     amazonPrice = 88.9f,
+                    amazonTax = .13f,
+                    naturaPercentageGain = .20f,
+                    taxes = 0f,
+                    extras = 0f,
                     paymentOption = "cash",
                     canceled = false,
                     observations = ""

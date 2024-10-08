@@ -129,6 +129,52 @@ internal fun ReceiptContent(
             placeholder = stringResource(id = R.string.enter_amazon_price),
             isError = hasInvalidField && receiptFields.amazonPrice.isBlank()
         )
+
+        CustomFloatField(
+            modifier = Modifier
+                .semantics { contentDescription = "Amazon percentage tax" }
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .fillMaxWidth(),
+            value = receiptFields.amazonTax,
+            onValueChange = receiptFields::updateAmazonTax,
+            label = stringResource(id = R.string.amazon_percentage_tax),
+            placeholder = stringResource(id = R.string.enter_amazon_percentage_tax),
+            isError = hasInvalidField && receiptFields.amazonTax.isBlank()
+        )
+        CustomFloatField(
+            modifier = Modifier
+                .semantics { contentDescription = "Natura percentage gain" }
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .fillMaxWidth(),
+            value = receiptFields.naturaPercentageGain,
+            onValueChange = receiptFields::updateNaturaPercentageGain,
+            label = stringResource(id = R.string.natura_percentage_gain),
+            placeholder = stringResource(id = R.string.enter_natura_percentage_gain),
+            isError = hasInvalidField && receiptFields.naturaPercentageGain.isBlank()
+        )
+        CustomFloatField(
+            modifier = Modifier
+                .semantics { contentDescription = "Other taxes percentage" }
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .fillMaxWidth(),
+            value = receiptFields.taxes,
+            onValueChange = receiptFields::updateTaxes,
+            label = stringResource(id = R.string.other_taxes),
+            placeholder = stringResource(id = R.string.enter_other_taxes),
+            isError = hasInvalidField && receiptFields.taxes.isBlank()
+        )
+        CustomFloatField(
+            modifier = Modifier
+                .semantics { contentDescription = "Extras values" }
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .fillMaxWidth(),
+            value = receiptFields.extras,
+            onValueChange = receiptFields::updateExtras,
+            label = stringResource(id = R.string.extras),
+            placeholder = stringResource(id = R.string.enter_extras),
+            isError = hasInvalidField && receiptFields.extras.isBlank()
+        )
+
         CustomTextField(
             modifier = Modifier
                 .semantics { contentDescription = "Payment option" }
