@@ -15,6 +15,10 @@ internal data class ReceiptInternal(
     val customerName: String,
     val naturaPrice: Float,
     val amazonPrice: Float,
+    val amazonTax: Float,
+    val naturaPercentageGain: Float,
+    val taxes: Float,
+    val extras: Float,
     val paymentOption: String,
     val canceled: Boolean,
     val observations: String
@@ -29,6 +33,10 @@ internal fun ReceiptInternal.asExternal() = Receipt(
     customerName = customerName,
     naturaPrice = naturaPrice,
     amazonPrice = amazonPrice,
+    amazonTax = amazonTax,
+    naturaPercentageGain = naturaPercentageGain,
+    taxes = taxes,
+    extras = extras,
     paymentOption = paymentOption,
     canceled = canceled,
     observations = observations
@@ -43,6 +51,10 @@ internal fun Receipt.asInternal() = ReceiptInternal(
     customerName = customerName,
     naturaPrice = naturaPrice,
     amazonPrice = amazonPrice,
+    amazonTax = amazonTax,
+    naturaPercentageGain = naturaPercentageGain,
+    taxes = taxes,
+    extras = extras,
     paymentOption = paymentOption,
     canceled = canceled,
     observations = observations
