@@ -9,6 +9,10 @@ data class Receipt(
     val quantity: Int,
     val naturaPrice: Float,
     val amazonPrice: Float,
+    val amazonTax: Float,
+    val naturaPercentageGain: Float,
+    val taxes: Float,
+    val extras: Float,
     val paymentOption: String,
     val canceled: Boolean,
     val observations: String
@@ -23,6 +27,10 @@ data class Receipt(
             quantity = 0,
             naturaPrice = 0F,
             amazonPrice = 0F,
+            amazonTax = 0F,
+            naturaPercentageGain = 0F,
+            taxes = 0F,
+            extras = 0F,
             paymentOption = "",
             canceled = false,
             observations = ""

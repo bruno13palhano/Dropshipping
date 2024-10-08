@@ -23,6 +23,10 @@ class HomeUseCase @Inject constructor(
                     val financial = Financial(
                         amazonPrice = receipt.amazonPrice,
                         naturaPrice = receipt.naturaPrice,
+                        amazonTax = receipt.amazonTax,
+                        naturaPercentageGain = receipt.naturaPercentageGain,
+                        taxes = receipt.taxes,
+                        extras = receipt.extras
                     )
 
                     amazonProfit += financial.calculateAmazonProfit()
