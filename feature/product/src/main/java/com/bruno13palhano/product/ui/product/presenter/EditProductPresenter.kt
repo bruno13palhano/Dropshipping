@@ -2,6 +2,7 @@ package com.bruno13palhano.product.ui.product.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.data.repository.ProductRepository
@@ -19,6 +20,42 @@ internal fun editProductPresenter(
 ): EditProductState {
     val state = remember { mutableStateOf(EditProductState.INITIAL_STATE) }
 
+    HandleEvents(
+        events = events,
+        state = state,
+        reducer = reducer,
+        sendEffect = sendEffect
+    )
+
+    UpdateProduct(
+        update = state.value.update,
+        id = state.value.id,
+        productFields = productFields,
+        productRepository = productRepository
+    )
+
+    DeleteProduct(
+        delete = state.value.delete,
+        id = state.value.id,
+        productRepository = productRepository
+    )
+
+    SetCurrentProductState(
+        id = state.value.id,
+        productFields = productFields,
+        productRepository = productRepository
+    )
+
+    return state.value
+}
+
+@Composable
+private fun HandleEvents(
+    events: Flow<EditProductEvent>,
+    state: MutableState<EditProductState>,
+    reducer: Reducer<EditProductState, EditProductEvent, EditProductEffect>,
+    sendEffect: (effect: EditProductEffect) -> Unit
+) {
     LaunchedEffect(Unit) {
         events.collect { event ->
             reducer.reduce(previousState = state.value, event = event).let {
@@ -27,62 +64,42 @@ internal fun editProductPresenter(
             }
         }
     }
-
-    LaunchedEffect(state.value.update) {
-        if (state.value.update) {
-            updateProduct(
-                id = state.value.id,
-                productFields = productFields,
-                productRepository = productRepository
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.delete) {
-        if (state.value.delete) {
-            deleteProduct(
-                id = state.value.id,
-                productRepository = productRepository
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.id) {
-        if (state.value.id == 0L) return@LaunchedEffect
-
-        getProduct(
-            id = state.value.id,
-            productFields = productFields,
-            productRepository = productRepository
-        )
-    }
-
-    return state.value
 }
 
-private suspend fun updateProduct(
+@Composable
+private fun UpdateProduct(
+    update: Boolean,
     id: Long,
     productFields: ProductFields,
     productRepository: ProductRepository
 ) {
-    productRepository.update(data = productFields.toProduct(id = id))
+    LaunchedEffect(update) {
+        if (update) productRepository.update(data = productFields.toProduct(id = id))
+    }
 }
 
-private suspend fun deleteProduct(
+@Composable
+private fun DeleteProduct(
+    delete: Boolean,
     id: Long,
     productRepository: ProductRepository
 ) {
-    productRepository.delete(id = id)
+    LaunchedEffect(delete) {
+        if (delete) productRepository.delete(id = id)
+    }
 }
 
-private suspend fun getProduct(
+@Composable
+private fun SetCurrentProductState(
     id: Long,
     productFields: ProductFields,
     productRepository: ProductRepository
 ) {
-    productRepository.get(id = id)
-        .catch { it.printStackTrace() }
-        .collect {
-            productFields.setFields(product = it)
-        }
+    LaunchedEffect(id) {
+        if (id == 0L) return@LaunchedEffect
+
+        productRepository.get(id = id)
+            .catch { it.printStackTrace() }
+            .collect { productFields.setFields(product = it) }
+    }
 }

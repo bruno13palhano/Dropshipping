@@ -2,6 +2,7 @@ package com.bruno13palhano.receipt.ui.search.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.data.repository.CacheRepository
@@ -23,64 +24,94 @@ internal fun searchPresenter(
 ): SearchState {
     val state = remember { mutableStateOf(SearchState.INITIAL_STATE) }
 
+    HandleEvents(events = events, state = state, reducer = reducer, sendEffect = sendEffect)
+
+    InsertSearch(
+        insert = state.value.insert,
+        query = state.value.query,
+        cacheRepository = cacheRepository
+    )
+
+    DeleteSearch(
+        delete = state.value.delete,
+        query = state.value.query,
+        cacheRepository = cacheRepository
+    )
+
+    GetCache(cacheRepository = cacheRepository, sendEvent = sendEvent)
+
+    GetProducts(
+        query = state.value.query,
+        productRepository = productRepository,
+        sendEvent = sendEvent
+    )
+
+    return state.value
+}
+
+@Composable
+private fun HandleEvents(
+    events: Flow<SearchEvent>,
+    state: MutableState<SearchState>,
+    reducer: Reducer<SearchState, SearchEvent, SearchEffect>,
+    sendEffect: (effect: SearchEffect) -> Unit
+) {
     LaunchedEffect(Unit) {
         events.collect { event ->
-            reducer.reduce(event = event, previousState = state.value).let {
+            reducer.reduce(previousState = state.value, event = event).let {
                 state.value = it.first
                 it.second?.let { effect -> sendEffect(effect) }
             }
         }
     }
-
-    LaunchedEffect(state.value.insert) {
-        if (state.value.insert) {
-            cacheRepository.insert(Cache(query = state.value.query.trim()))
-        }
-    }
-
-    LaunchedEffect(state.value.delete) {
-        if (state.value.delete) {
-            cacheRepository.delete(query = state.value.query)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        getCache(cacheRepository = cacheRepository, sendEvent = sendEvent)
-    }
-
-    LaunchedEffect(state.value.query) {
-        getProducts(
-            query = state.value.query,
-            productRepository = productRepository,
-            sendEvent = sendEvent
-        )
-    }
-
-    return state.value
 }
 
-private suspend fun getCache(
+@Composable
+private fun InsertSearch(
+    insert: Boolean,
+    query: String,
     cacheRepository: CacheRepository,
-    sendEvent: (event: SearchEvent) -> Unit,
 ) {
-    cacheRepository.getAll()
-        .map { it.map { cache -> cache.query } }
-        .collect { sendEvent(SearchEvent.UpdateCache(cache = it)) }
+    LaunchedEffect(insert) { cacheRepository.insert(Cache(query = query.trim())) }
 }
 
-private suspend fun getProducts(
+@Composable
+private fun DeleteSearch(
+    delete: Boolean,
+    query: String,
+    cacheRepository: CacheRepository,
+) {
+    LaunchedEffect(delete) { cacheRepository.delete(query = query) }
+}
+
+@Composable
+private fun GetCache(
+    cacheRepository: CacheRepository,
+    sendEvent: (event: SearchEvent) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        cacheRepository.getAll()
+            .map { it.map { cache -> cache.query } }
+            .collect { sendEvent(SearchEvent.UpdateCache(cache = it)) }
+    }
+}
+
+@Composable
+private fun GetProducts(
     query: String,
     productRepository: ProductRepository,
     sendEvent: (event: SearchEvent) -> Unit
 ) {
-    productRepository.search(query)
-        .map { products ->
-            products.map { product ->
-                CommonItem(
-                    id = product.id,
-                    title = product.name
-                )
+    LaunchedEffect(query) {
+        productRepository.search(query)
+            .map { products ->
+                products.map { product ->
+                    CommonItem(
+                        id = product.id,
+                        title = product.name
+                    )
+                }
             }
-        }
-        .collect { sendEvent(SearchEvent.UpdateProducts(products = it)) }
+            .collect { sendEvent(SearchEvent.UpdateProducts(products = it)) }
+    }
 }

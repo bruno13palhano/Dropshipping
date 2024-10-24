@@ -2,6 +2,7 @@ package com.bruno13palhano.receipt.ui.receipt.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.data.repository.ReceiptRepository
@@ -22,6 +23,49 @@ internal fun editReceiptPresenter(
 ): EditReceiptState {
     val state = remember { mutableStateOf(EditReceiptState.INITIAL_STATE) }
 
+    HandleEvents(
+        events = events,
+        state = state,
+        reducer = reducer,
+        sendEffect = sendEffect
+    )
+
+    UpdateReceipt(
+        edit = state.value.edit,
+        receiptId = state.value.receipt.id,
+        receiptRepository = receiptRepository,
+        receiptFields = receiptFields,
+        product = state.value.receipt.product
+    )
+
+    CancelReceipt(
+        cancel = state.value.cancel,
+        receipt = state.value.receipt,
+        receiptRepository = receiptRepository
+    )
+
+    DeleteReceipt(
+        delete = state.value.delete,
+        receiptId = state.value.receipt.id,
+        receiptRepository = receiptRepository
+    )
+
+    SetCurrentReceiptState(
+        receiptId = state.value.receipt.id,
+        receiptRepository = receiptRepository,
+        sendEvent = sendEvent
+    )
+
+    return state.value
+}
+
+@Composable
+private fun HandleEvents(
+    events: Flow<EditReceiptEvent>,
+    state: MutableState<EditReceiptState>,
+    reducer: Reducer<EditReceiptState, EditReceiptEvent, EditReceiptEffect>,
+    sendEffect: (effect: EditReceiptEffect) -> Unit
+) {
     LaunchedEffect(Unit) {
         events.collect { event ->
             reducer.reduce(previousState = state.value, event = event).let {
@@ -30,85 +74,67 @@ internal fun editReceiptPresenter(
             }
         }
     }
-
-    LaunchedEffect(state.value.edit) {
-        if (state.value.edit) {
-            updateReceipt(
-                receiptId = state.value.receipt.id,
-                receiptRepository = receiptRepository,
-                receiptFields = receiptFields,
-                product = state.value.receipt.product
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.cancel) {
-        if (state.value.cancel) {
-            cancelReceipt(
-                receipt = state.value.receipt,
-                receiptRepository = receiptRepository
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.delete) {
-        if (state.value.delete) {
-            deleteReceipt(
-                receiptId = state.value.receipt.id,
-                receiptRepository = receiptRepository
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.receipt.id) {
-        if (state.value.receipt.id == 0L) return@LaunchedEffect
-
-        getReceipt(
-            receiptId = state.value.receipt.id,
-            receiptRepository = receiptRepository,
-            sendEvent = sendEvent
-        )
-    }
-
-    return state.value
 }
 
-private suspend fun updateReceipt(
+@Composable
+private fun UpdateReceipt(
+    edit: Boolean,
     receiptId: Long,
     receiptRepository: ReceiptRepository,
     receiptFields: ReceiptFields,
     product: Product
 ) {
-    receiptRepository.update(
-        data = receiptFields.toReceipt(
-            id = receiptId,
-            product = product
-        )
-    )
+    LaunchedEffect(edit) {
+        if (edit) {
+            receiptRepository.update(
+                data = receiptFields.toReceipt(
+                    id = receiptId,
+                    product = product
+                )
+            )
+        }
+    }
 }
 
-private suspend fun deleteReceipt(
-    receiptId: Long,
-    receiptRepository: ReceiptRepository
-) {
-    receiptRepository.delete(id = receiptId)
-}
-
-private suspend fun cancelReceipt(
+@Composable
+private fun CancelReceipt(
+    cancel: Boolean,
     receipt: Receipt,
     receiptRepository: ReceiptRepository
 ) {
-    receiptRepository.update(data = receipt.copy(canceled = true))
+    LaunchedEffect(cancel) {
+        if (cancel) {
+            receiptRepository.update(data = receipt.copy(canceled = true))
+        }
+    }
 }
 
-private suspend fun getReceipt(
+@Composable
+private fun DeleteReceipt(
+    delete: Boolean,
+    receiptId: Long,
+    receiptRepository: ReceiptRepository
+) {
+    LaunchedEffect(delete) {
+        if (delete) {
+            receiptRepository.delete(id = receiptId)
+        }
+    }
+}
+
+@Composable
+private fun SetCurrentReceiptState(
     receiptId: Long,
     receiptRepository: ReceiptRepository,
     sendEvent: (event: EditReceiptEvent) -> Unit
 ) {
-    receiptRepository.get(id = receiptId)
-        .catch { it.printStackTrace() }
-        .collect {
-            sendEvent(EditReceiptEvent.UpdateReceipt(receipt = it))
-        }
+    LaunchedEffect(receiptId) {
+        if (receiptId == 0L) return@LaunchedEffect
+
+        receiptRepository.get(id = receiptId)
+            .catch { it.printStackTrace() }
+            .collect {
+                sendEvent(EditReceiptEvent.UpdateReceipt(receipt = it))
+            }
+    }
 }

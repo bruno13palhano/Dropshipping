@@ -2,6 +2,7 @@ package com.bruno13palhano.receipt.ui.receipt.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.data.repository.ProductRepository
@@ -22,6 +23,36 @@ internal fun newReceiptPresenter(
 ): NewReceiptState {
     val state = remember { mutableStateOf(NewReceiptState.INITIAL_STATE) }
 
+    HandleEvents(
+        events = events,
+        state = state,
+        reducer = reducer,
+        sendEffect = sendEffect
+    )
+
+    InsertNewReceipt(
+        insert = state.value.insert,
+        receiptRepository = receiptRepository,
+        receiptFields = receiptFields,
+        product = state.value.product
+    )
+
+    GetProduct(
+        productId = state.value.product.id,
+        productRepository = productRepository,
+        sendEvent = sendEvent
+    )
+
+    return state.value
+}
+
+@Composable
+private fun HandleEvents(
+    events: Flow<NewReceiptEvent>,
+    state: MutableState<NewReceiptState>,
+    reducer: Reducer<NewReceiptState, NewReceiptEvent, NewReceiptEffect>,
+    sendEffect: (effect: NewReceiptEffect) -> Unit
+) {
     LaunchedEffect(Unit) {
         events.collect { event ->
             reducer.reduce(event = event, previousState = state.value).let {
@@ -30,44 +61,33 @@ internal fun newReceiptPresenter(
             }
         }
     }
-
-    LaunchedEffect(state.value.insert) {
-        if (state.value.insert) {
-            insertReceipt(
-                receiptRepository = receiptRepository,
-                receiptFields = receiptFields,
-                product = state.value.product
-            )
-        }
-    }
-
-    LaunchedEffect(state.value.product.id) {
-        if (state.value.product.id == 0L) return@LaunchedEffect
-
-        getProduct(
-            productId = state.value.product.id,
-            productRepository = productRepository,
-            sendEvent = sendEvent
-        )
-    }
-
-    return state.value
 }
 
-private suspend fun insertReceipt(
+@Composable
+private fun InsertNewReceipt(
+    insert: Boolean,
     receiptRepository: ReceiptRepository,
     receiptFields: ReceiptFields,
     product: Product
 ) {
-    receiptRepository.insert(data = receiptFields.toReceipt(product = product))
+    LaunchedEffect(insert) {
+        if (insert) {
+            receiptRepository.insert(data = receiptFields.toReceipt(product = product))
+        }
+    }
 }
 
-private suspend fun getProduct(
+@Composable
+private fun GetProduct(
     productId: Long,
     productRepository: ProductRepository,
     sendEvent: (event: NewReceiptEvent) -> Unit
 ) {
-    productRepository.get(id = productId).collect {
-        sendEvent(NewReceiptEvent.UpdateProduct(product = it))
+    LaunchedEffect(productId) {
+        if (productId == 0L) return@LaunchedEffect
+
+        productRepository.get(id = productId).collect {
+            sendEvent(NewReceiptEvent.UpdateProduct(product = it))
+        }
     }
 }

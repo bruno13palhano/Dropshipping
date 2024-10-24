@@ -2,6 +2,7 @@ package com.bruno13palhano.receipt.ui.receipts.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.model.Receipt
@@ -18,23 +19,36 @@ internal fun receiptsPresenter(
 ): ReceiptsState {
     val state = remember { mutableStateOf(ReceiptsState.INITIAL_STATE) }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            reducer.reduce(previousState = state.value, event = event).let {
-                state.value = it.first
-                it.second?.let{ effect -> sendEffect(effect) }
-            }
-        }
-    }
+    HandleEvents(events = events, state = state, reducer = reducer, sendEffect = sendEffect)
 
-    LaunchedEffect(Unit) { getReceipts(receipts = receipts, sendEvent = sendEvent) }
+    GetReceipts(receipts = receipts, sendEvent = sendEvent)
 
     return state.value
 }
 
-private suspend fun getReceipts(
+@Composable
+private fun HandleEvents(
+    events: Flow<ReceiptsEvent>,
+    state: MutableState<ReceiptsState>,
+    reducer: Reducer<ReceiptsState, ReceiptsEvent, ReceiptsEffect>,
+    sendEffect: (ReceiptsEffect) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            reducer.reduce(previousState = state.value, event = event).let {
+                state.value = it.first
+                it.second?.let { effect -> sendEffect(effect) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GetReceipts(
     receipts: Flow<List<Receipt>>,
     sendEvent: (event: ReceiptsEvent) -> Unit
 ) {
-    receipts.collect { sendEvent(ReceiptsEvent.UpdateReceipts(receipts = it)) }
+    LaunchedEffect(Unit) {
+        receipts.collect { sendEvent(ReceiptsEvent.UpdateReceipts(receipts = it)) }
+    }
 }
