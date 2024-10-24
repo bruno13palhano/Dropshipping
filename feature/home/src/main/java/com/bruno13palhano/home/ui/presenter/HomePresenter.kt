@@ -2,6 +2,7 @@ package com.bruno13palhano.home.ui.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.bruno13palhano.model.MostSaleItem
@@ -21,46 +22,55 @@ internal fun homePresenter(
 ): HomeState {
     val state = remember { mutableStateOf(HomeState.INITIAL_STATE) }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            reducer.reduce(event = event, previousState = state.value).let {
-                state.value = it.first
-            }
-        }
-    }
+    HandleEvents(events = events, state = state, reducer = reducer)
 
-    LaunchedEffect(Unit) {
-        getProfit(profit = profit, sendEvent = sendEvent)
-    }
+    GetProfit(profit = profit, sendEvent = sendEvent)
 
-    LaunchedEffect(Unit) {
-        getLastReceipts(lastReceipts = lastReceipts, sendEvent = sendEvent)
-    }
+    GetLastReceipts(lastReceipts = lastReceipts, sendEvent = sendEvent)
 
-    LaunchedEffect(Unit) {
-        getMostSales(mostSale = mostSale, sendEvent = sendEvent)
-    }
+    GetMostSales(mostSale = mostSale, sendEvent = sendEvent)
 
     return state.value
 }
 
-private suspend fun getProfit(
-    profit: Flow<Profit>,
-    sendEvent: (event: HomeEvent) -> Unit
+@Composable
+private fun HandleEvents(
+    events: Flow<HomeEvent>,
+    state: MutableState<HomeState>,
+    reducer: Reducer<HomeState, HomeEvent, HomeEffect>
 ) {
-    profit.collect { sendEvent(HomeEvent.UpdateProfit(profit = it)) }
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            reducer.reduce(previousState = state.value, event = event).let {
+                state.value = it.first
+            }
+        }
+    }
 }
 
-private suspend fun getLastReceipts(
+@Composable
+private fun GetProfit(profit: Flow<Profit>, sendEvent: (event: HomeEvent) -> Unit) {
+    LaunchedEffect(Unit) {
+        profit.collect { sendEvent(HomeEvent.UpdateProfit(profit = it)) }
+    }
+}
+
+@Composable
+private fun GetLastReceipts(
     lastReceipts: Flow<List<ReceiptItem>>,
     sendEvent: (event: HomeEvent) -> Unit
 ) {
-    lastReceipts.collect { sendEvent(HomeEvent.UpdateLastReceipts(receipts = it)) }
+    LaunchedEffect(Unit) {
+        lastReceipts.collect { sendEvent(HomeEvent.UpdateLastReceipts(receipts = it)) }
+    }
 }
 
-private suspend fun getMostSales(
+@Composable
+private fun GetMostSales(
     mostSale: Flow<List<MostSaleItem>>,
     sendEvent: (event: HomeEvent) -> Unit
 ) {
-    mostSale.collect { sendEvent(HomeEvent.UpdateMostSale(mostSale = it)) }
+    LaunchedEffect(Unit) {
+        mostSale.collect { sendEvent(HomeEvent.UpdateMostSale(mostSale = it)) }
+    }
 }
